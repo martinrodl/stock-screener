@@ -2,6 +2,7 @@ import React from "react";
 import { StockDetail } from "../types/StockDetail";
 import { IncomeStatement } from "../types/IncomeStatement";
 import { KeyMetrics } from "../types/KeyMetrics";
+import { formatBigNumber } from "../helpers/formatNumber";
 
 type DetailedMetricsTableProps = {
   stockDetail: StockDetail;
@@ -19,41 +20,45 @@ const DetailedMetricsTable: React.FC<DetailedMetricsTableProps> = ({
   };
 
   return (
-    <table className="min-w-full">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Net Income</th>
-          <th>Revenue</th>
-          <th>Debt</th>
-          <th>Dividend Yield</th>
-          <th>Profit Margin</th>
-        </tr>
-      </thead>
-      <tbody>
-        {stockDetail.incomeStatements.map((incomeStatement, index) => {
-          const keyMetrics = findKeyMetrics(incomeStatement);
-          const totalDebt =
-            stockDetail.balanceSheetStatements[index]?.shortTermDebt +
-            stockDetail.balanceSheetStatements[index]?.longTermDebt;
+    <div className="flex flex-col">
+      <div className="flex mb-2">
+        <div className="flex-1 font-bold w-32 text-center">Date</div>
+        <div className="flex-1 font-bold w-32 text-center">Net Income</div>
+        <div className="flex-1 font-bold w-32 text-center">Revenue</div>
+        <div className="flex-1 font-bold w-32 text-center">Debt</div>
+        <div className="flex-1 font-bold w-32 text-center">Dividend Yield</div>
+        <div className="flex-1 font-bold w-32 text-center">Profit Margin</div>
+      </div>
+      {stockDetail.incomeStatements.map((incomeStatement, index) => {
+        const keyMetrics = findKeyMetrics(incomeStatement);
+        const totalDebt =
+          stockDetail.balanceSheetStatements[index]?.shortTermDebt +
+          stockDetail.balanceSheetStatements[index]?.longTermDebt;
 
-          return (
-            <tr key={index}>
-              <td>{new Date(incomeStatement.date).toLocaleDateString()}</td>
-              <td>{incomeStatement.netIncome}</td>
-              <td>{incomeStatement.revenue}</td>
-              <td>{totalDebt}</td>
-              <td>{keyMetrics?.dividendYield}</td>
-              <td>
-                {(incomeStatement.netIncome / incomeStatement.revenue).toFixed(
-                  2
-                )}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+        return (
+          <div key={index} className="flex">
+            <div className="flex-1 w-32 text-center">
+              {new Date(incomeStatement.date).toLocaleDateString()}
+            </div>
+            <div className="flex-1 w-32 text-center">
+              {formatBigNumber(incomeStatement.netIncome)}
+            </div>
+            <div className="flex-1 w-32 text-center">
+              {formatBigNumber(incomeStatement.revenue)}
+            </div>
+            <div className="flex-1 w-32 text-center">
+              {formatBigNumber(totalDebt)}
+            </div>
+            <div className="flex-1 w-32 text-center">
+              {keyMetrics?.dividendYield}
+            </div>
+            <div className="flex-1 w-32 text-center">
+              {(incomeStatement.netIncome / incomeStatement.revenue).toFixed(2)}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 

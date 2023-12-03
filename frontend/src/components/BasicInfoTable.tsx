@@ -1,5 +1,5 @@
-// BasicInfoTable.tsx
 import React from "react";
+import { formatBigNumber } from "../helpers/formatNumber";
 
 interface BasicInfoProps {
   peRatio: number | null;
@@ -19,47 +19,31 @@ const BasicInfoTable: React.FC<BasicInfoProps> = ({
   interestCoverage,
 }) => {
   return (
-    <div className="overflow-x-auto">
-      <table className="table-auto w-full text-left whitespace-no-wrap">
-        <tbody>
-          <tr>
-            <td className="px-4 py-2 border">P/E Ratio</td>
-            <td className="px-4 py-2 border">
-              {peRatio ? peRatio.toFixed(2) : "N/A"}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-4 py-2 border">Market Cap</td>
-            <td className="px-4 py-2 border">
-              {marketCap ? `$${marketCap.toLocaleString()}` : "N/A"}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-4 py-2 border">ROIC</td>
-            <td className="px-4 py-2 border">
-              {roic ? `${(roic * 100).toFixed(2)}%` : "N/A"}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-4 py-2 border">ROE</td>
-            <td className="px-4 py-2 border">
-              {roe ? `${(roe * 100).toFixed(2)}%` : "N/A"}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-4 py-2 border">Debt to Equity</td>
-            <td className="px-4 py-2 border">
-              {debtToEquity ? debtToEquity.toFixed(2) : "N/A"}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-4 py-2 border">Interest Coverage</td>
-            <td className="px-4 py-2 border">
-              {interestCoverage ? interestCoverage.toFixed(2) : "N/A"}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div className="flex flex-col space-y-5 border p-3 rounded-md min-w-[220px] max-w-lg">
+      <div className="flex justify-between border-b py-2">
+        <span>P/E Ratio:</span>
+        <span>{peRatio ? peRatio.toFixed(2) : "N/A"}</span>
+      </div>
+      <div className="flex justify-between border-b py-2">
+        <span>Market Cap:</span>
+        <span>{marketCap ? formatBigNumber(marketCap) : "N/A"}</span>
+      </div>
+      <div className="flex justify-between border-b py-2">
+        <span>ROIC:</span>
+        <span>{roic ? `${(roic * 100).toFixed(2)}%` : "N/A"}</span>
+      </div>
+      <div className="flex justify-between border-b py-2">
+        <span>ROE:</span>
+        <span>{roe ? `${(roe * 100).toFixed(2)}%` : "N/A"}</span>
+      </div>
+      <div className="flex justify-between border-b py-2">
+        <span>Debt to Equity:</span>
+        <span>{debtToEquity ? debtToEquity.toFixed(2) : "N/A"}</span>
+      </div>
+      <div className="flex justify-between border-b py-2">
+        <span>Interest Coverage:</span>
+        <span>{interestCoverage ? interestCoverage.toFixed(2) : "N/A"}</span>
+      </div>
     </div>
   );
 };
