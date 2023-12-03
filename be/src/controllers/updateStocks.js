@@ -11,8 +11,9 @@ import {
 } from "../utils/stockUtils.js";
 
 export const launchSaveStockList = async (req, res) => {
+  const { exchange } = req.body;
   try {
-    await saveStockList("NASDAQ");
+    await saveStockList(exchange);
     res.sendStatus(201);
   } catch (error) {
     res.status(500).send(error.message);

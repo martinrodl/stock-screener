@@ -37,7 +37,12 @@ export const filterStocks = async (req, res) => {
       }),
     };
 
-    let stocks = await Stock.find(query).skip(offset).limit(limit);
+    let stocks = await Stock.find(
+      query,
+      "symbol name exchange peRatio price marketCap"
+    )
+      .skip(offset)
+      .limit(limit);
 
     // Filtering with additional conditions
     let filteredStocks = [];

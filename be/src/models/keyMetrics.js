@@ -66,7 +66,7 @@ const keyMetricsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-keyMetricsSchema.index({ symbol: 1, date: 1 }, { unique: true });
+// keyMetricsSchema.index({ symbol: 1, date: 1 }, { unique: true });
 
 const KeyMetrics = mongoose.model("KeyMetrics", keyMetricsSchema);
 

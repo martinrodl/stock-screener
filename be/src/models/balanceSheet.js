@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const balanceSheetSchema = new mongoose.Schema(
   {
-    date: { type: Date, required: true },
-    symbol: { type: String, required: true },
+    date: String,
     reportedCurrency: String,
     cik: String,
     fillingDate: Date,
@@ -60,7 +59,7 @@ const balanceSheetSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-balanceSheetSchema.index({ date: 1, symbol: 1 }, { unique: true });
+// balanceSheetSchema.index({ date: 1, symbol: 1 }, { unique: true });
 
 const BalanceSheet = mongoose.model("BalanceSheet", balanceSheetSchema);
 

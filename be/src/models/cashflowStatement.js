@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const cashFlowStatementSchema = new mongoose.Schema(
   {
-    date: { type: Date, required: true },
-    symbol: { type: String, required: true },
+    date: String,
     reportedCurrency: String,
     cik: String,
     fillingDate: Date,
@@ -46,7 +45,7 @@ const cashFlowStatementSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-cashFlowStatementSchema.index({ date: 1, symbol: 1 }, { unique: true });
+// cashFlowStatementSchema.index({ date: 1, symbol: 1 }, { unique: true });
 
 const CashFlowStatement = mongoose.model(
   "CashFlowStatement",

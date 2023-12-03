@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const incomeGrowthSchema = new mongoose.Schema(
   {
-    date: { type: Date, required: true },
-    symbol: { type: String, required: true },
+    date: String,
     calendarYear: String,
     period: String,
     growthRevenue: Number,
@@ -36,7 +35,7 @@ const incomeGrowthSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-incomeGrowthSchema.index({ date: 1, symbol: 1 }, { unique: true });
+// incomeGrowthSchema.index({ date: 1, symbol: 1 }, { unique: true });
 
 const ProfitGrowth = mongoose.model("IncomeGrowth", incomeGrowthSchema);
 
