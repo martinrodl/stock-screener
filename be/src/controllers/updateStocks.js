@@ -10,15 +10,6 @@ import {
   updateAllStocksSubdocuments,
 } from "../utils/stockUtils.js";
 
-export const getAllStocks = async (req, res) => {
-  try {
-    const stocks = await Stock.find({});
-    res.json(stocks);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
 export const launchSaveStockList = async (req, res) => {
   try {
     await saveStockList("NASDAQ");
