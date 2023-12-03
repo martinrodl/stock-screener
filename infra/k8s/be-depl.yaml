@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: be-depl
+  name: stocks-be-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: be
+      app: stocks-be
   template:
     metadata:
       labels:
-        app: be
+        app: stocks-be
     spec:
       containers:
         - name: be
-          image: mrodl/stocks-be
+          image: mrodl/stocks-be:latest
           resources:
             limits:
               memory: 516Mi
@@ -24,10 +24,15 @@ spec:
               cpu: "0.1"
           env:
             - name: MONGO_URI
-              value: "mongodb://be-mongo-srv:27017/stocks"
+              value: "mongodb://stocks-mongo-srv:27017/stocks"
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fmp-secret
+                  key: FMP_KEY            
           livenessProbe:
             httpGet:
-              path: /status
+              path: /be-stocks/api/status
               port: 3000
             initialDelaySeconds: 240
             periodSeconds: 60
@@ -35,13 +40,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: be-srv
+  name: stocks-be-srv
 spec:
   type: NodePort
   selector:
-    app: be
+    app: stocks-be
   ports:
-    - name: be
+    - name: stocks-be
       protocol: TCP
       port: 3000
       targetPort: 3000

@@ -8,12 +8,17 @@ import "dotenv/config";
 
 const app = express();
 
+
+if (!process.env.API_KEY) {
+    throw new Error("API_KEY must be defined");
+}
+
 if (!process.env.MONGO_URI) {
   throw new Error("Mongo URI must be defined");
 }
 
 try {
-  await mongoose.connect("mongodb://localhost/stockDB");
+  await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to mongoDB", process.env.MONGO_URI);
 } catch (err) {
   console.log(err);
@@ -29,7 +34,8 @@ app.use(helmet());
 app.use(morgan("combined"));
 
 app.use(express.json());
-app.use("/api", router);
+console.log("*")
+app.use("/be-stocks/api", router);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");

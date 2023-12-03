@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: stocks-mongo
+  name: stocks-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stocks-mongo
+  template:
+    metadata:
+      labels:
+        app: stocks-mongo
+    spec:
+      securityContext:
+        fsGroup: 999
+      containers:
+      - image: mongo
+        name: stocks-mongo
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: "0.4"
+          requests:
+            memory: 128Mi
+            cpu: "0.1"
+        args: ["--dbpath", "/data/stocksdb"]
+        volumeMounts:
+        - name: "mongo-data-dir"
+          mountPath: "/data/stocksdb"
+        securityContext:
+          runAsUser: 999
+      volumes:
+      - name: "mongo-data-dir"
+        persistentVolumeClaim:
+          claimName: "stock-pvc"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: stocks-mongo
+  name: stocks-mongo-srv
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+    nodePort: 32001
+  selector:
+    app: stocks-mongo
+  type: NodePort
