@@ -64,7 +64,7 @@ const Sidebar: React.FC = () => {
                     !isSidebarVisible && 'opacity-0'
                 }`}
             >
-                My App
+                Stock Screener - V1
             </h1>
             <nav>
                 <ul>
