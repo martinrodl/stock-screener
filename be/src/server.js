@@ -1,58 +1,56 @@
-import express from "express";
-import mongoose from "mongoose";
-import router from "./routes/index.js";
-import cors from "cors";
-import helmet from "helmet";
-import morgan from "morgan";
-import "dotenv/config";
+import express from 'express'
+import mongoose from 'mongoose'
+import router from './routes/index.js'
+import cors from 'cors'
+import helmet from 'helmet'
+import morgan from 'morgan'
+import 'dotenv/config'
 
-const app = express();
-
+const app = express()
 
 if (!process.env.API_KEY) {
-    throw new Error("API_KEY must be defined");
+    throw new Error('API_KEY must be defined')
 }
 
 if (!process.env.MONGO_URI) {
-  throw new Error("Mongo URI must be defined");
+    throw new Error('Mongo URI must be defined')
 }
 
 try {
-  await mongoose.connect(process.env.MONGO_URI);
-  console.log("Connected to mongoDB", process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI)
+    console.log('Connected to mongoDB', process.env.MONGO_URI)
 } catch (err) {
-  console.log(err);
+    console.log(err)
 }
 
 app.use(
-  cors({
-    origin: "*",
-  })
-);
+    cors({
+        origin: '*',
+    })
+)
 
-app.use(helmet());
-app.use(morgan("combined"));
+app.use(helmet())
+app.use(morgan('combined'))
 
-app.use(express.json());
-console.log("*")
-app.use("/be-stocks/api", router);
+app.use(express.json())
+app.use('/be-stocks/api', router)
 
 app.use((req, res, next) => {
-  const error = new Error("Not Found");
-  error.status = 404;
-  next(error);
-});
+    const error = new Error('Not Found')
+    error.status = 404
+    next(error)
+})
 
 // Not found handler
 app.use((error, req, res, next) => {
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: error.message,
-    },
-  });
-});
+    res.status(error.status || 500)
+    res.json({
+        error: {
+            message: error.message,
+        },
+    })
+})
 
 app.listen(process.env.PORT ?? 3000, () => {
-  console.log(`Server is running on port ${process.env.PORT ?? 3000}`);
-});
+    console.log(`Server is running on port ${process.env.PORT ?? 3000}`)
+})

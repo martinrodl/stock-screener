@@ -1,73 +1,60 @@
-// BarChart.tsx
-import React from "react";
-import { Bar } from "react-chartjs-2";
+import React from 'react'
+import { Bar } from 'react-chartjs-2'
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { StockDetail } from "../types/StockDetail";
-import { CashflowStatement } from "../types/CashflowStatement";
-import { GrowthCashflowMetrics } from "../types/CashflowGrowthMetrics";
-import { GrowthIncomeMetrics } from "../types/GrowthIncomeMetrics";
-import { KeyMetrics } from "../types/KeyMetrics";
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js'
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-// Extract valid property names from CashflowStatement type
-type propertiesProps =
-  | keyof CashflowStatement
-  | keyof GrowthCashflowMetrics
-  | keyof GrowthIncomeMetrics
-  | keyof KeyMetrics;
-
-interface BarChartProps {
-  stock: StockDetail;
-  properties: propertiesProps[];
+interface DataPoint {
+    [key: string]: number | string
 }
 
-const BarChart: React.FC<BarChartProps> = ({ stock, properties }) => {
-  // Assuming you want to aggregate the values of the same property across all CashflowStatements
-  const labels = properties;
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Cashflow Metrics",
-        data: labels.map((prop) =>
-          stock.cashflowStatements.reduce(
-            (acc, statement) => acc + (statement[prop] || 0),
-            0
-          )
-        ),
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
-        borderColor: "rgba(54, 162, 235, 1)",
+const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+
+interface BarChartProps {
+    mergedDatasets: DataPoint[]
+    maxValue?: number // Optional prop for setting a maximum value
+}
+
+const BarChart: React.FC<BarChartProps> = ({ mergedDatasets, maxValue }) => {
+    // Function to cap values at the maxValue
+    const capValue = (value: number) =>
+        maxValue !== undefined && value > maxValue ? maxValue : value
+
+    // Extract property keys (excluding 'date')
+    const propertyKeys = Object.keys(mergedDatasets[0]).filter((key) => key !== 'date')
+
+    // Create datasets for each property, capping values if maxValue is set
+    const datasets = propertyKeys.map((property, index) => ({
+        label: property,
+        data: mergedDatasets.map((dataPoint) => capValue(dataPoint[property] as number)),
+        backgroundColor: colors[index % colors.length],
+        borderColor: colors[index % colors.length],
         borderWidth: 1,
-      },
-    ],
-  };
+    }))
 
-  const options = {
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-    maintainAspectRatio: false,
-  };
+    const data = {
+        labels: mergedDatasets.map((dataPoint) => dataPoint.date.toString()),
+        datasets,
+    }
 
-  return <Bar data={data} options={options} />;
-};
+    const options = {
+        scales: {
+            y: {
+                beginAtZero: true,
+            },
+        },
+        maintainAspectRatio: false,
+    }
 
-export default BarChart;
+    return <Bar data={data} options={options} />
+}
+
+export default BarChart
