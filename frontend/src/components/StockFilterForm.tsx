@@ -1,12 +1,15 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { useDispatch } from 'react-redux'
 
 import { StockCriteria } from '../types/StockCriteria'
 import { filteredCriteria } from '../helpers/filteredCriteria'
+import { setCriteria } from '../store/stockSlice'
 
 // Props type
 interface StockFilterFormProps {
     onSubmit: (formState: StockCriteria) => void
+    savedStockCriteria: StockCriteria
 }
 
 // Tooltip information for each metric
@@ -17,30 +20,32 @@ const tooltips: { [key: string]: string } = {
         'Number of years to consider for criteria \n positiveProfitYears \n positiveOperatingCashFlowYears \n positiveFreeCashFlowYears \n positiveDividendGrowthYears',
 }
 
-const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit }) => {
+const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockCriteria }) => {
+    const dispatch = useDispatch()
     const [formState, setFormState] = useState<StockCriteria>({
-        marketCapMax: '',
-        peRatioMin: '',
-        peRatioMax: '',
-        dividendYieldMin: '',
-        dividendYieldMax: '',
-        roicMin: '',
-        roicMax: '',
-        roeMin: '',
-        roeMax: '',
-        solvencyMin: '',
-        solvencyMax: '',
-        debtToEquityMin: '',
-        debtToEquityMax: '',
-        interestCoverageMin: '',
-        interestCoverageMax: '',
-        positiveProfitYears: '',
-        profitGrowthMin: '',
-        revenueGrowthMin: '',
-        positiveOperatingCashFlowYears: '',
-        positiveFreeCashFlowYears: '',
-        positiveDividendGrowthYears: '',
-        numberYears: '',
+        marketCapMax: savedStockCriteria?.marketCapMax ?? '',
+        marketCapMin: savedStockCriteria?.marketCapMin ?? '',
+        peRatioMin: savedStockCriteria?.peRatioMin ?? '',
+        peRatioMax: savedStockCriteria?.peRatioMax ?? '',
+        dividendYieldMin: savedStockCriteria?.dividendYieldMin ?? '',
+        dividendYieldMax: savedStockCriteria?.dividendYieldMax ?? '',
+        roicMin: savedStockCriteria?.roicMin ?? '',
+        roicMax: savedStockCriteria?.roicMax ?? '',
+        roeMin: savedStockCriteria?.roeMin ?? '',
+        roeMax: savedStockCriteria?.roeMax ?? '',
+        solvencyMin: savedStockCriteria?.solvencyMin ?? '',
+        solvencyMax: savedStockCriteria?.solvencyMax ?? '',
+        debtToEquityMin: savedStockCriteria?.debtToEquityMin ?? '',
+        debtToEquityMax: savedStockCriteria?.debtToEquityMax ?? '',
+        interestCoverageMin: savedStockCriteria?.interestCoverageMin ?? '',
+        interestCoverageMax: savedStockCriteria?.interestCoverageMax ?? '',
+        positiveProfitYears: savedStockCriteria?.positiveProfitYears ?? '',
+        profitGrowthMin: savedStockCriteria?.profitGrowthMin ?? '',
+        revenueGrowthMin: savedStockCriteria?.revenueGrowthMin ?? '',
+        positiveOperatingCashFlowYears: savedStockCriteria?.positiveOperatingCashFlowYears ?? '',
+        positiveFreeCashFlowYears: savedStockCriteria?.positiveFreeCashFlowYears ?? '',
+        positiveDividendGrowthYears: savedStockCriteria?.positiveDividendGrowthYears ?? '',
+        numberYears: savedStockCriteria?.numberYears ?? '',
     })
     const [isFormVisible, setIsFormVisible] = useState(true)
 
@@ -51,6 +56,7 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit }) => {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         onSubmit(filteredCriteria(formState))
+        dispatch(setCriteria(filteredCriteria(formState)))
     }
 
     const toggleFormVisibility = () => {
@@ -66,9 +72,9 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit }) => {
                 {isFormVisible ? 'Hide Form' : 'Show Form'}
             </button>
             {isFormVisible && (
-                <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4">
+                <form onSubmit={handleSubmit} className="md:max-w-xl max-w-xs x-auto p-4">
                     {/* Input fields with labels and tooltips */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-3">
                         {Object.entries(formState).map(([key, value]) => (
                             <div key={key} className="grid grid-rows-2">
                                 <label

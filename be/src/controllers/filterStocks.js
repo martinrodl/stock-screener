@@ -1,4 +1,5 @@
 import Stock from '../models/stockModel.js'
+import { addCondition } from '../helpers/helperCondition.js'
 
 export const filterStocks = async (req, res) => {
     try {
@@ -26,30 +27,26 @@ export const filterStocks = async (req, res) => {
             positiveDividendGrowthYears,
             numberYears = 3,
             limit = 100, // Default limit
-            offset = 0, // Default offset
+            skip = 0, // Default offset
         } = req.body
 
+        const andConditions = []
+
+        addCondition(andConditions, 'peRatio', peRatioMin, peRatioMax)
+        addCondition(andConditions, 'marketCap', marketCapMin, marketCapMax)
+        addCondition(andConditions, 'keyMetrics.dividendYield', dividendYieldMin, dividendYieldMax)
+        addCondition(andConditions, 'keyMetrics.roic', roicMin, roicMax)
+        addCondition(andConditions, 'keyMetrics.roe', roeMin, roeMax)
+        addCondition(andConditions, 'keyMetrics.solvencyRatio', solvencyMin, solvencyMax)
+        addCondition(andConditions, 'keyMetrics.debtToEquity', debtToEquityMin, debtToEquityMax)
+        addCondition(
+            andConditions,
+            'keyMetrics.interestCoverage',
+            interestCoverageMin,
+            interestCoverageMax
+        )
+
         let aggregationPipeline = [
-            {
-                $match: {
-                    $and: [
-                        { peRatio: { $gte: 0 } },
-                        ...(peRatioMin !== undefined
-                            ? [{ peRatio: { $gte: parseFloat(peRatioMin) } }]
-                            : []),
-                        ...(peRatioMax !== undefined
-                            ? [{ peRatio: { $lte: parseFloat(peRatioMax) } }]
-                            : []),
-                        ...(marketCapMin
-                            ? [{ marketCap: { $gte: parseFloat(marketCapMin) } }]
-                            : []),
-                        ...(marketCapMax
-                            ? [{ marketCap: { $lte: parseFloat(marketCapMax) } }]
-                            : []),
-                        // ... other conditions
-                    ],
-                },
-            },
             { $unwind: { path: '$keyMetrics', preserveNullAndEmptyArrays: true } },
             { $sort: { 'keyMetrics.date': -1 } },
             {
@@ -65,43 +62,17 @@ export const filterStocks = async (req, res) => {
                 },
             },
             {
-                // Additional match for fields within the latest keyMetrics entry
-                $match: {
-                    ...(dividendYieldMin && {
-                        'keyMetrics.dividendYield': { $gte: parseFloat(dividendYieldMin) },
-                    }),
-                    ...(dividendYieldMax && {
-                        'keyMetrics.dividendYield': { $lte: parseFloat(dividendYieldMax) },
-                    }),
-                    ...(roicMin && { 'keyMetrics.roic': { $gte: parseFloat(roicMin) } }),
-                    ...(roicMax && { 'keyMetrics.roic': { $lte: parseFloat(roicMax) } }),
-                    ...(roeMin && { 'keyMetrics.roe': { $gte: parseFloat(roeMin) } }),
-                    ...(roeMax && { 'keyMetrics.roe': { $lte: parseFloat(roeMax) } }),
-                    ...(solvencyMin && {
-                        'keyMetrics.solvencyRatio': { $gte: parseFloat(solvencyMin) },
-                    }),
-                    ...(solvencyMax && {
-                        'keyMetrics.solvencyRatio': { $lte: parseFloat(solvencyMax) },
-                    }),
-                    ...(debtToEquityMin && {
-                        'keyMetrics.debtToEquity': { $gte: parseFloat(debtToEquityMin) },
-                    }),
-                    ...(debtToEquityMax && {
-                        'keyMetrics.debtToEquity': { $lte: parseFloat(debtToEquityMax) },
-                    }),
-                    ...(interestCoverageMin && {
-                        'keyMetrics.interestCoverage': { $gte: parseFloat(interestCoverageMin) },
-                    }),
-                    ...(interestCoverageMax && {
-                        'keyMetrics.interestCoverage': { $lte: parseFloat(interestCoverageMax) },
-                    }),
+                $match: andConditions.length > 0 ? { $and: andConditions } : {},
+            },
 
-                    // ... add other filters based on the latest keyMetrics entry
+            {
+                $sort: {
+                    symbol: 1, // Sort by symbol in ascending order
                 },
             },
         ]
 
-        let stocks = await Stock.aggregate(aggregationPipeline)
+        let stocks = await Stock.aggregate(aggregationPipeline).allowDiskUse(true)
 
         let filteredStocks = stocks
             .filter((stock) => {
@@ -157,7 +128,7 @@ export const filterStocks = async (req, res) => {
 
                 return isEligible
             })
-            .slice(offset, offset + limit)
+            .slice(skip, skip + limit)
 
         res.json(filteredStocks)
     } catch (error) {
