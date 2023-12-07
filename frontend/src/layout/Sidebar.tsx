@@ -15,27 +15,27 @@ const pages = [
     {
         key: 'graham-number-screener',
         title: 'Graham Number Screener',
-        path: '/graham-number-screener',
+        path: '/',
     },
     {
         key: 'graham-rules-screener',
         title: 'Graham Rules Screener',
-        path: '/graham-rules-screener',
+        path: '/',
     },
     {
         key: 'my-portfolio',
         title: 'My Portfolio',
-        path: '/my-portfolio',
+        path: '/',
     },
     {
         key: 'long-term-recommendation',
         title: 'Long Term Recommendation',
-        path: '/long-term-recommendation',
+        path: '/',
     },
     {
         key: 'short-or-quick-buy',
         title: 'Short or Quick Buy',
-        path: '/short-or-quick-buy',
+        path: '/',
     },
 ]
 
@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
 
     return (
         <div
-            className={`fixed top-0 left-0 h-screen bg-gray-800 text-white p-5 transition-width duration-300 ${
+            className={`top-0 left-0 h-screen bg-gray-800 text-white p-5 transition-width duration-300 ${
                 isSidebarVisible ? 'w-64' : 'w-24'
             }`}
         >
@@ -64,7 +64,7 @@ const Sidebar: React.FC = () => {
                     !isSidebarVisible && 'opacity-0'
                 }`}
             >
-                Stock Screener - V1
+                Stock Screener - V1.0.1
             </h1>
             <nav>
                 <ul>
