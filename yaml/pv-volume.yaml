@@ -1,26 +1,26 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: stock-pv
-  labels:
-    type: local
+    name: stock-pv
+    labels:
+        type: local
 spec:
-  storageClassName: manual
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /data/stocksdb
+    storageClassName: manual
+    capacity:
+        storage: 2Gi
+    accessModes:
+        - ReadWriteOnce
+    hostPath:
+        path: /data/stocksdb
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: stock-pvc
+    name: stock-pvc
 spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 500Mi
+    storageClassName: manual
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 2Gi
