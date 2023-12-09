@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import BarChart from '../components/BarChart'
-import StackedBarChart from '../components/StackedBarChart'
 import BasicInfoTable from '../components/BasicInfoTable'
 import DetailMetricsTable from '../components/DetailMetricsTable'
 import { useGetStockDetailQuery } from '../services/stockApi'
@@ -60,23 +59,27 @@ const StockDetails = () => {
             </div>
             <div className="mb-4">
                 <BasicInfoTable
-                    marketCap={stock.marketCap}
-                    peRatio={stock.peRatio}
+                    marketCap={stock.values.marketCap}
+                    peRatio={stock.values.peRatio}
                     roic={stock.keyMetrics[0]?.roic || NaN}
                     roe={stock.keyMetrics[0]?.roe || NaN}
                     debtToEquity={stock.keyMetrics[0]?.debtToEquity || NaN}
-                    interestCoverage={stock.keyMetrics[0]?.interestCoverage || NaN}
+                    dateMetrics={stock.keyMetrics[0]?.date}
+                    price={stock.values.price}
+                    dcf={stock.values.dcf}
+                    intrinsicValue={stock.values.intrinsicValue}
+                    date={stock.values.date}
                 />
             </div>
 
             <DetailMetricsTable stockDetail={stock} />
 
-            <div className="my-4 flex flex-col gap-y-5">
-                <h2 className="text-lg font-semibold">Growth Metrics Graph</h2>
-                <div className="max-h-80">
+            <div className="my-4 flex flex-col gap-y-10">
+                <h1 className="text-lg font-semibold text-center">Growth Metrics Graph</h1>
+                <div className="h-[300px] w-[500px]">
                     {stock && datasets.length > 0 && <BarChart mergedDatasets={datasets} />}
                 </div>
-                <div className="max-h-80">
+                <div className="h-[300px] w-[500px]">
                     {stock && datasets.length > 0 && (
                         <BarChart mergedDatasets={datasets2} maxValue={1} />
                     )}

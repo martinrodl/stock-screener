@@ -2,7 +2,7 @@ import os from 'os'
 
 export const getStatus = (req, res) => {
     res.json({
-        version: '1.0.0',
+        version: '1.0.2',
         freeMemory: os.freemem(),
         totalMemory: os.totalmem(),
         cpuLoad: os.loadavg(),

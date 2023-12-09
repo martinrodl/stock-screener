@@ -14,8 +14,6 @@ export const filterStocks = async (req, res) => {
             roicMax,
             roeMin,
             roeMax,
-            solvencyMin,
-            solvencyMax,
             debtToEquityMin,
             debtToEquityMax,
             interestCoverageMin,
@@ -25,19 +23,21 @@ export const filterStocks = async (req, res) => {
             positiveOperatingCashFlowYears,
             positiveFreeCashFlowYears,
             positiveDividendGrowthYears,
+            priceToIntrinsicValueRatioMax,
+            priceToDiscountedCashFlowRatioMax,
             numberYears = 3,
             limit = 100, // Default limit
             skip = 0, // Default offset
         } = req.body
 
         const andConditions = []
+        console.log('*')
 
-        addCondition(andConditions, 'peRatio', peRatioMin, peRatioMax)
-        addCondition(andConditions, 'marketCap', marketCapMin, marketCapMax)
+        addCondition(andConditions, 'values.peRatio', peRatioMin, peRatioMax)
+        addCondition(andConditions, 'values.marketCap', marketCapMin, marketCapMax)
         addCondition(andConditions, 'keyMetrics.dividendYield', dividendYieldMin, dividendYieldMax)
         addCondition(andConditions, 'keyMetrics.roic', roicMin, roicMax)
         addCondition(andConditions, 'keyMetrics.roe', roeMin, roeMax)
-        addCondition(andConditions, 'keyMetrics.solvencyRatio', solvencyMin, solvencyMax)
         addCondition(andConditions, 'keyMetrics.debtToEquity', debtToEquityMin, debtToEquityMax)
         addCondition(
             andConditions,
@@ -71,8 +71,8 @@ export const filterStocks = async (req, res) => {
                 },
             },
         ]
-
         let stocks = await Stock.aggregate(aggregationPipeline).allowDiskUse(true)
+        console.log('stocks', stocks.length)
 
         let filteredStocks = stocks
             .filter((stock) => {
@@ -83,7 +83,7 @@ export const filterStocks = async (req, res) => {
                     isEligible =
                         isEligible &&
                         stock.growthIncomeMetrics
-                            .slice(-numberYears)
+                            ?.slice(-numberYears)
                             .every((year) => year.growthRevenue >= revenueGrowthMin)
                 }
 
@@ -92,7 +92,7 @@ export const filterStocks = async (req, res) => {
                     isEligible =
                         isEligible &&
                         stock.cashflowStatement
-                            .slice(-numberYears)
+                            ?.slice(-numberYears)
                             .filter((year) => year.operatingCashFlow > 0).length >=
                             positiveOperatingCashFlowYears
                 }
@@ -102,7 +102,7 @@ export const filterStocks = async (req, res) => {
                     isEligible =
                         isEligible &&
                         stock.cashflowStatement
-                            .slice(-numberYears)
+                            ?.slice(-numberYears)
                             .filter((year) => year.freeCashFlow > 0).length >=
                             positiveFreeCashFlowYears
                 }
@@ -112,7 +112,7 @@ export const filterStocks = async (req, res) => {
                     isEligible =
                         isEligible &&
                         stock.growthProfitMetrics
-                            .slice(-numberYears)
+                            ?.slice(-numberYears)
                             .every((year) => year.growthNetIncome >= profitGrowthMin)
                 }
 
@@ -121,14 +121,33 @@ export const filterStocks = async (req, res) => {
                     isEligible =
                         isEligible &&
                         stock.cashflowStatement
-                            .slice(-numberYears)
+                            ?.slice(-numberYears)
                             .filter((year) => year.dividendsPaid < year.previousYearDividendsPaid)
                             .length >= positiveDividendGrowthYears
+                }
+
+                if (priceToIntrinsicValueRatioMax && stock.values.intrinsicValue) {
+                    const priceToIntrinsicValueRatio =
+                        stock.values.price / stock.values.intrinsicValue
+                    isEligible =
+                        isEligible && priceToIntrinsicValueRatio <= priceToIntrinsicValueRatioMax
+                }
+
+                // Calculate and check price to discounted cash flow ratio
+                if (priceToDiscountedCashFlowRatioMax && stock.values.dcf) {
+                    const priceToDcfRatio = stock.values.price / stock.values.dcf
+                    isEligible = isEligible && priceToDcfRatio <= priceToDiscountedCashFlowRatioMax
                 }
 
                 return isEligible
             })
             .slice(skip, skip + limit)
+            .map((stock) => ({
+                symbol: stock.symbol,
+                name: stock.name,
+                marketCap: stock.values.marketCap,
+                peRatio: stock.values.peRatio,
+            }))
 
         res.json(filteredStocks)
     } catch (error) {

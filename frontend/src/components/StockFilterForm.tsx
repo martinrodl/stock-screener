@@ -6,7 +6,18 @@ import { StockCriteria } from '../types/StockCriteria'
 import { filteredCriteria } from '../helpers/filteredCriteria'
 import { setCriteria } from '../store/stockSlice'
 
-// Props type
+const marketCapOptions = [
+    { label: '0', value: 0 },
+    { label: '10M', value: 10000000 },
+    { label: '50M', value: 50000000 },
+    { label: '100M', value: 100000000 },
+    { label: '500M', value: 500000000 },
+    { label: '1B', value: 1000000000 },
+    { label: '5B', value: 5000000000 },
+    { label: '10B', value: 100000000000 },
+    { label: '50B', value: 50000000000 },
+    { label: '100B', value: 100000000000 },
+]
 interface StockFilterFormProps {
     onSubmit: (formState: StockCriteria) => void
     savedStockCriteria: StockCriteria
@@ -33,12 +44,13 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
         roicMax: savedStockCriteria?.roicMax ?? '',
         roeMin: savedStockCriteria?.roeMin ?? '',
         roeMax: savedStockCriteria?.roeMax ?? '',
-        solvencyMin: savedStockCriteria?.solvencyMin ?? '',
-        solvencyMax: savedStockCriteria?.solvencyMax ?? '',
         debtToEquityMin: savedStockCriteria?.debtToEquityMin ?? '',
         debtToEquityMax: savedStockCriteria?.debtToEquityMax ?? '',
         interestCoverageMin: savedStockCriteria?.interestCoverageMin ?? '',
         interestCoverageMax: savedStockCriteria?.interestCoverageMax ?? '',
+        priceToIntrinsicValueRatioMax: savedStockCriteria?.priceToIntrinsicValueRatioMax ?? '',
+        priceToDiscountedCashFlowRatioMax:
+            savedStockCriteria?.priceToDiscountedCashFlowRatioMax ?? '',
         positiveProfitYears: savedStockCriteria?.positiveProfitYears ?? '',
         profitGrowthMin: savedStockCriteria?.profitGrowthMin ?? '',
         revenueGrowthMin: savedStockCriteria?.revenueGrowthMin ?? '',
@@ -50,7 +62,20 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
     const [isFormVisible, setIsFormVisible] = useState(true)
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormState({ ...formState, [e.target.name]: e.target.value })
+        let { name, value } = e.target
+
+        // Convert percentage to decimal for dividend fields
+        if (name === 'dividendYieldMin' || name === 'dividendYieldMax') {
+            value = value ? (parseFloat(value) / 100).toString() : ''
+        }
+
+        // If the field is empty, remove it from the state
+        if (value === '') {
+            const { [name]: _, ...rest } = formState
+            setFormState(rest)
+        } else {
+            setFormState({ ...formState, [name]: value })
+        }
     }
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -61,6 +86,85 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
 
     const toggleFormVisibility = () => {
         setIsFormVisible(!isFormVisible)
+    }
+
+    const prepareFieldValue = (key: string, value: string) => {
+        if (key === 'dividendYieldMin' || key === 'dividendYieldMax') {
+            // Convert back to percentage for display
+            return (parseFloat(value) * 100).toFixed(2)
+        }
+        return value
+    }
+
+    const renderFormField = (key: string, value: string) => {
+        switch (key) {
+            case 'marketCapMax':
+            case 'marketCapMin':
+                return (
+                    <select
+                        name={key}
+                        id={key}
+                        value={value}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    >
+                        {marketCapOptions.map((option) => (
+                            <option key={option.label} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                )
+            case 'dividendYieldMin':
+            case 'dividendYieldMax':
+            case 'roicMin':
+            case 'roicMax':
+            case 'roeMin':
+            case 'roeMax':
+            case 'priceToIntrinsicValueRatioMax':
+            case 'priceToDiscountedCashFlowRatioMax':
+            case 'interestCoverageMax':
+            case 'interestCoverageMin':
+                return (
+                    <div className="relative">
+                        <input
+                            type="number"
+                            name={key}
+                            id={key}
+                            value={prepareFieldValue(key, value)}
+                            onChange={handleChange}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
+                        {value && (
+                            <span className="absolute inset-y-0 right-16 top-1 flex items-center text-sm leading-5">
+                                %
+                            </span>
+                        )}
+                    </div>
+                )
+            case 'numberYears':
+                return (
+                    <input
+                        type="number"
+                        name={key}
+                        id={key}
+                        value={value || 3}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                )
+            default:
+                return (
+                    <input
+                        type="number"
+                        name={key}
+                        id={key}
+                        value={value}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                )
+        }
     }
 
     return (
@@ -77,6 +181,7 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-3">
                         {Object.entries(formState).map(([key, value]) => (
                             <div key={key} className="grid grid-rows-2">
+                                {/* ... other fields */}
                                 <label
                                     htmlFor={key}
                                     className="block text-sm font-medium text-gray-700 capitalize"
@@ -90,14 +195,7 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
                                         ⓘ
                                     </span>
                                 </label>
-                                <input
-                                    type="number"
-                                    name={key}
-                                    id={key}
-                                    value={value}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm max-h-8"
-                                />
+                                {renderFormField(key, value)}
                             </div>
                         ))}
                     </div>

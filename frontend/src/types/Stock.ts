@@ -1,6 +1,6 @@
 export type Stock = {
-  name: string;
-  symbol: string;
-  marketCap: number;
-  peRatio: number;
-};
+    name: string
+    symbol: string
+    marketCap: number
+    peRatio: number
+}

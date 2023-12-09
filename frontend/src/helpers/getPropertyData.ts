@@ -40,7 +40,7 @@ export function getProperties(
         return data
     })
 
-    return result
+    return result.reverse()
 }
 
 // Example usage:

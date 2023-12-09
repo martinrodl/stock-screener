@@ -21,6 +21,7 @@ const DetailedMetricsTable: React.FC<DetailedMetricsTableProps> = ({ stockDetail
                 <div className="flex-1 font-bold w-32 text-center">Revenue</div>
                 <div className="flex-1 font-bold w-32 text-center">Debt</div>
                 <div className="flex-1 font-bold w-32 text-center">Dividend Yield</div>
+                <div className="flex-1 font-bold w-32 text-center">Payout ratio</div>
                 <div className="flex-1 font-bold w-32 text-center">Profit Margin</div>
             </div>
             {stockDetail.incomeStatements.map((incomeStatement, index) => {
@@ -42,7 +43,10 @@ const DetailedMetricsTable: React.FC<DetailedMetricsTableProps> = ({ stockDetail
                         </div>
                         <div className="flex-1 w-32 text-center">{formatBigNumber(totalDebt)}</div>
                         <div className="flex-1 w-32 text-center">
-                            {keyMetrics?.dividendYield?.toFixed(3)}
+                            {(Number(keyMetrics?.dividendYield) * 100).toFixed(2)}%
+                        </div>
+                        <div className="flex-1 w-32 text-center">
+                            {(Number(keyMetrics?.payoutRatio) * 100).toFixed(2)}%
                         </div>
                         <div className="flex-1 w-32 text-center">
                             {(incomeStatement?.netIncome / incomeStatement?.revenue).toFixed(3)}

@@ -1,7 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
-const keyMetricsSchema = new mongoose.Schema(
-  {
+const keyMetricsSchema = new mongoose.Schema({
     date: String,
     calendarYear: String,
     period: String,
@@ -62,12 +61,10 @@ const keyMetricsSchema = new mongoose.Schema(
     inventoryTurnover: Number,
     roe: Number,
     capexPerShare: Number,
-  },
-  { timestamps: true }
-);
+})
 
 // keyMetricsSchema.index({ symbol: 1, date: 1 }, { unique: true });
 
-const KeyMetrics = mongoose.model("KeyMetrics", keyMetricsSchema);
+const KeyMetrics = mongoose.model('KeyMetrics', keyMetricsSchema)
 
-export default KeyMetrics;
+export default KeyMetrics

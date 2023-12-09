@@ -12,7 +12,7 @@ import { RootState } from '../store/RootState'
 const pageSize = 20
 
 const StockList = () => {
-    const [page, setPage] = useState(1)
+    const [page, setPage] = useState(0)
     const dispatch = useDispatch()
     const [fetchStocks, { data, isLoading, error }] = useFetchStocksMutation()
     const stocks = useSelector((state: RootState) => state.stock.results)
@@ -74,7 +74,7 @@ const StockList = () => {
             </Link>
         ))
     }
-
+    console.log(error)
     return (
         <div className="flex flex-col items-center p-2">
             <h1 className="text-xl font-bold mb-2">Stocks screener</h1>
