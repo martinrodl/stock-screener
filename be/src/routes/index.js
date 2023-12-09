@@ -16,6 +16,7 @@ import {
 
 import { filterStocks } from '../controllers/filterStocks.js'
 import { updateBondYield } from '../controllers/otherData.js'
+import { getPortfolioStocks } from '../controllers/portfolioStock.js'
 
 const router = express.Router()
 
@@ -25,6 +26,7 @@ router.get('/status', getStatus) // Route to get the status of the server
 // Stock routes
 router.get('/onestock', getStock) // Route to get all stocks from the database
 router.get('/stocks', getAllStocks) // Route to get all stocks from the database
+router.post('/portfoliostocks', getPortfolioStocks) // Route to get all stocks from the database
 
 // Update routes
 router.post('/launchsavestockslist', launchSaveStockList) // Route to launch the saveStockList function

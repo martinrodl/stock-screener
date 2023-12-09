@@ -28,7 +28,17 @@ export const stockApi = createApi({
         getStockDetail: builder.query<StockDetail, string>({
             query: (symbol) => `/api/onestock?symbol=${symbol}`,
         }),
+        fetchPorfolioStock: builder.mutation<Stock[], string[]>({
+            query: (symbols) => ({
+                url: '/api/portfoliostocks',
+                method: 'POST',
+                body: {
+                    symbols,
+                },
+            }),
+        }),
     }),
 })
 
-export const { useFetchStocksMutation, useGetStockDetailQuery } = stockApi
+export const { useFetchStocksMutation, useGetStockDetailQuery, useFetchPorfolioStockMutation } =
+    stockApi

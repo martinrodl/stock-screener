@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 
 import { StockCriteria } from '../types/StockCriteria'
 import { filteredCriteria } from '../helpers/filteredCriteria'
-import { setCriteria } from '../store/stockSlice'
+import { setCriteria, setGrahamsCriteria } from '../store/stockSlice'
 
 const marketCapOptions = [
     { label: '0', value: 0 },
@@ -21,6 +21,7 @@ const marketCapOptions = [
 interface StockFilterFormProps {
     onSubmit: (formState: StockCriteria) => void
     savedStockCriteria: StockCriteria
+    isGrahams?: boolean
 }
 
 // Tooltip information for each metric
@@ -31,7 +32,11 @@ const tooltips: { [key: string]: string } = {
         'Number of years to consider for criteria \n positiveProfitYears \n positiveOperatingCashFlowYears \n positiveFreeCashFlowYears \n positiveDividendGrowthYears',
 }
 
-const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockCriteria }) => {
+const StockFilterForm: React.FC<StockFilterFormProps> = ({
+    onSubmit,
+    savedStockCriteria,
+    isGrahams,
+}) => {
     const dispatch = useDispatch()
     const [formState, setFormState] = useState<StockCriteria>({
         marketCapMax: savedStockCriteria?.marketCapMax ?? '',
@@ -81,7 +86,11 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         onSubmit(filteredCriteria(formState))
-        dispatch(setCriteria(filteredCriteria(formState)))
+        if (isGrahams) {
+            dispatch(setGrahamsCriteria(filteredCriteria(formState)))
+        } else {
+            dispatch(setCriteria(filteredCriteria(formState)))
+        }
     }
 
     const toggleFormVisibility = () => {
@@ -121,8 +130,6 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
             case 'roicMax':
             case 'roeMin':
             case 'roeMax':
-            case 'priceToIntrinsicValueRatioMax':
-            case 'priceToDiscountedCashFlowRatioMax':
             case 'interestCoverageMax':
             case 'interestCoverageMin':
                 return (
@@ -150,7 +157,7 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
                         id={key}
                         value={value || 3}
                         onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className=" mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                 )
             default:
@@ -161,7 +168,7 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({ onSubmit, savedStockC
                         id={key}
                         value={value}
                         onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="h-10 mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                 )
         }

@@ -13,19 +13,14 @@ const pages = [
         path: '/criteria-list',
     },
     {
-        key: 'graham-number-screener',
-        title: 'Graham Number Screener',
-        path: '/',
-    },
-    {
         key: 'graham-rules-screener',
         title: 'Graham Rules Screener',
-        path: '/',
+        path: '/graham-list',
     },
     {
-        key: 'my-portfolio',
-        title: 'My Portfolio',
-        path: '/',
+        key: 'PortfolioStocks',
+        title: 'Portfolio List',
+        path: '/PortfolioStocks',
     },
     {
         key: 'long-term-recommendation',

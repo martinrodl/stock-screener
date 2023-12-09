@@ -15,8 +15,6 @@ export type StockCriteria = {
     interestCoverageMax?: string
     priceToIntrinsicValueRatioMax?: string
     priceToDiscountedCashFlowRatioMax?: string
-    solvencyMin?: string
-    solvencyMax?: string
     profitGrowthMin?: string
     revenueGrowthMin?: string
     positiveProfitYears?: string
