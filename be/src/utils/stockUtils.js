@@ -1,5 +1,4 @@
 import Stock from '../models/stockModel.js'
-import { updateStockPrice } from '../services/countingStockValue.js'
 
 import {
     getStocksList,
@@ -11,12 +10,16 @@ import {
     getStockCashflow,
 } from '../services/index.js'
 import { delay } from '../helpers/delay.js'
+import { updateStockValuesUtils } from './updateStockPrice.js'
 
 export const saveStockList = async (stockList) => {
     console.log('Saving stock list')
     try {
         const stocks = await getStocksList(stockList)
         for (const stock of stocks) {
+            if (stock.marketCap < 10000000) {
+                continue
+            }
             try {
                 await Stock.findOneAndUpdate(
                     { symbol: stock.symbol },
@@ -192,13 +195,13 @@ export const updateAllStocksSubdocuments = async () => {
     }
 }
 
-export const updateStocksPrice = async () => {
+export const updateStocksValuesUtils = async () => {
     try {
         const stocks = await Stock.find({})
         for (const stock of stocks) {
             try {
-                console.log('Updating stock price for:', stock.symbol)
-                await updateStockPrice(stock.symbol)
+                console.log('Updating stock values for:', stock.symbol)
+                await updateStockValuesUtils(stock.symbol)
             } catch (error) {
                 console.error('Error in fetching stock data:', error)
                 continue

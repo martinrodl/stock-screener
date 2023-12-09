@@ -8,8 +8,6 @@ export const fetchBondYield = async () => {
         const response = await axios.get(url)
         const data = response.data
         const currentYield = data.data[0].value
-        const otherData = new OtherData({ currentYield: currentYield })
-        await otherData.save()
         return currentYield
     } catch (error) {
         console.error('Error fetching bond yield data:', error.message)

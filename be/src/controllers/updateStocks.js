@@ -8,10 +8,9 @@ import {
     updateBalancedSheets,
     updateCashflowStatements,
     updateAllStocksSubdocuments,
-    updateStocksPrice,
+    updateStocksValuesUtils,
 } from '../utils/stockUtils.js'
-import { updateStockPrice } from '../services/countingStockValue.js'
-
+import { updateStockValuesUtils } from '../utils/updateStockPrice.js'
 export const launchSaveStockList = async (req, res) => {
     const { exchange } = req.body
     try {
@@ -51,19 +50,19 @@ export const launchUpdateAllStocksSubdocuments = async (req, res) => {
     }
 }
 
-export const updatePriceStock = async (req, res) => {
+export const updateStockValues = async (req, res) => {
     try {
         const { symbol } = req.body
-        await updateStockPrice(symbol)
+        await updateStockValuesUtils(symbol)
         res.sendStatus(201)
     } catch (error) {
         res.status(500).send(error.message)
     }
 }
 
-export const updatePriceStocks = async (req, res) => {
+export const updateStocksValues = async (req, res) => {
     try {
-        await updateStocksPrice()
+        await updateStocksValuesUtils()
         res.sendStatus(201)
     } catch (error) {
         res.status(500).send(error.message)
