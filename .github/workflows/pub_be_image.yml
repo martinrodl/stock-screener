@@ -19,18 +19,6 @@ jobs:
               with:
                   node-version: '16'
 
-            - name: Increment Backend Version
-              run: |
-                  cd be
-                  npm version patch -m "Increment backend version [skip ci]"
-                  git push
-
-            - name: Increment Frontend Version
-              run: |
-                  cd frontend
-                  npm version patch -m "Increment frontend version [skip ci]"
-                  git push
-
             - name: Build and Push Docker Image
               run: |
                   cd be
