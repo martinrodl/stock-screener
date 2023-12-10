@@ -6,7 +6,6 @@ update_version() {
     echo "Updating version in $1"
     npm version patch
     git add package.json package-lock.json
-    git commit -m "Increment version in $1"
     cd - || exit
 }
 
@@ -18,6 +17,3 @@ BACKEND_PATH="./be"
 update_version "$BACKEND_PATH"
 update_version "$FRONTEND_PATH"
 
-# Push changes
-echo "Pushing changes to repository..."
-git push

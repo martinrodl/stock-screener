@@ -90,14 +90,14 @@ export const updateStockValuesUtils = async (ticker) => {
     } catch (error) {
         console.error('Error in fetching stock updateStockValuesUtils data:', error)
     }
-    try {
-        await updateIntrinsicValue(ticker)
-    } catch (error) {
-        console.error('Error in fetching stock updateIntrinsicValue data:', error)
-    }
-    try {
-        await updateDCFValue(ticker)
-    } catch (error) {
-        console.error('Error in fetching stock updateDCFValue data:', error)
-    }
+    // try {
+    //     await updateIntrinsicValue(ticker)
+    // } catch (error) {
+    //     console.error('Error in fetching stock updateIntrinsicValue data:', error)
+    // }
+    // try {
+    //     await updateDCFValue(ticker)
+    // } catch (error) {
+    //     console.error('Error in fetching stock updateDCFValue data:', error)
+    // }
 }

@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "update_version": "./update_versions.sh"
+    }
+}

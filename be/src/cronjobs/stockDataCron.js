@@ -1,7 +1,7 @@
 import cron from 'node-cron'
 
 import { saveStockList, updateAllStocksSubdocuments } from '../utils/stockUtils.js'
-import { updateStockValuesUtils } from '../utils/updateStocksPrice.js'
+import { updateStockValuesUtils } from '../utils/updateStockPrice.js'
 import { updateBondYield } from '../utils/otherData.js'
 
 // Scheduled to run once month
