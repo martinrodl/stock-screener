@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useFetchPorfolioStockMutation } from '../services/stockApi'
 import { Stock } from '../types/Stock'
@@ -22,7 +22,7 @@ const MyPortfolio = () => {
 
     useEffect(() => {
         fetchStocks(portfolioSymbols)
-    }, [fetchStocks, portfolioSymbols])
+    }, [fetchStocks])
 
     const renderStocks = (stocks: Stock[]) => {
         return stocks.map((stock, index) => (

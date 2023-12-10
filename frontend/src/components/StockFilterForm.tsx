@@ -7,6 +7,7 @@ import { filteredCriteria } from '../helpers/filteredCriteria'
 import { setCriteria, setGrahamsCriteria } from '../store/stockSlice'
 
 const marketCapOptions = [
+    { label: '', value: '' },
     { label: '0', value: 0 },
     { label: '10M', value: 10000000 },
     { label: '50M', value: 50000000 },
@@ -70,17 +71,15 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({
         let { name, value } = e.target
 
         // Convert percentage to decimal for dividend fields
-        if (name === 'dividendYieldMin' || name === 'dividendYieldMax') {
-            value = value ? (parseFloat(value) / 100).toString() : ''
+        if ((name === 'dividendYieldMin' || name === 'dividendYieldMax') && value) {
+            value = (parseFloat(value) / 100).toString()
         }
 
-        // If the field is empty, remove it from the state
-        if (value === '') {
-            const { [name]: _, ...rest } = formState
-            setFormState(rest)
-        } else {
-            setFormState({ ...formState, [name]: value })
-        }
+        // Update the state with the new value, even if it's an empty string
+        setFormState((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }))
     }
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
