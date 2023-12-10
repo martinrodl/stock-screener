@@ -78,7 +78,6 @@ export const updateGrowthCashflowMetrics = async (stockSymbol, limit = 10) => {
         if (!stock) {
             throw new Error(`Stock with symbol ${stockSymbol} not found`)
         }
-        console.log('Updating growth metrics of ', stock.symbol)
         for (const metric of cashflowMetrics) {
             const dateExists = stock.growthCashflowtMetrics.some((gm) => gm.date === metric.date)
 
@@ -100,7 +99,6 @@ export const updateGrowthIncomegrowthmetrics = async (stockSymbol, limit = 10) =
         if (!stock) {
             throw new Error(`Stock with symbol ${stockSymbol} not found`)
         }
-        console.log('Updating growth metrics of ', stock.symbol)
         for (const metric of keyMetrics) {
             const dateExists = stock.growthIncomeMetrics.some((gm) => gm.date === metric.date)
 
@@ -121,7 +119,6 @@ export const updateIncomeStatements = async (stockSymbol, limit = 10) => {
         if (!stock) {
             throw new Error(`Stock with symbol ${stockSymbol} not found`)
         }
-        console.log('Updating income statement of ', stock.symbol)
         for (const statement of incomeStatements) {
             const dateExists = stock.incomeStatements.some((doc) => doc.date === statement.date)
 
@@ -143,7 +140,6 @@ export const updateBalancedSheets = async (stockSymbol, limit = 10) => {
         if (!stock) {
             throw new Error(`Stock with symbol ${stockSymbol} not found`)
         }
-        console.log('Updating income statement of ', stock.symbol)
         for (const balancedsheet of balancedSheets) {
             const dateExists = stock.balanceSheetStatements.some(
                 (doc) => doc.date === balancedsheet.date
@@ -167,7 +163,6 @@ export const updateCashflowStatements = async (stockSymbol, limit = 10) => {
         if (!stock) {
             throw new Error(`Stock with symbol ${stockSymbol} not found`)
         }
-        console.log('Updating income statement of ', stock.symbol)
         for (const statement of cashflowStatements) {
             const dateExists = stock.cashflowStatements.some((doc) => doc.date === statement.date)
 
