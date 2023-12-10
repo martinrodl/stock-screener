@@ -22,6 +22,6 @@ jobs:
             - name: Build and Push Docker Image
               run: |
                   cd be
-                  docker build -t mrodl/stock-be:latest .
+                  docker build -t mrodl/stocks-be:latest .
                   echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-                  docker push mrodl/stock-be:latest
+                  docker push mrodl/stocks-be:latest
