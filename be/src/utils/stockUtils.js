@@ -20,6 +20,9 @@ export const saveStockList = async (stockList) => {
             if (stock.marketCap < 10000000) {
                 continue
             }
+            if (!stock.pe) {
+                continue
+            }
             try {
                 await Stock.findOneAndUpdate(
                     { symbol: stock.symbol },
@@ -27,6 +30,12 @@ export const saveStockList = async (stockList) => {
                         symbol: stock.symbol,
                         name: stock.name,
                         exchange: stock.exchange,
+                        values: {
+                            peRatio: stock.pe,
+                            marketCap: stock.marketCap,
+                            date: stock.timestamp,
+                            price: stock.price,
+                        },
                     },
                     { upsert: true }
                 )

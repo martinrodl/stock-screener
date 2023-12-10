@@ -12,6 +12,7 @@ const actualValues = new mongoose.Schema(
         dcf: Number,
         price: Number,
         intrinsicValue: Number,
+        peterlynchValue: Number,
     },
     { timestamps: true }
 )
