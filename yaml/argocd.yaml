@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+    name: stocks-be-application
+    namespace: argocd
+    annotations:
+        argocd-image-updater.argoproj.io/image-list: 'be=mrodl/stocks-be:latest'
+        argocd-image-updater.argoproj.io/be.update-strategy: 'latest'
+        argocd-image-updater.argoproj.io/be.allow-tags: 'regexp:^.*'
+spec:
+    project: default
+    source:
+        repoURL: https://github.com/martinrodl/stock-screener.git
+        path: infra/k8s
+        targetRevision: prod
+    destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: default
+    syncPolicy:
+        automated:
+            prune: true
+            selfHeal: true
