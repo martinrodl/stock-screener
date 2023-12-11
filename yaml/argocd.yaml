@@ -5,6 +5,7 @@ metadata:
     namespace: argocd
     annotations:
         argocd-image-updater.argoproj.io/image-list: 'be=mrodl/stocks-be:latest'
+        argocd-image-updater.argoproj.io/be.force-update: 'true'
         argocd-image-updater.argoproj.io/be.update-strategy: 'latest'
         argocd-image-updater.argoproj.io/be.allow-tags: 'regexp:^.*'
 spec:
