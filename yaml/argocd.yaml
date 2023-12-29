@@ -4,10 +4,9 @@ metadata:
     name: stocks-be-application
     namespace: argocd
     annotations:
-        argocd-image-updater.argoproj.io/image-list: 'be=mrodl/stocks-be:latest'
+        argocd-image-updater.argoproj.io/image-list: 'be=mrodl/stocks-be'
+        argocd-image-updater.argoproj.io/be.tag-match: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+$'
         argocd-image-updater.argoproj.io/be.force-update: 'true'
-        argocd-image-updater.argoproj.io/be.update-strategy: 'latest'
-        argocd-image-updater.argoproj.io/be.allow-tags: 'regexp:^.*'
 spec:
     project: default
     source:

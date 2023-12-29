@@ -26,6 +26,7 @@ export const updateStockPrice = async (ticker) => {
             marketCap: stockQuote.marketCap,
             date: stockQuote.timestamp,
             price: stockQuote.price,
+            sharesOutstanding: stockQuote.sharesOutstanding,
         }
 
         await stock.save()
@@ -126,6 +127,31 @@ const calculatePeterLynchFairValue = async (ticker) => {
     }
 }
 
+export const calculateCapeRatio = async (ticker) => {
+    try {
+        const stock = await Stock.findOne({ symbol: ticker })
+        if (!stock) {
+            throw new Error(`Stock with symbol ${ticker} not found`)
+        }
+        const calculateAverageEPS = (incomeStatements, sharesOutstanding) => {
+            const totalEPS = incomeStatements.reduce((sum, statement) => {
+                const eps = statement.netIncome / sharesOutstanding
+                return sum + eps
+            }, 0)
+            return totalEPS / incomeStatements.length
+        }
+        const incomeStatements = await getStockIncomeStatement(ticker)
+        const averageEPS = calculateAverageEPS(incomeStatements, stock.values.sharesOutstanding)
+
+        const capeRatio = stock.values.price / averageEPS
+        stock.values.capeRatio = capeRatio
+        await stock.save()
+    } catch (error) {
+        console.error('Error calculating CAPE ratio:', error)
+        return null
+    }
+}
+
 export const updateStockValuesUtils = async (ticker) => {
     try {
         await updateStockPrice(ticker)
@@ -142,7 +168,11 @@ export const updateStockValuesUtils = async (ticker) => {
     } catch (error) {
         console.error('Error in fetching stock updateDCFValue data:', error)
     }
-
+    try {
+        await calculateCapeRatio(ticker)
+    } catch (error) {
+        console.error('Error in fetching stock updateDCFValue data:', error)
+    }
     try {
         await calculatePeterLynchFairValue(ticker)
     } catch (error) {

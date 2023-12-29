@@ -13,6 +13,8 @@ const actualValues = new mongoose.Schema(
         price: Number,
         intrinsicValue: Number,
         peterlynchValue: Number,
+        sharesOutstanding: Number,
+        capeRatio: Number,
     },
     { timestamps: true }
 )

@@ -12,6 +12,7 @@ export const getStatus = (req, res) => {
 
         res.json({
             version: packageJson.version,
+            updated:1,
             freeMemory: os.freemem(),
             totalMemory: os.totalmem(),
             cpuLoad: os.loadavg(),
