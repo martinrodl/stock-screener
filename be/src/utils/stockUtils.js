@@ -49,7 +49,7 @@ export const saveStockList = async (stockList) => {
     }
 }
 
-export const updateKeyMetrics = async (stockSymbol, limit = 10) => {
+export const updateKeyMetrics = async (stockSymbol, limit = 20) => {
     try {
         const keyMetrics = await getStockKeyMetrics(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -71,7 +71,7 @@ export const updateKeyMetrics = async (stockSymbol, limit = 10) => {
     }
 }
 
-export const updateGrowthCashflowMetrics = async (stockSymbol, limit = 10) => {
+export const updateGrowthCashflowMetrics = async (stockSymbol, limit = 20) => {
     try {
         const cashflowMetrics = await getStockCashflowgrowthMetric(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -92,7 +92,7 @@ export const updateGrowthCashflowMetrics = async (stockSymbol, limit = 10) => {
     }
 }
 
-export const updateGrowthIncomegrowthmetrics = async (stockSymbol, limit = 10) => {
+export const updateGrowthIncomegrowthmetrics = async (stockSymbol, limit = 20) => {
     try {
         const keyMetrics = await getStockIncomegrowthMetric(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -112,7 +112,7 @@ export const updateGrowthIncomegrowthmetrics = async (stockSymbol, limit = 10) =
         console.error('Error in fetching stock data:', error)
     }
 }
-export const updateIncomeStatements = async (stockSymbol, limit = 10) => {
+export const updateIncomeStatements = async (stockSymbol, limit = 20) => {
     try {
         const incomeStatements = await getStockIncomeStatement(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -133,7 +133,7 @@ export const updateIncomeStatements = async (stockSymbol, limit = 10) => {
     }
 }
 
-export const updateBalancedSheets = async (stockSymbol, limit = 10) => {
+export const updateBalancedSheets = async (stockSymbol, limit = 20) => {
     try {
         const balancedSheets = await getStockBalanceSheet(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -156,7 +156,7 @@ export const updateBalancedSheets = async (stockSymbol, limit = 10) => {
     }
 }
 
-export const updateCashflowStatements = async (stockSymbol, limit = 10) => {
+export const updateCashflowStatements = async (stockSymbol, limit = 20) => {
     try {
         const cashflowStatements = await getStockCashflow(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })

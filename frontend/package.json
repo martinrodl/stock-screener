@@ -1,9 +1,10 @@
 {
     "name": "stock-filter-app",
     "private": true,
-    "version": "1.0.14",
+    "version": "1.0.15",
     "type": "module",
     "scripts": {
+        "start": "vite",
         "dev": "vite",
         "build": "vite build",
         "tscheck-build": "tsc && vite build",

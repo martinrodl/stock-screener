@@ -31,7 +31,6 @@ export const filterStocks = async (req, res) => {
         } = req.body
 
         const andConditions = []
-        console.log('*')
 
         addCondition(andConditions, 'values.peRatio', peRatioMin, peRatioMax)
         addCondition(andConditions, 'values.marketCap', marketCapMin, marketCapMax)

@@ -41,7 +41,7 @@ const StockList = () => {
 
     const renderPagesButtons = () => {
         return (
-            <div className="flex-1 flex justify-between ">
+            <div className="flex-1 flex justify-between mb-3">
                 <button onClick={handlePreviousPage} disabled={page === 1}>
                     Previous page
                 </button>
@@ -58,7 +58,7 @@ const StockList = () => {
             <h1 className="text-xl font-bold mb-2">Stocks screener</h1>
             <StockFilterForm savedStockCriteria={savedStockCriteria} onSubmit={handleSubmit} />
             <div className="mt-6">
-                {isLoading && <h2>Loading...</h2>}
+                {isLoading && <h2 className="my-2">Loading...</h2>}
                 {error && <h2>Error: {String(error)}</h2>}
                 {stocks && !stocks.length && <h2>No stocks found</h2>}
                 {renderPagesButtons()}

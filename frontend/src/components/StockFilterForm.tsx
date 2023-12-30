@@ -23,6 +23,7 @@ interface StockFilterFormProps {
     onSubmit: (formState: StockCriteria) => void
     savedStockCriteria: StockCriteria
     isGrahams?: boolean
+    displayedCriteria?: string[]
 }
 
 // Tooltip information for each metric
@@ -37,6 +38,7 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({
     onSubmit,
     savedStockCriteria,
     isGrahams,
+    displayedCriteria,
 }) => {
     const dispatch = useDispatch()
     const [formState, setFormState] = useState<StockCriteria>({
@@ -185,25 +187,32 @@ const StockFilterForm: React.FC<StockFilterFormProps> = ({
                 <form onSubmit={handleSubmit} className="md:max-w-xl max-w-xs x-auto p-4">
                     {/* Input fields with labels and tooltips */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-3">
-                        {Object.entries(formState).map(([key, value]) => (
-                            <div key={key} className="grid grid-rows-2">
-                                {/* ... other fields */}
-                                <label
-                                    htmlFor={key}
-                                    className="block text-sm font-medium text-gray-700 capitalize"
-                                >
-                                    {key.replace(/([A-Z])/g, ' $1')}:
-                                    <span
-                                        className="ml-1 cursor-pointer text-indigo-600 hover:text-indigo-800"
-                                        title={tooltips[key]}
-                                        data-tooltip-id={key}
+                        {Object.entries(formState)
+                            .filter(
+                                ([key]) =>
+                                    !displayedCriteria ||
+                                    displayedCriteria.length === 0 ||
+                                    displayedCriteria.includes(key)
+                            ) // Check if displayedCriteria is empty or contains the key
+                            .map(([key, value]) => (
+                                <div key={key} className="grid grid-rows-2">
+                                    {/* ... other fields */}
+                                    <label
+                                        htmlFor={key}
+                                        className="block text-sm font-medium text-gray-700 capitalize"
                                     >
-                                        ⓘ
-                                    </span>
-                                </label>
-                                {renderFormField(key, value)}
-                            </div>
-                        ))}
+                                        {key.replace(/([A-Z])/g, ' $1')}:
+                                        <span
+                                            className="ml-1 cursor-pointer text-indigo-600 hover:text-indigo-800"
+                                            title={tooltips[key]}
+                                            data-tooltip-id={key}
+                                        >
+                                            ⓘ
+                                        </span>
+                                    </label>
+                                    {renderFormField(key, value)}
+                                </div>
+                            ))}
                     </div>
                     {/* Submit button */}
                     <div className="mt-4">

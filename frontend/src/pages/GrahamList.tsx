@@ -19,7 +19,6 @@ const defaultCriteria = {
     numberYears: '5',
     profitGrowthMin: '0.05',
     positiveDividendGrowthYears: '5',
-    priceToIntrinsicValueRatioMax: '0.6',
 } as StockCriteria
 
 const GrahamList = () => {
@@ -67,8 +66,22 @@ const GrahamList = () => {
 
     return (
         <div className="flex flex-col items-center p-2">
-            <h1 className="text-xl font-bold mb-2">Stocks Screener</h1>
-            <StockFilterForm savedStockCriteria={defaultCriteria} onSubmit={handleSubmit} />
+            <h1 className="text-xl font-bold mb-2">Grahams criteria</h1>
+            <StockFilterForm
+                displayedCriteria={[
+                    'marketCapMin',
+                    'peRatioMax',
+                    'dividendYieldMin',
+                    'roicMin',
+                    'debtToEquityMax',
+                    'numberYears',
+                    'positiveDividendGrowthYears',
+                    'profitGrowthMin',
+                    'revenueGrowthMin',
+                ]}
+                savedStockCriteria={defaultCriteria}
+                onSubmit={handleSubmit}
+            />
             <div className="mt-6">
                 {isLoading && <h2>Loading...</h2>}
                 {error && <h2>Error: {String(error)}</h2>}
