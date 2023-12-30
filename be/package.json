@@ -1,6 +1,6 @@
 {
     "name": "be",
-    "version": "1.0.12",
+    "version": "1.0.14",
     "description": "",
     "main": "src/server.js",
     "type": "module",
