@@ -12,7 +12,7 @@ export const getStocksList = async (stockListSymbol) => {
     }
 }
 
-export const getStockBalanceSheet = async (stockSymbol, limit = 10, period = PERIODS.quarter) => {
+export const getStockBalanceSheet = async (stockSymbol, limit = 10, period = PERIODS.annual) => {
     try {
         const response = await axios.get(
             `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${PERIODS[period]}&apikey=${process.env.API_KEY}&limit=${limit}`
@@ -23,7 +23,7 @@ export const getStockBalanceSheet = async (stockSymbol, limit = 10, period = PER
     }
 }
 
-export const getStockCashflow = async (stockSymbol, limit = 10, period = PERIODS.quarter) => {
+export const getStockCashflow = async (stockSymbol, limit = 10, period = PERIODS.annual) => {
     try {
         const response = await axios.get(
             `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${PERIODS[period]}&apikey=${process.env.API_KEY}&limit=${limit}`
@@ -34,7 +34,7 @@ export const getStockCashflow = async (stockSymbol, limit = 10, period = PERIODS
     }
 }
 
-export const getStockKeyMetrics = async (stockSymbol, limit = 10, period = PERIODS.quarter) => {
+export const getStockKeyMetrics = async (stockSymbol, limit = 10, period = PERIODS.annual) => {
     try {
         const response = await axios.get(
             `https://financialmodelingprep.com/api/v3/key-metrics/${stockSymbol}?period=${PERIODS[period]}&apikey=${process.env.API_KEY}&limit=${limit}`
@@ -63,7 +63,7 @@ export const getStockCashflowgrowthMetric = async (
 export const getStockIncomegrowthMetric = async (
     stockSymbol,
     limit = 10,
-    period = PERIODS.quarter
+    period = PERIODS.annual
 ) => {
     try {
         const response = await axios.get(
@@ -75,11 +75,7 @@ export const getStockIncomegrowthMetric = async (
     }
 }
 
-export const getStockIncomeStatement = async (
-    stockSymbol,
-    limit = 10,
-    period = PERIODS.quarter
-) => {
+export const getStockIncomeStatement = async (stockSymbol, limit = 10, period = PERIODS.annual) => {
     try {
         const response = await axios.get(
             `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${PERIODS[period]}&apikey=${process.env.API_KEY}&limit=${limit}`
@@ -109,5 +105,16 @@ export const getStockDCF = async (stockSymbol) => {
         return response.data
     } catch (error) {
         console.error('Error in fetching StockDCF data:', error)
+    }
+}
+
+export const getStockPeers = async (stockSymbol) => {
+    try {
+        const response = await axios.get(
+            `https://financialmodelingprep.com/api/v4/stock_peers?symbol=${stockSymbol}&apikey=${process.env.API_KEY}`
+        )
+        return response.data
+    } catch (error) {
+        console.error('Error in fetching StockPeers data:', error)
     }
 }

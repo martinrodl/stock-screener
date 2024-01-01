@@ -26,6 +26,7 @@ const stockSchema = new mongoose.Schema({
         required: true,
     },
     incomeStatements: { type: [incomeStatement.schema], required: true },
+    incomeStatementsQuarters: { type: [incomeStatement.schema], required: true },
     cashflowStatements: { type: [cashflowStatement.schema], required: true },
     values: { type: values.schema },
 })

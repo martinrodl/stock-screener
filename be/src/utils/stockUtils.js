@@ -1,4 +1,5 @@
 import Stock from '../models/stockModel.js'
+import OtherData from '../models/otherData.js'
 
 import {
     getStocksList,
@@ -10,20 +11,23 @@ import {
     getStockCashflow,
 } from '../services/index.js'
 import { delay } from '../helpers/delay.js'
-import { updateStockValuesUtils } from './updateStockPrice.js'
+import { updateStockValuesUtils } from './updateStockValues.js'
 
 export const saveStockList = async (stockList) => {
     console.log('Saving stock list')
     try {
         const stocks = await getStocksList(stockList)
+        const otherData = await OtherData.findOne().sort({ _id: -1 })
+        const minMarketCap = otherData.minMarketCap
         for (const stock of stocks) {
-            if (stock.marketCap < 10000000) {
+            if (stock.marketCap < minMarketCap) {
                 continue
             }
             if (!stock.pe) {
                 continue
             }
             try {
+                console.log('Saving stock:', stock.symbol)
                 await Stock.findOneAndUpdate(
                     { symbol: stock.symbol },
                     {
@@ -49,7 +53,7 @@ export const saveStockList = async (stockList) => {
     }
 }
 
-export const updateKeyMetrics = async (stockSymbol, limit = 20) => {
+export const updateKeyMetrics = async (stockSymbol, limit = 10) => {
     try {
         const keyMetrics = await getStockKeyMetrics(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -71,7 +75,7 @@ export const updateKeyMetrics = async (stockSymbol, limit = 20) => {
     }
 }
 
-export const updateGrowthCashflowMetrics = async (stockSymbol, limit = 20) => {
+export const updateGrowthCashflowMetrics = async (stockSymbol, limit = 10) => {
     try {
         const cashflowMetrics = await getStockCashflowgrowthMetric(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -92,7 +96,7 @@ export const updateGrowthCashflowMetrics = async (stockSymbol, limit = 20) => {
     }
 }
 
-export const updateGrowthIncomegrowthmetrics = async (stockSymbol, limit = 20) => {
+export const updateGrowthIncomegrowthmetrics = async (stockSymbol, limit = 10) => {
     try {
         const keyMetrics = await getStockIncomegrowthMetric(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -112,7 +116,7 @@ export const updateGrowthIncomegrowthmetrics = async (stockSymbol, limit = 20) =
         console.error('Error in fetching stock data:', error)
     }
 }
-export const updateIncomeStatements = async (stockSymbol, limit = 20) => {
+export const updateIncomeStatements = async (stockSymbol, limit = 10) => {
     try {
         const incomeStatements = await getStockIncomeStatement(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -133,7 +137,7 @@ export const updateIncomeStatements = async (stockSymbol, limit = 20) => {
     }
 }
 
-export const updateBalancedSheets = async (stockSymbol, limit = 20) => {
+export const updateBalancedSheets = async (stockSymbol, limit = 10) => {
     try {
         const balancedSheets = await getStockBalanceSheet(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })
@@ -156,7 +160,7 @@ export const updateBalancedSheets = async (stockSymbol, limit = 20) => {
     }
 }
 
-export const updateCashflowStatements = async (stockSymbol, limit = 20) => {
+export const updateCashflowStatements = async (stockSymbol, limit = 10) => {
     try {
         const cashflowStatements = await getStockCashflow(stockSymbol, limit)
         const stock = await Stock.findOne({ symbol: stockSymbol })

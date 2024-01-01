@@ -10,7 +10,7 @@ import {
     updateAllStocksSubdocuments,
     updateStocksValuesUtils,
 } from '../utils/stockUtils.js'
-import { updateStockValuesUtils } from '../utils/updateStockPrice.js'
+import { updateStockValuesUtils } from '../utils/updateStockValues.js'
 export const launchSaveStockList = async (req, res) => {
     const { exchange } = req.body
     try {
