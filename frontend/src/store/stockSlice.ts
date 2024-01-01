@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { StockCriteria } from '../types/StockCriteria'
+import { StockCriteria, SimpleStockCriteria } from '../types/StockCriteria'
 import { Stock } from '../types/Stock'
 
 // Define the type for the initial state
 interface StockState {
     criteria: StockCriteria
+    simpleCriteria: SimpleStockCriteria
     grahamsCriteria: StockCriteria
     results: Stock[]
     grahamsResults: Stock[]
@@ -13,6 +14,7 @@ interface StockState {
 // Provide an initial state with the correct type
 const initialState: StockState = {
     criteria: {},
+    simpleCriteria: {},
     results: [],
     grahamsCriteria: {},
     grahamsResults: [],
@@ -24,6 +26,9 @@ const stockSlice = createSlice({
     reducers: {
         setCriteria: (state, action: PayloadAction<StockCriteria>) => {
             state.criteria = action.payload
+        },
+        setSimpleCriteria: (state, action: PayloadAction<SimpleStockCriteria>) => {
+            state.simpleCriteria = action.payload
         },
         setGrahamsCriteria: (state, action: PayloadAction<StockCriteria>) => {
             state.grahamsCriteria = action.payload

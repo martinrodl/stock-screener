@@ -33,8 +33,8 @@ export const saveStockList = async (stockList) => {
                     {
                         symbol: stock.symbol,
                         name: stock.name,
-                        exchange: stock.exchange,
                         values: {
+                            exchange: stock.exchange,
                             peRatio: stock.pe,
                             marketCap: stock.marketCap,
                             date: stock.timestamp,

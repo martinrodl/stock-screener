@@ -55,7 +55,7 @@ const StockDetails = () => {
                 <h1 className="text-xl font-bold">
                     {stock.name} ({stock.symbol})
                 </h1>
-                <p>Exchange: {stock.exchange}</p>
+                <p>Exchange: {stock.values.exchange}</p>
             </div>
             <div className="mb-4">
                 <BasicInfoTable
@@ -67,8 +67,34 @@ const StockDetails = () => {
                     dateMetrics={stock.keyMetrics[0]?.date}
                     price={stock.values.price}
                     dcf={stock.values.dcf}
-                    intrinsicValue={stock.values.intrinsicValue}
                     date={stock.values.date}
+                    capeRatio={stock.values.capeRatio}
+                    intrinsicValueZeroGrowth={stock.values.intrinsicValueZeroGrowth}
+                    intrinsicValueAverageGrowth={stock.values.intrinsicValueAverageGrowth}
+                    intrinsicValueLastYearGrowth={stock.values.intrinsicValueLastYearGrowth}
+                    peterlynchValue={stock.values.peterlynchValue}
+                    sharesOutstanding={stock.values.sharesOutstanding}
+                    sharesOutstanding5y={stock.values.sharesOutstanding5y}
+                    roe10y={stock.values.roe10y}
+                    roic10y={stock.values.roic10y}
+                    averageProfitGrowth={stock.values.averageProfitGrowth}
+                    averageDividendGrowth={stock.values.averageDividendGrowth}
+                    averageNetIncomeGrowth={stock.values.averageNetIncomeGrowth}
+                    averageProfitMargin={stock.values.averageProfitMargin}
+                    profitMargin={stock.values.profitMargin}
+                    eps={stock.values.eps}
+                    debtPerShare={stock.values.debtPerShare}
+                    dividendYield={stock.values.dividendYield}
+                    dividendYield10y={stock.values.dividendYield10y}
+                    dividendPayoutRatio={stock.values.dividendPayoutRatio}
+                    freeCashFlowPerShare={stock.values.freeCashFlowPerShare}
+                    buybackYield={stock.values.buybackYield}
+                    buybackPayoutRatio={stock.values.buybackPayoutRatio}
+                    debtToAssets={stock.values.debtToAssets}
+                    netDebtToEBITDA={stock.values.netDebtToEBITDA}
+                    similarCompanies={stock.values.similarCompanies}
+                    averagePESimilarCompanies={stock.values.averagePESimilarCompanies}
+                    yearReturn={stock.values.yearReturn}
                 />
             </div>
 

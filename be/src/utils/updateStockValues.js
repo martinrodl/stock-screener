@@ -196,12 +196,14 @@ export const calculateAverages = async (ticker) => {
         calculateAverage(stock.incomeStatements, 'netIncome', 10) /
         calculateAverage(stock.incomeStatements, 'revenue', 10)
     const dividendYield10y = calculateAverage(stock.keyMetrics, 'dividendYield', 10)
+    const sharesOutstanding5y = calculateAverage(stock.keyMetrics, 'sharesOutstanding', 5)
 
     stock.values.averageNetIncomeGrowth = averageNetIncomeGrowth
     stock.values.averageDividendGrowth = averageDividendGrowth
     stock.values.averageRevenueGrowth = averageRevenueGrowth
     stock.values.averageProfitMargin = averageProfitMargin
     stock.values.dividendYield10y = dividendYield10y
+    stock.values.sharesOutstanding5y = sharesOutstanding5y
     await stock.save()
 }
 
@@ -276,11 +278,18 @@ const calculateYearReturn = async (ticker) => {
     const growthRate = stock.values.averageNetIncomeGrowth
     const dividendYield = stock.values.dividendYield
 
+    if (!currentPrice || !currentEPS || !futurePE || !growthRate || !dividendYield) {
+        throw new Error('Missing values for calculating year return')
+    }
+
     const futureEPS = currentEPS * Math.pow(1 + growthRate, 5)
     const futureStockPrice = futureEPS * futurePE
     const totalDividends = currentPrice * dividendYield * 5
     const futureTotalValue = futureStockPrice + totalDividends
     const annualizedReturn = Math.pow(futureTotalValue / currentPrice, 1 / 5) - 1
+    if (isNaN(annualizedReturn)) {
+        throw new Error('Annualized return is NaN')
+    }
     stock.values.yearReturn = annualizedReturn
     await stock.save()
 }

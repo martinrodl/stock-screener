@@ -17,6 +17,7 @@ const actualValues = new mongoose.Schema(
         intrinsicValueLastYearGrowth: Number,
         peterlynchValue: Number,
         sharesOutstanding: Number,
+        sharesOutstanding5y: Number,
         roe10y: Number,
         roe: Number,
         roic: Number,

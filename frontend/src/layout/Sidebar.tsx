@@ -8,6 +8,11 @@ const pages = [
         path: '/',
     },
     {
+        key: 'simplecriteria-list',
+        title: 'Simple Criteria List',
+        path: '/simple-criteria-list',
+    },
+    {
         key: 'criteria-list',
         title: 'Criteria List',
         path: '/criteria-list',

@@ -23,3 +23,27 @@ export type StockCriteria = {
     positiveDividendGrowthYears?: string
     numberYears?: string
 }
+
+export type SimpleStockCriteria = {
+    marketCapMin?: string
+    peRatioMin?: string
+    peRatioMax?: string
+    roicMin?: string
+    roic10yMin?: string
+    roeMin?: string
+    roe10yMin?: string
+    intrinsicValueZeroGrowthMin?: string
+    intrinsicValueAverageGrowthMin?: string
+    intrinsicValueLastYearGrowthMin?: string
+    averageProfitGrowthMin?: string
+    averageDividendGrowthMin?: string
+    averageNetIncomeGrowthMin?: string
+    averageProfitMarginMin?: string
+    profitMarginMin?: string
+    dividendYieldMin?: string
+    dividendYield10yMin?: string
+    debtToAssetsMax?: string
+    debtToEquityMax?: string
+    netDebtToEBITDAMax?: string
+    yearReturnMin?: string
+}

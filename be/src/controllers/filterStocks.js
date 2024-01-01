@@ -154,3 +154,111 @@ export const filterStocks = async (req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const simpleFilterStocks = async (req, res) => {
+    try {
+        const {
+            marketCapMin,
+            peRatioMin,
+            peRatioMax,
+            roicMin,
+            roic10yMin,
+            roeMin,
+            roe10yMin,
+            intrinsicValueZeroGrowthMin,
+            intrinsicValueAverageGrowthMin,
+            intrinsicValueLastYearGrowthMin,
+            averageProfitGrowthMin,
+            averageDividendGrowthMin,
+            averageNetIncomeGrowthMin,
+            averageProfitMarginMin,
+            profitMarginMin,
+            dividendYieldMin,
+            dividendYield10yMin,
+            debtToAssetsMax,
+            debtToEquityMax,
+            netDebtToEBITDAMax,
+            yearReturnMin,
+            limit = 100, // Default limit
+            skip = 0, // Default offset
+        } = req.body
+
+        const stockPromise = Stock.find({}).select('values')
+
+        if (marketCapMin) {
+            stockPromise.where('values.marketCap').gte(marketCapMin)
+        }
+
+        if (peRatioMin) {
+            stockPromise.where('values.peRatio').gte(peRatioMin)
+        }
+        if (peRatioMax) {
+            stockPromise.where('values.peRatio').lte(peRatioMax)
+        }
+        if (roicMin) {
+            stockPromise.where('keyMetrics.roic').gte(roicMin)
+        }
+        if (roic10yMin) {
+            stockPromise.where('keyMetrics.roic10y').gte(roic10yMin)
+        }
+        if (roeMin) {
+            stockPromise.where('keyMetrics.roe').gte(roeMin)
+        }
+        if (roe10yMin) {
+            stockPromise.where('keyMetrics.roe10y').gte(roe10yMin)
+        }
+        if (intrinsicValueZeroGrowthMin) {
+            stockPromise.where('values.intrinsicValueZeroGrowth').gte(intrinsicValueZeroGrowthMin)
+        }
+        if (intrinsicValueAverageGrowthMin) {
+            stockPromise
+                .where('values.intrinsicValueAverageGrowth')
+                .gte(intrinsicValueAverageGrowthMin)
+        }
+        if (intrinsicValueLastYearGrowthMin) {
+            stockPromise
+                .where('values.intrinsicValueLastYearGrowth')
+                .gte(intrinsicValueLastYearGrowthMin)
+        }
+        if (averageProfitGrowthMin) {
+            stockPromise.where('values.averageProfitGrowth').gte(averageProfitGrowthMin)
+        }
+        if (averageDividendGrowthMin) {
+            stockPromise.where('values.averageDividendGrowth').gte(averageDividendGrowthMin)
+        }
+        if (averageNetIncomeGrowthMin) {
+            stockPromise.where('values.averageNetIncomeGrowth').gte(averageNetIncomeGrowthMin)
+        }
+        if (averageProfitMarginMin) {
+            stockPromise.where('values.averageProfitMargin').gte(averageProfitMarginMin)
+        }
+        if (profitMarginMin) {
+            stockPromise.where('values.profitMargin').gte(profitMarginMin)
+        }
+        if (dividendYieldMin) {
+            stockPromise.where('keyMetrics.dividendYield').gte(dividendYieldMin)
+        }
+        if (dividendYield10yMin) {
+            stockPromise.where('keyMetrics.dividendYield10y').gte(dividendYield10yMin)
+        }
+        if (debtToAssetsMax) {
+            stockPromise.where('keyMetrics.debtToAssets').lte(debtToAssetsMax)
+        }
+        if (debtToEquityMax) {
+            stockPromise.where('keyMetrics.debtToEquity').lte(debtToEquityMax)
+        }
+        if (netDebtToEBITDAMax) {
+            stockPromise.where('keyMetrics.netDebtToEBITDA').lte(netDebtToEBITDAMax)
+        }
+        if (yearReturnMin) {
+            stockPromise.where('values.yearReturn').gte(yearReturnMin)
+        }
+
+        const stocks = await stockPromise.skip(skip).limit(limit)
+
+        res.json(stocks)
+    } catch (error) {
+        console.error(error)
+        res.status(500).send(error.message)
+    }
+}

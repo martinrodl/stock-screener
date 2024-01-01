@@ -14,7 +14,7 @@ import {
     updateStocksValues,
 } from '../controllers/updateStocks.js'
 
-import { filterStocks } from '../controllers/filterStocks.js'
+import { filterStocks, simpleFilterStocks } from '../controllers/filterStocks.js'
 import { updateBondYield } from '../controllers/otherData.js'
 import { getPortfolioStocks } from '../controllers/portfolioStock.js'
 
@@ -43,6 +43,7 @@ router.post('/updateStocksValues', updateStocksValues)
 
 // Filter routes
 router.post('/filterstocks', filterStocks) // Route to filter stock
+router.post('/simplefilterstocks', simpleFilterStocks) // Route to filter stock
 
 // Other data routes
 router.post('/updatebondyield', updateBondYield) // Route to update bond yield
