@@ -183,7 +183,7 @@ export const simpleFilterStocks = async (req, res) => {
             skip = 0, // Default offset
         } = req.body
 
-        const stockPromise = Stock.find({}).select('values')
+        const stockPromise = Stock.find({}).select('symbol name values')
 
         if (marketCapMin) {
             stockPromise.where('values.marketCap').gte(marketCapMin)
@@ -256,7 +256,14 @@ export const simpleFilterStocks = async (req, res) => {
 
         const stocks = await stockPromise.skip(skip).limit(limit)
 
-        res.json(stocks)
+        const filteredStocks = stocks.map((stock) => ({
+            symbol: stock.symbol,
+            name: stock.name,
+            marketCap: stock.values.marketCap,
+            peRatio: stock.values.peRatio,
+        }))
+
+        res.json(filteredStocks)
     } catch (error) {
         console.error(error)
         res.status(500).send(error.message)
