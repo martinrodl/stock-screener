@@ -1,17 +1,19 @@
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import SymbolInputForm from '../components/SymbolInputForm'
 
 const pages = [
     {
-        key: 'home',
-        title: 'Stock Screener',
+        key: 'simplecriteria-list',
+        title: 'Simple Criteria List',
         path: '/',
     },
     {
-        key: 'simplecriteria-list',
-        title: 'Simple Criteria List',
-        path: '/simple-criteria-list',
+        key: 'home',
+        title: 'Stock Screener - experimental',
+        path: '/stock-screener',
     },
+
     {
         key: 'criteria-list',
         title: 'Criteria List',
@@ -85,6 +87,7 @@ const Sidebar: React.FC = () => {
                     ))}
                 </ul>
             </nav>
+            <SymbolInputForm />
         </div>
     )
 }

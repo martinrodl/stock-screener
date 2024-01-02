@@ -1,6 +1,5 @@
 import React from 'react'
 import moment from 'moment'
-
 import { formatBigNumber } from '../helpers/formatNumber'
 
 interface BasicInfoProps {
@@ -42,231 +41,162 @@ interface BasicInfoProps {
     yearReturn?: number
 }
 
-const BasicInfoTable: React.FC<BasicInfoProps> = ({
-    peRatio,
-    marketCap,
-    roic,
-    roe,
-    debtToEquity,
-    dateMetrics,
-    price,
-    dcf,
-    date,
-    capeRatio,
-    intrinsicValueZeroGrowth,
-    intrinsicValueAverageGrowth,
-    intrinsicValueLastYearGrowth,
-    peterlynchValue,
-    sharesOutstanding,
-    sharesOutstanding5y,
-    roe10y,
-    roic10y,
-    averageProfitGrowth,
-    averageDividendGrowth,
-    averageNetIncomeGrowth,
-    averageProfitMargin,
-    profitMargin,
-    eps,
-    debtPerShare,
-    dividendYield,
-    dividendYield10y,
-    dividendPayoutRatio,
-    freeCashFlowPerShare,
-    buybackYield,
-    buybackPayoutRatio,
-    debtToAssets,
-    netDebtToEBITDA,
-    similarCompanies,
-    averagePESimilarCompanies,
-    yearReturn,
-}) => {
+const BasicInfoTable: React.FC<BasicInfoProps> = (props) => {
+    // Mapping of property keys to display labels and formatting functions
+    const dataMapping = [
+        { key: 'marketCap', label: 'Market Cap', format: formatBigNumber },
+        { key: 'peRatio', label: 'P/E Ratio', format: (n: number) => n?.toFixed(2) },
+        { key: 'roic', label: 'ROIC', format: (n: number) => `${(n * 100).toFixed(2)}%` },
+        { key: 'roe', label: 'ROE', format: (n: number) => `${(n * 100).toFixed(2)}%` },
+
+        { key: 'price', label: 'Price', format: (n: number) => n?.toFixed(2) },
+        { key: 'dcf', label: 'DCF', format: (n: number) => n?.toFixed(2) },
+        { key: 'capeRatio', label: 'CAPE Ratio', format: (n: number) => n?.toFixed(2) },
+
+        {
+            key: 'intrinsicValueZeroGrowth',
+            label: 'Intrinsic Value (Zero Growth)',
+            format: (n: number) => n?.toFixed(2),
+        },
+        {
+            key: 'intrinsicValueAverageGrowth',
+            label: 'Intrinsic Value (Average Growth)',
+            format: (n: number) => n?.toFixed(2),
+        },
+        {
+            key: 'intrinsicValueLastYearGrowth',
+            label: 'Intrinsic Value (Last Year Growth)',
+            format: (n: number) => n?.toFixed(2),
+        },
+        {
+            key: 'peterlynchValue',
+            label: 'Peter Lynch Value',
+            format: (n: number) => n?.toFixed(2),
+        },
+        {
+            key: 'yearReturn',
+            label: 'Year Return',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        { key: 'sharesOutstanding', label: 'Shares Outstanding', format: formatBigNumber },
+        { key: 'sharesOutstanding5y', label: 'Shares Outstanding (5Y)', format: formatBigNumber },
+        { key: 'roe10y', label: 'ROE (10Y)', format: (n: number) => `${(n * 100).toFixed(2)}%` },
+        { key: 'roic10y', label: 'ROIC (10Y)', format: (n: number) => `${(n * 100).toFixed(2)}%` },
+        {
+            key: 'averageProfitGrowth',
+            label: 'Average Profit Growth',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'averageDividendGrowth',
+            label: 'Average Dividend Growth',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'averageNetIncomeGrowth',
+            label: 'Average Net Income Growth',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'averageProfitMargin',
+            label: 'Average Profit Margin',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'profitMargin',
+            label: 'Profit Margin',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        { key: 'eps', label: 'EPS', format: (n: number) => n?.toFixed(2) },
+        { key: 'debtPerShare', label: 'Debt Per Share', format: (n: number) => n?.toFixed(2) },
+        {
+            key: 'dividendYield',
+            label: 'Dividend Yield',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'dividendYield10y',
+            label: 'Dividend Yield (10Y)',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'dividendPayoutRatio',
+            label: 'Dividend Payout Ratio',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'freeCashFlowPerShare',
+            label: 'Free Cash Flow Per Share',
+            format: (n: number) => n?.toFixed(2),
+        },
+        {
+            key: 'buybackYield',
+            label: 'Buyback Yield',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        {
+            key: 'buybackPayoutRatio',
+            label: 'Buyback Payout Ratio',
+            format: (n: number) => `${(n * 100).toFixed(2)}%`,
+        },
+        { key: 'debtToEquity', label: 'Debt to Equity', format: (n: number) => n?.toFixed(2) },
+        { key: 'debtToAssets', label: 'Debt to Assets', format: (n: number) => n?.toFixed(2) },
+        {
+            key: 'netDebtToEBITDA',
+            label: 'Net Debt to EBITDA',
+            format: (n: number) => n?.toFixed(2),
+        },
+        {
+            key: 'similarCompanies',
+            label: 'Similar Companies',
+            format: (companies: string[]) => companies?.join(', ') || 'N/A',
+        },
+        {
+            key: 'averagePESimilarCompanies',
+            label: 'Average PE (Similar Companies)',
+            format: (n: number) => n?.toFixed(2),
+        },
+
+        { key: 'dateMetrics', label: 'Date Metrics', format: (d: string) => d || 'N/A' },
+        {
+            key: 'date',
+            label: 'Date',
+            format: (d: string) => (d ? moment.unix(parseInt(d)).format('YYYY-MM-DD') : 'N/A'),
+        },
+    ]
+
+    // Split the data into three columns
+    const columns = [
+        dataMapping.slice(0, Math.ceil(dataMapping.length / 3)),
+        dataMapping.slice(Math.ceil(dataMapping.length / 3), 2 * Math.ceil(dataMapping.length / 3)),
+        dataMapping.slice(2 * Math.ceil(dataMapping.length / 3)),
+    ]
+
+    // Function to render a single data row
+    const renderRow = ({
+        key,
+        label,
+        format,
+    }: {
+        key: string
+        label: string
+        format: (n: number | string) => string | number
+    }) => (
+        <div key={key} className="flex justify-between items-center border-b py-2">
+            <span className=" text-sm truncate">{label}:</span>
+            <span className="text-sm truncate ml-2">
+                {props[key] !== undefined ? format(props[key]) : 'N/A'}
+            </span>
+        </div>
+    )
+
     return (
         <div className="flex justify-center border">
-            <div className="flex flex-col space-y-5 p-3 rounded-md min-w-[220px] max-w-lg">
-                <div className="flex justify-between border-b py-2">
-                    <span>Market Cap:</span>
-                    <span>{marketCap ? formatBigNumber(marketCap) : 'N/A'}</span>
+            {columns.map((column, index) => (
+                <div key={index} className="flex flex-col flex-grow space-y-2 p-3 rounded-md">
+                    {column.map((item) => renderRow(item))}
                 </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>P/E Ratio:</span>
-                    <span>{peRatio ? peRatio.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>CAPE Ratio:</span>
-                    <span>{capeRatio ? capeRatio.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Average PE similar companies:</span>
-                    <span>
-                        {averagePESimilarCompanies ? averagePESimilarCompanies.toFixed(2) : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Similar companies:</span>
-                    <span>{similarCompanies ? similarCompanies.join(', ') : 'N/A'}</span>
-                </div>
-
-                <div className="flex justify-between border-b py-2">
-                    <span>ROE:</span>
-                    <span>{roe ? `${(roe * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>ROE 10y:</span>
-                    <span>{roe10y ? `${(roe10y * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>ROIC:</span>
-                    <span>{roic ? `${(roic * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>ROIC 10y:</span>
-                    <span>{roic10y ? `${(roic10y * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Price:</span>
-                    <span>{price ? price.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>EPS:</span>
-                    <span>{eps ? eps.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Free cash flow per share:</span>
-                    <span>{freeCashFlowPerShare ? freeCashFlowPerShare.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Debt per share:</span>
-                    <span>{debtPerShare ? debtPerShare.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Discounted cash flow value:</span>
-                    <span>{dcf ? dcf.toFixed(2) : 'N/A'}</span>
-                </div>
-
-                <div className="flex justify-between border-b py-2">
-                    <span>Intrinsic value zero growth:</span>
-                    <span>
-                        {intrinsicValueZeroGrowth ? intrinsicValueZeroGrowth.toFixed(2) : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Intrinsic value average growth:</span>
-                    <span>
-                        {intrinsicValueAverageGrowth
-                            ? intrinsicValueAverageGrowth.toFixed(2)
-                            : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Intrinsic value last year growth:</span>
-                    <span>
-                        {intrinsicValueLastYearGrowth
-                            ? intrinsicValueLastYearGrowth.toFixed(2)
-                            : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Peter Lynch value:</span>
-                    <span>{peterlynchValue ? peterlynchValue.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Shares outstanding:</span>
-                    <span>{sharesOutstanding ? formatBigNumber(sharesOutstanding) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Shares outstanding 5y:</span>
-                    <span>
-                        {sharesOutstanding5y ? formatBigNumber(sharesOutstanding5y) : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Profit margin:</span>
-                    <span>{profitMargin ? `${(profitMargin * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Average profit margin:</span>
-                    <span>
-                        {averageProfitMargin ? `${(averageProfitMargin * 100).toFixed(2)}%` : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Average profit growth:</span>
-                    <span>
-                        {averageProfitGrowth ? `${(averageProfitGrowth * 100).toFixed(2)}%` : 'N/A'}
-                    </span>
-                </div>
-
-                <div className="flex justify-between border-b py-2">
-                    <span>Average net income growth:</span>
-                    <span>
-                        {averageNetIncomeGrowth
-                            ? `${(averageNetIncomeGrowth * 100).toFixed(2)}%`
-                            : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Average dividend growth:</span>
-                    <span>
-                        {averageDividendGrowth
-                            ? `${(averageDividendGrowth * 100).toFixed(2)}%`
-                            : 'N/A'}
-                    </span>
-                </div>
-
-                <div className="flex justify-between border-b py-2">
-                    <span>Dividend yield:</span>
-                    <span>{dividendYield ? `${(dividendYield * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Dividend yield 10y:</span>
-                    <span>
-                        {dividendYield10y ? `${(dividendYield10y * 100).toFixed(2)}%` : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Dividend payout ratio:</span>
-                    <span>
-                        {dividendPayoutRatio ? `${(dividendPayoutRatio * 100).toFixed(2)}%` : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Buyback yield:</span>
-                    <span>{buybackYield ? `${(buybackYield * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Buyback payout ratio:</span>
-                    <span>
-                        {buybackPayoutRatio ? `${(buybackPayoutRatio * 100).toFixed(2)}%` : 'N/A'}
-                    </span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Debt to Equity:</span>
-                    <span>{debtToEquity ? debtToEquity.toFixed(2) : 'N/A'}</span>
-                </div>
-
-                <div className="flex justify-between border-b py-2">
-                    <span>Debt to assets:</span>
-                    <span>{debtToAssets ? debtToAssets.toFixed(2) : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Net debt to EBITDA:</span>
-                    <span>{netDebtToEBITDA ? netDebtToEBITDA.toFixed(2) : 'N/A'}</span>
-                </div>
-
-                <div className="flex justify-between border-b py-2">
-                    <span>Year return:</span>
-                    <span>{yearReturn ? `${(yearReturn * 100).toFixed(2)}%` : 'N/A'}</span>
-                </div>
-
-                <div className="flex justify-between border-b py-2">
-                    <span>Date metrics:</span>
-                    <span>{dateMetrics ? dateMetrics : 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b py-2">
-                    <span>Date:</span>
-                    <span>{date ? moment.unix(date).format('YYYY-MM-DD') : 'N/A'}</span>
-                </div>
-            </div>
+            ))}
         </div>
     )
 }

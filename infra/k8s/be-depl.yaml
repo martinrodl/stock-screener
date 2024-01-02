@@ -18,11 +18,11 @@ spec:
                   imagePullPolicy: Always
                   resources:
                       limits:
-                          memory: 516Mi
-                          cpu: '0.4'
+                          memory: 2048Mi
+                          cpu: '0.8'
                       requests:
-                          memory: 128Mi
-                          cpu: '0.1'
+                          memory: 256Mi
+                          cpu: '0.2'
                   env:
                       - name: MONGO_URI
                         value: 'mongodb://stocks-mongo-srv:27017/stocks'
