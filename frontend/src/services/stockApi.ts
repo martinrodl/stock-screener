@@ -48,6 +48,13 @@ export const stockApi = createApi({
                 },
             }),
         }),
+        updateStockValues: builder.mutation<void, string>({
+            query: (symbol) => ({
+                url: '/api/updateStockValues',
+                method: 'POST',
+                body: { symbol },
+            }),
+        }),
     }),
 })
 
@@ -56,4 +63,5 @@ export const {
     useGetStockDetailQuery,
     useFetchPorfolioStockMutation,
     useSimpleFetchStocksMutation,
+    useUpdateStockValuesMutation,
 } = stockApi

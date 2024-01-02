@@ -3,20 +3,32 @@ import { useState } from 'react'
 import BarChart from '../components/BarChart'
 import BasicInfoTable from '../components/BasicInfoTable'
 import DetailMetricsTable from '../components/DetailMetricsTable'
-import { useGetStockDetailQuery } from '../services/stockApi'
+import { useGetStockDetailQuery, useUpdateStockValuesMutation } from '../services/stockApi'
 import { getProperties } from '../helpers/getPropertyData'
 import { mergeDataSets } from '../helpers/mergeDatasets'
 import { useEffect } from 'react'
+import { delay } from '../helpers/delay'
 
 const StockDetails = () => {
     const [datasets, setDatasets] = useState<any[]>([])
     const [datasets2, setDatasets2] = useState<any[]>([])
-
     const { symbol } = useParams()
     const navigate = useNavigate()
-    const { data: stock, error, isLoading } = useGetStockDetailQuery(symbol ?? '')
+    const { data: stock, error, isLoading, refetch } = useGetStockDetailQuery(symbol ?? '')
+    const [updateStockValues, { isLoading: updateLoading }] = useUpdateStockValuesMutation()
+
     const handleBackButtonClick = () => {
         navigate('/')
+    }
+
+    const handleUpdateButtonClick = async () => {
+        try {
+            await updateStockValues(symbol ?? '').unwrap()
+            delay(2000)
+            await refetch()
+        } catch (error) {
+            console.error('Failed to update stock values:', error)
+        }
     }
 
     useEffect(() => {
@@ -38,26 +50,34 @@ const StockDetails = () => {
         }
     }, [stock])
 
-    if (!stock || isLoading) {
-        return <h2>Loading...</h2>
+    if (isLoading || updateLoading) {
+        return <h2 className="mt-5 ml-5">Loading...</h2>
     }
-    if (error) return <div>Error: {String(error)}</div>
-
+    if (error) return <div className="mt-5 ml-5">Error: {String(error)}</div>
+    if (!stock) return <h2 className="mt-5 ml-5">Stock not found</h2>
     return (
         <div className="p-4 flex flex-col items-center">
-            <button
-                onClick={handleBackButtonClick}
-                className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                Back to Stocks
-            </button>
+            <div className="flex w-full p-4 justify-around">
+                <button
+                    onClick={handleBackButtonClick}
+                    className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Back to Stocks
+                </button>
+                <button
+                    onClick={handleUpdateButtonClick}
+                    className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Update Stock Values
+                </button>
+            </div>
             <div className="flex gap-x-3 items-center mb-4">
                 <h1 className="text-xl font-bold">
                     {stock.name} ({stock.symbol})
                 </h1>
                 <p>Exchange: {stock.values.exchange}</p>
             </div>
-            <div className="mb-4">
+            <div className="mb-14">
                 <BasicInfoTable
                     marketCap={stock.values.marketCap}
                     peRatio={stock.values.peRatio}
@@ -100,12 +120,12 @@ const StockDetails = () => {
 
             <DetailMetricsTable stockDetail={stock} />
 
-            <div className="my-4 flex flex-col gap-y-10">
+            <div className="my-4 flex flex-col gap-y-10 mt-20">
                 <h1 className="text-lg font-semibold text-center">Growth Metrics Graph</h1>
-                <div className="h-[300px] w-[500px]">
+                <div className="h-[300px] w-[800px]">
                     {stock && datasets.length > 0 && <BarChart mergedDatasets={datasets} />}
                 </div>
-                <div className="h-[300px] w-[500px]">
+                <div className="h-[300px] w-[800px]">
                     {stock && datasets.length > 0 && (
                         <BarChart mergedDatasets={datasets2} maxValue={1} />
                     )}

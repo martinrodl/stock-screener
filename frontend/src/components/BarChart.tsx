@@ -16,7 +16,7 @@ interface DataPoint {
     [key: string]: number | string
 }
 
-const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+const colors = ['#36A2EB', '#4BC0C0', '#FFCE56', '#FF6384']
 
 interface BarChartProps {
     mergedDatasets: DataPoint[]

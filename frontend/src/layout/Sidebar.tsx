@@ -31,12 +31,7 @@ const pages = [
     },
     {
         key: 'long-term-recommendation',
-        title: 'Long Term Recommendation',
-        path: '/',
-    },
-    {
-        key: 'short-or-quick-buy',
-        title: 'Short or Quick Buy',
+        title: 'Long Term Recommendation - not working',
         path: '/',
     },
 ]
@@ -87,7 +82,9 @@ const Sidebar: React.FC = () => {
                     ))}
                 </ul>
             </nav>
-            <SymbolInputForm />
+            <div className={`${!isSidebarVisible && 'opacity-0'}`}>
+                <SymbolInputForm />
+            </div>
         </div>
     )
 }
