@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import SimpleStockFilterForm from '../components/SimpleStockFilterForm'
 import { Stock } from '../types/Stock'
 import { SimpleStockCriteria } from '../types/StockCriteria'
-import { useFetchStocksMutation } from '../services/stockApi'
-import { setResults } from '../store/stockSlice'
+import { useSimpleFetchStocksMutation } from '../services/stockApi'
+import { setSimpleResults } from '../store/stockSlice'
 import { RootState } from '../store/RootState'
 import { LineStock } from '../components/LineStock'
 
@@ -14,8 +14,8 @@ const pageSize = 20
 const SimpleStockList = () => {
     const [page, setPage] = useState(0)
     const dispatch = useDispatch()
-    const [fetchStocks, { data, isLoading, error }] = useFetchStocksMutation()
-    const stocks = useSelector((state: RootState) => state.stock.results)
+    const [fetchStocks, { data, isLoading, error }] = useSimpleFetchStocksMutation()
+    const stocks = useSelector((state: RootState) => state.stock.simpleResults)
     const savedStockCriteria = useSelector((state: RootState) => state.stock.simpleCriteria)
     const handleSubmit = (criteria: SimpleStockCriteria) => {
         fetchStocks({ criteria, skip: page * pageSize, limit: pageSize })
@@ -23,7 +23,7 @@ const SimpleStockList = () => {
 
     useEffect(() => {
         if (data) {
-            dispatch(setResults(data))
+            dispatch(setSimpleResults(data))
         }
     }, [data, dispatch])
 

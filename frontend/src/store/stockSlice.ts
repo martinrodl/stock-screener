@@ -8,6 +8,7 @@ interface StockState {
     simpleCriteria: SimpleStockCriteria
     grahamsCriteria: StockCriteria
     results: Stock[]
+    simpleResults: Stock[]
     grahamsResults: Stock[]
 }
 
@@ -16,6 +17,7 @@ const initialState: StockState = {
     criteria: {},
     simpleCriteria: {},
     results: [],
+    simpleResults: [],
     grahamsCriteria: {},
     grahamsResults: [],
 }
@@ -36,11 +38,15 @@ const stockSlice = createSlice({
         setResults: (state, action: PayloadAction<Stock[]>) => {
             state.results = action.payload
         },
+        setSimpleResults: (state, action: PayloadAction<Stock[]>) => {
+            state.simpleResults = action.payload
+        },
         setGrahamReults: (state, action: PayloadAction<Stock[]>) => {
             state.grahamsResults = action.payload
         },
     },
 })
 
-export const { setCriteria, setResults, setGrahamReults, setGrahamsCriteria } = stockSlice.actions
+export const { setCriteria, setResults, setGrahamReults, setGrahamsCriteria, setSimpleResults } =
+    stockSlice.actions
 export default stockSlice.reducer

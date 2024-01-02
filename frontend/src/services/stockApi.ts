@@ -25,6 +25,17 @@ export const stockApi = createApi({
                 },
             }),
         }),
+        simpleFetchStocks: builder.mutation<Stock[], StockCriteriaWithPagination>({
+            query: ({ criteria, skip, limit }) => ({
+                url: '/api/simplefilterstocks',
+                method: 'POST',
+                body: {
+                    ...criteria, // Spread existing criteria
+                    skip: skip, // Include skip value
+                    limit: limit, // Include limit value
+                },
+            }),
+        }),
         getStockDetail: builder.query<StockDetail, string>({
             query: (symbol) => `/api/onestock?symbol=${symbol}`,
         }),
@@ -40,5 +51,9 @@ export const stockApi = createApi({
     }),
 })
 
-export const { useFetchStocksMutation, useGetStockDetailQuery, useFetchPorfolioStockMutation } =
-    stockApi
+export const {
+    useFetchStocksMutation,
+    useGetStockDetailQuery,
+    useFetchPorfolioStockMutation,
+    useSimpleFetchStocksMutation,
+} = stockApi
