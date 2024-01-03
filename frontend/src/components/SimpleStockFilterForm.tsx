@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 
 import { SimpleStockCriteria } from '../types/StockCriteria'
 import { filteredCriteria } from '../helpers/filteredCriteria'
-import { setCriteria, setGrahamsCriteria } from '../store/stockSlice'
+import { setSimpleCriteria } from '../store/stockSlice'
 
 const marketCapOptions = [
     { label: '', value: '' },
@@ -78,11 +78,7 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         onSubmit(filteredCriteria(formState))
-        if (isGrahams) {
-            dispatch(setGrahamsCriteria(filteredCriteria(formState)))
-        } else {
-            dispatch(setCriteria(filteredCriteria(formState)))
-        }
+        dispatch(setSimpleCriteria(filteredCriteria(formState)))
     }
 
     const toggleFormVisibility = () => {

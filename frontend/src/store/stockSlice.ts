@@ -47,6 +47,12 @@ const stockSlice = createSlice({
     },
 })
 
-export const { setCriteria, setResults, setGrahamReults, setGrahamsCriteria, setSimpleResults } =
-    stockSlice.actions
+export const {
+    setCriteria,
+    setResults,
+    setGrahamReults,
+    setGrahamsCriteria,
+    setSimpleResults,
+    setSimpleCriteria,
+} = stockSlice.actions
 export default stockSlice.reducer

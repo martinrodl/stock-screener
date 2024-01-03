@@ -50,27 +50,48 @@ const StockDetails = () => {
         }
     }, [stock])
 
+    const getTopButtons = () => (
+        <div className="flex w-full p-4 justify-around">
+            <button
+                onClick={handleBackButtonClick}
+                className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+                Back to Stocks
+            </button>
+            <button
+                onClick={handleUpdateButtonClick}
+                className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+                Update Stock Values
+            </button>
+        </div>
+    )
+
     if (isLoading || updateLoading) {
-        return <h2 className="mt-5 ml-5">Loading...</h2>
+        return (
+            <div>
+                {getTopButtons()}
+                <h2 className="mt-5 ml-5">Loading...</h2>
+            </div>
+        )
     }
-    if (error) return <div className="mt-5 ml-5">Error: {String(error)}</div>
-    if (!stock) return <h2 className="mt-5 ml-5">Stock not found</h2>
+    if (error)
+        return (
+            <div>
+                {getTopButtons()}
+                <div className="mt-5 ml-5">Error: {String(error)}</div>
+            </div>
+        )
+    if (!stock)
+        return (
+            <div>
+                {getTopButtons()}
+                <h2 className="mt-5 ml-5">Stock not found</h2>
+            </div>
+        )
     return (
         <div className="p-4 flex flex-col items-center">
-            <div className="flex w-full p-4 justify-around">
-                <button
-                    onClick={handleBackButtonClick}
-                    className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    Back to Stocks
-                </button>
-                <button
-                    onClick={handleUpdateButtonClick}
-                    className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    Update Stock Values
-                </button>
-            </div>
+            {getTopButtons()}
             <div className="flex gap-x-3 items-center mb-4">
                 <h1 className="text-xl font-bold">
                     {stock.name} ({stock.symbol})
