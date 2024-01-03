@@ -24,5 +24,7 @@ export function mergeDataSets(
     })
 
     // Convert the map back to an array
-    return Object.keys(mergedDataMap).map((date) => ({ date, ...mergedDataMap[date] }))
+    return Object.keys(mergedDataMap)
+        .map((date) => ({ date, ...mergedDataMap[date] }))
+        .sort((a, b) => a.date.localeCompare(b.date))
 }
