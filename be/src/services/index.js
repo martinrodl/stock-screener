@@ -48,7 +48,7 @@ export const getStockKeyMetrics = async (stockSymbol, limit = 10, period = PERIO
 export const getStockCashflowgrowthMetric = async (
     stockSymbol,
     limit = 10,
-    period = PERIODS.quarter
+    period = PERIODS.annual
 ) => {
     try {
         const response = await axios.get(

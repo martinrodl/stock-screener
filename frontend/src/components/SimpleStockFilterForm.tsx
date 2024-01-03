@@ -43,9 +43,9 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
         roic10yMin: savedStockCriteria?.roic10yMin ?? '',
         roeMin: savedStockCriteria?.roeMin ?? '',
         roe10yMin: savedStockCriteria?.roe10yMin ?? '',
-        intrinsicValueZeroGrowthMin: savedStockCriteria?.intrinsicValueZeroGrowthMin ?? '',
-        intrinsicValueAverageGrowthMin: savedStockCriteria?.intrinsicValueAverageGrowthMin ?? '',
-        intrinsicValueLastYearGrowthMin: savedStockCriteria?.intrinsicValueLastYearGrowthMin ?? '',
+        // intrinsicValueZeroGrowthMin: savedStockCriteria?.intrinsicValueZeroGrowthMin ?? '',
+        // intrinsicValueAverageGrowthMin: savedStockCriteria?.intrinsicValueAverageGrowthMin ?? '',
+        // intrinsicValueLastYearGrowthMin: savedStockCriteria?.intrinsicValueLastYearGrowthMin ?? '',
         averageProfitGrowthMin: savedStockCriteria?.averageProfitGrowthMin ?? '',
         averageDividendGrowthMin: savedStockCriteria?.averageDividendGrowthMin ?? '',
         averageNetIncomeGrowthMin: savedStockCriteria?.averageNetIncomeGrowthMin ?? '',
@@ -55,16 +55,31 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
         dividendYield10yMin: savedStockCriteria?.dividendYield10yMin ?? '',
         debtToAssetsMax: savedStockCriteria?.debtToAssetsMax ?? '',
         debtToEquityMax: savedStockCriteria?.debtToEquityMax ?? '',
-        netDebtToEBITDAMax: savedStockCriteria?.netDebtToEBITDAMax ?? '',
-        yearReturnMin: savedStockCriteria?.yearReturnMin ?? '',
+        // netDebtToEBITDAMax: savedStockCriteria?.netDebtToEBITDAMax ?? '',
+        // yearReturnMin: savedStockCriteria?.yearReturnMin ?? '',
     })
     const [isFormVisible, setIsFormVisible] = useState(true)
+
+    const percentageFields = [
+        'roeMin',
+        'roe10yMin',
+        'roicMin',
+        'roic10yMin',
+        'averageProfitGrowthMin',
+        'averageDividendGrowthMin',
+        'averageNetIncomeGrowthMin',
+        'averageProfitMarginMin',
+        'profitMarginMin',
+        'dividendYieldMin',
+        'dividendYield10yMin',
+        'debtToAssetsMax',
+        'debtToEquityMax',
+    ]
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         let { name, value } = e.target
 
-        // Convert percentage to decimal for dividend fields
-        if ((name === 'dividendYieldMin' || name === 'dividendYieldMax') && value) {
+        if (percentageFields.includes(name) && value) {
             value = (parseFloat(value) / 100).toString()
         }
 
@@ -86,9 +101,8 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
     }
 
     const prepareFieldValue = (key: string, value: string) => {
-        if (key === 'dividendYieldMin' || key === 'dividendYieldMax') {
-            // Convert back to percentage for display
-            return (parseFloat(value) * 100).toFixed(2)
+        if (percentageFields.includes(key) && value) {
+            return (parseFloat(value) * 100).toFixed(0)
         }
         return value
     }
@@ -114,6 +128,16 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
             case 'dividendYieldMin':
             case 'roicMin':
             case 'roeMin':
+            case 'roic10yMin':
+            case 'roe10yMin':
+            case 'averageProfitGrowthMin':
+            case 'averageDividendGrowthMin':
+            case 'averageNetIncomeGrowthMin':
+            case 'averageProfitMarginMin':
+            case 'profitMarginMin':
+            case 'dividendYield10yMin':
+            case 'debtToAssetsMax':
+            case 'debtToEquityMax':
                 return (
                     <div className="relative">
                         <input
@@ -130,17 +154,6 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
                             </span>
                         )}
                     </div>
-                )
-            case 'numberYears':
-                return (
-                    <input
-                        type="number"
-                        name={key}
-                        id={key}
-                        value={value || 3}
-                        onChange={handleChange}
-                        className=" mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
                 )
             default:
                 return (
@@ -176,11 +189,11 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
                                     displayedCriteria.includes(key)
                             ) // Check if displayedCriteria is empty or contains the key
                             .map(([key, value]) => (
-                                <div key={key} className="grid grid-rows-2">
+                                <div key={key} className="grid grid-rows-2 items-end">
                                     {/* ... other fields */}
                                     <label
                                         htmlFor={key}
-                                        className="block text-sm font-medium text-gray-700 capitalize"
+                                        className="text-sm line-clamp-2 font-medium text-gray-700 capitalize max-h-10"
                                     >
                                         {key.replace(/([A-Z])/g, ' $1')}:
                                         <span
