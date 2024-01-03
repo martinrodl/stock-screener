@@ -169,10 +169,12 @@ export const calculateROEROIC = async (ticker) => {
     if (!stock) {
         throw new Error(`Stock with symbol ${ticker} not found`)
     }
+
     const roe = stock.keyMetrics[0].roe
     const roic = stock.keyMetrics[0].roic
     const roe10y = calculateAverage(stock.keyMetrics, 'roe', 10)
     const roic10y = calculateAverage(stock.keyMetrics, 'roic', 10)
+
     stock.values.roe = roe
     stock.values.roic = roic
     stock.values.roe10y = roe10y
@@ -295,6 +297,7 @@ const calculateYearReturn = async (ticker) => {
 }
 
 export const updateStockValuesUtils = async (ticker) => {
+    console.log('Updating stock values for', ticker)
     try {
         await updateStockPrice(ticker)
     } catch (error) {

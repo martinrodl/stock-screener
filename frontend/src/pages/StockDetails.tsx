@@ -25,7 +25,7 @@ const StockDetails = () => {
         try {
             await updateStockValues(symbol ?? '').unwrap()
             delay(2000)
-            await refetch()
+            refetch()
         } catch (error) {
             console.error('Failed to update stock values:', error)
         }

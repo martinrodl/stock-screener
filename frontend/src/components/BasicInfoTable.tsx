@@ -184,7 +184,7 @@ const BasicInfoTable: React.FC<BasicInfoProps> = (props) => {
     }) => (
         <div key={key} className="flex justify-between items-center border-b py-2">
             <span className=" text-sm truncate">{label}:</span>
-            <span className="text-sm truncate ml-2">
+            <span className="inline-block text-sm truncate ml-2 w-20">
                 {props[key] !== undefined ? format(props[key]) : 'N/A'}
             </span>
         </div>

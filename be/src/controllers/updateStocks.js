@@ -15,7 +15,7 @@ export const launchSaveStockList = async (req, res) => {
     const { exchange } = req.body
     try {
         saveStockList(exchange)
-        res.sendStatus(201)
+        res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -27,7 +27,7 @@ export const launchUpdate = (updateFunction) => async (req, res) => {
     try {
         const stock = await Stock.findOne({ symbol })
         updateFunction(stock.symbol)
-        res.sendStatus(201)
+        res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -44,7 +44,7 @@ export const launchUpdateCashflowStatement = launchUpdate(updateCashflowStatemen
 export const launchUpdateAllStocksSubdocuments = async (req, res) => {
     try {
         updateAllStocksSubdocuments()
-        res.sendStatus(201)
+        res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -53,8 +53,8 @@ export const launchUpdateAllStocksSubdocuments = async (req, res) => {
 export const updateStockValues = async (req, res) => {
     try {
         const { symbol } = req.body
-        updateStockValuesUtils(symbol)
-        res.sendStatus(201)
+        await updateStockValuesUtils(symbol)
+        res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -63,7 +63,7 @@ export const updateStockValues = async (req, res) => {
 export const updateStocksValues = async (req, res) => {
     try {
         updateStocksValuesUtils()
-        res.sendStatus(201)
+        res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)
     }
