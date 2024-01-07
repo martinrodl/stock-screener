@@ -55,7 +55,7 @@ const SimpleStockList = () => {
     }
     return (
         <div className="flex flex-col items-center p-2">
-            <h1 className="text-xl font-bold mb-2">Stocks screener</h1>
+            <h1 className="text-xl font-bold mb-2">Simple stocks screener</h1>
             <SimpleStockFilterForm
                 savedStockCriteria={savedStockCriteria}
                 onSubmit={handleSubmit}

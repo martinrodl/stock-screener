@@ -1,17 +1,17 @@
 import { useState } from 'react'
 
 import {
-    useGetAllPortfolioStocksQuery,
-    useAddStockToPortfolioMutation,
-    useRemoveStockFromPortfolioMutation,
+    useGetAllConsiderStocksQuery,
+    useAddStockToConsiderMutation,
+    useRemoveStockFromConsiderMutation,
 } from '../services/stockApi'
 import { Stock } from '../types/Stock'
 import { PortofilLineStock } from '../components/PortofilLineStock'
 
-const ConsiderStocks = () => {
-    const { data: stocks, isLoading, error, refetch } = useGetAllPortfolioStocksQuery('')
-    const [addStockToPortfolio, { isLoading: isAdding }] = useAddStockToPortfolioMutation()
-    const [removeStockFromPortfolio] = useRemoveStockFromPortfolioMutation()
+const MyPortfolio = () => {
+    const { data: stocks, isLoading, error, refetch } = useGetAllConsiderStocksQuery('')
+    const [addStockToPortfolio, { isLoading: isAdding }] = useAddStockToConsiderMutation()
+    const [removeStockFromPortfolio] = useRemoveStockFromConsiderMutation()
 
     const [newStockSymbol, setNewStockSymbol] = useState('')
 
@@ -24,7 +24,7 @@ const ConsiderStocks = () => {
         }
     }
 
-    const handleRemoveStock = async (symbol: string) => {
+    const handleRemoveStock = async (symbol) => {
         await removeStockFromPortfolio(symbol)
         await refetch()
     }
@@ -32,17 +32,16 @@ const ConsiderStocks = () => {
     const renderStocks = (stocks: Stock[]) => {
         return stocks.map((stock, index) => (
             <PortofilLineStock
-                key={'portfoliostock' + index}
+                key={'considerstock' + index}
                 stock={stock}
                 index={index}
                 handleRemoveStock={handleRemoveStock}
             />
         ))
     }
-
     return (
         <div className="flex flex-col items-center p-2">
-            <h1 className="text-xl font-bold mb-2">My Portfolio</h1>
+            <h1 className="text-xl font-bold mb-2">Consider stocks</h1>
             <form onSubmit={handleAddStock} className="mb-4">
                 <input
                     type="text"
@@ -69,4 +68,4 @@ const ConsiderStocks = () => {
     )
 }
 
-export default ConsiderStocks
+export default MyPortfolio

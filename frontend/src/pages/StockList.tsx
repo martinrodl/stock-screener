@@ -55,7 +55,7 @@ const StockList = () => {
     }
     return (
         <div className="flex flex-col items-center p-2">
-            <h1 className="text-xl font-bold mb-2">Stocks screener</h1>
+            <h1 className="text-xl font-bold mb-2">Stocks screener - not working properly yet</h1>
             <StockFilterForm savedStockCriteria={savedStockCriteria} onSubmit={handleSubmit} />
             <div className="mt-6">
                 {isLoading && <h2 className="my-2">Loading...</h2>}

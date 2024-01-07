@@ -16,7 +16,14 @@ import {
 
 import { filterStocks, simpleFilterStocks } from '../controllers/filterStocks.js'
 import { updateBondYield } from '../controllers/otherData.js'
-import { getPortfolioStocks } from '../controllers/portfolioStock.js'
+import {
+    addStockToConsider,
+    addStockToPortfolio,
+    getAllConsiderStocks,
+    getAllPortfolioStocks,
+    removeStockFromPortfolio,
+    removeStockFromConsider,
+} from '../controllers/portfolioStock.js'
 
 const router = express.Router()
 
@@ -26,7 +33,12 @@ router.get('/status', getStatus) // Route to get the status of the server
 // Stock routes
 router.get('/onestock', getStock) // Route to get all stocks from the database
 router.get('/stocks', getAllStocks) // Route to get all stocks from the database
-router.post('/portfoliostocks', getPortfolioStocks) // Route to get all stocks from the database
+router.get('/portfoliostocks', getAllPortfolioStocks) // Route to get all stocks from the database
+router.post('/portfoliostocks', addStockToPortfolio) // Route to post a stock to the portfolio
+router.delete('/portfoliostocks', removeStockFromPortfolio) // Route to delete a stock from the portfolio
+router.get('/considerstocks', getAllConsiderStocks) // Route to get all stocks from the database
+router.post('/considerstocks', addStockToConsider) // Route to post a stock to the portfolio
+router.delete('/considerstocks', removeStockFromConsider) // Route to post a stock to the portfolio
 
 // Update routes
 router.post('/launchsavestockslist', launchSaveStockList) // Route to launch the saveStockList function

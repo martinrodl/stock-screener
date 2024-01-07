@@ -9,30 +9,35 @@ const pages = [
         path: '/',
     },
     {
-        key: 'home',
+        key: 'stock-screener',
         title: 'Stock Screener - experimental',
         path: '/stock-screener',
     },
 
+    // {
+    //     key: 'graham-rules-screener',
+    //     title: 'Graham Rules Screener',
+    //     path: '/graham-list',
+    // },
+    {
+        key: 'PortfolioStocks',
+        title: 'Portfolio List',
+        path: '/portfolio-list',
+    },
+    {
+        key: 'ConsiderStocks',
+        title: 'Consider List',
+        path: '/consider-list',
+    },
+    // {
+    //     key: 'long-term-recommendation',
+    //     title: 'Long Term Recommendation - not working',
+    //     path: '/',
+    // },
     {
         key: 'criteria-list',
         title: 'Criteria List',
         path: '/criteria-list',
-    },
-    {
-        key: 'graham-rules-screener',
-        title: 'Graham Rules Screener',
-        path: '/graham-list',
-    },
-    {
-        key: 'PortfolioStocks',
-        title: 'Portfolio List',
-        path: '/PortfolioStocks',
-    },
-    {
-        key: 'long-term-recommendation',
-        title: 'Long Term Recommendation - not working',
-        path: '/',
     },
 ]
 

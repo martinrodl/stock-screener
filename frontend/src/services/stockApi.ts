@@ -55,6 +55,40 @@ export const stockApi = createApi({
                 body: { symbol },
             }),
         }),
+        getAllPortfolioStocks: builder.query<Stock[], string>({
+            query: () => '/api/portfoliostocks',
+        }),
+        addStockToPortfolio: builder.mutation({
+            query: (symbol) => ({
+                url: '/api/portfoliostocks',
+                method: 'POST',
+                body: { symbol },
+            }),
+        }),
+        removeStockFromPortfolio: builder.mutation({
+            query: (symbol) => ({
+                url: '/api/portfoliostocks',
+                method: 'DELETE',
+                body: { symbol },
+            }),
+        }),
+        getAllConsiderStocks: builder.query<Stock[], string>({
+            query: () => '/api/considerstocks',
+        }),
+        addStockToConsider: builder.mutation({
+            query: (symbol) => ({
+                url: '/api/considerstocks',
+                method: 'POST',
+                body: { symbol },
+            }),
+        }),
+        removeStockFromConsider: builder.mutation({
+            query: (symbol) => ({
+                url: '/api/considerstocks',
+                method: 'DELETE',
+                body: { symbol },
+            }),
+        }),
     }),
 })
 
@@ -64,4 +98,10 @@ export const {
     useFetchPorfolioStockMutation,
     useSimpleFetchStocksMutation,
     useUpdateStockValuesMutation,
+    useGetAllPortfolioStocksQuery,
+    useAddStockToPortfolioMutation,
+    useRemoveStockFromPortfolioMutation,
+    useGetAllConsiderStocksQuery,
+    useAddStockToConsiderMutation,
+    useRemoveStockFromConsiderMutation,
 } = stockApi

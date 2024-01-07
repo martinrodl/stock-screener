@@ -41,6 +41,7 @@ const actualValues = new mongoose.Schema(
         similarCompanies: [String],
         averagePESimilarCompanies: Number,
         yearReturn: Number,
+        earningsDate: String,
     },
     { timestamps: true }
 )

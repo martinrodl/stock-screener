@@ -146,6 +146,8 @@ export const filterStocks = async (req, res) => {
                 name: stock.name,
                 marketCap: stock.values.marketCap,
                 peRatio: stock.values.peRatio,
+                earningsDate: stock.values.earningsDate,
+                yearReturn: stock.values.yearReturn,
             }))
 
         res.json(filteredStocks)
@@ -261,6 +263,8 @@ export const simpleFilterStocks = async (req, res) => {
             name: stock.name,
             marketCap: stock.values.marketCap,
             peRatio: stock.values.peRatio,
+            earningsDate: stock.values.earningsDate,
+            yearReturn: stock.values.yearReturn,
         }))
 
         res.json(filteredStocks)

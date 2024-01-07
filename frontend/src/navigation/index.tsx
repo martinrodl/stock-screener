@@ -5,6 +5,7 @@ import StockList from '../pages/StockList'
 import CriteriaList from '../pages/CriteriaList'
 import GrahamList from '../pages/GrahamList'
 import PortfolioStocks from '../pages/PortfolioStocks'
+import ConsiderStocks from '../pages/ConsiderStocks'
 import SimpleStockList from '../pages/SimpleStockList'
 
 const AppRoutes = () => {
@@ -15,8 +16,9 @@ const AppRoutes = () => {
                 <Route path="stock-screener" element={<StockList />} />
                 <Route path="stock/:symbol" element={<StockDetails />} />
                 <Route path="criteria-list" element={<CriteriaList />} />
+                <Route path="portfolio-list" element={<PortfolioStocks />} />
+                <Route path="consider-list" element={<ConsiderStocks />} />
                 <Route path="graham-list" element={<GrahamList />} />
-                <Route path="PortfolioStocks" element={<PortfolioStocks />} />
             </Route>
         </Routes>
     )

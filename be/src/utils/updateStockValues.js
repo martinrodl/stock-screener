@@ -1,3 +1,5 @@
+import axios from 'axios'
+import cheerio from 'cheerio'
 import OtherData from '../models/otherData.js'
 import Stock from '../models/stockModel.js'
 import {
@@ -296,6 +298,33 @@ const calculateYearReturn = async (ticker) => {
     await stock.save()
 }
 
+async function fetchEarningsDate(ticker) {
+    try {
+        const stock = await Stock.findOne({ symbol: ticker })
+        if (!stock) {
+            throw new Error(`Stock with symbol ${ticker} not found`)
+        }
+        const url = `https://finance.yahoo.com/quote/${ticker}?p=${ticker}&.tsrc=fin-srch`
+        const { data } = await axios.get(url)
+        const $ = cheerio.load(data)
+
+        // The selector might change based on the website's structure
+        const earningsDateSelector = 'td[data-test="EARNINGS_DATE-value"] > span'
+        const earningsDate = $(earningsDateSelector).first().text()
+
+        if (!earningsDate) {
+            console.log('Earnings date not found.')
+            return null
+        }
+
+        console.log(`Earnings Date for ${ticker}: ${earningsDate}`)
+        stock.values.earningsDate = earningsDate
+        await stock.save()
+    } catch (error) {
+        console.error(`An error occurred: ${error.message}`)
+    }
+}
+
 export const updateStockValuesUtils = async (ticker) => {
     console.log('Updating stock values for', ticker)
     try {
@@ -347,5 +376,10 @@ export const updateStockValuesUtils = async (ticker) => {
         await calculateYearReturn(ticker)
     } catch (error) {
         console.error('Error  calculateYearReturn data:', error)
+    }
+    try {
+        await fetchEarningsDate(ticker)
+    } catch (error) {
+        console.error('Error  fetchEarningsDate data:', error)
     }
 }
