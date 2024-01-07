@@ -15,7 +15,7 @@ export async function addStockToPortfolio(req, res) {
     const { symbol } = req.body
     try {
         const document = await PortfolioModel.findOne()
-        if (document && document.portfolioStocks && document.portfolioStocks.length > 0) {
+        if (document) {
             await PortfolioModel.findByIdAndUpdate(document._id, {
                 $addToSet: { portfolioStocks: symbol },
             })
