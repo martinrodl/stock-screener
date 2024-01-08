@@ -1,6 +1,6 @@
 import express from 'express'
 import { getStatus } from '../controllers/status.js'
-import { getAllStocks, getStock } from '../controllers/stocks.js'
+import { getAllStocks, getStock, getStockSureData } from '../controllers/stocks.js'
 import {
     launchSaveStockList,
     launchUpdateKeyMetrics,
@@ -35,6 +35,7 @@ router.get('/status', getStatus) // Route to get the status of the server
 
 // Stock routes
 router.get('/onestock', getStock) // Route to get all stocks from the database
+router.get('/stocksuredata', getStockSureData)
 router.get('/stocks', getAllStocks) // Route to get all stocks from the database
 router.get('/portfoliostocks', getAllPortfolioStocks) // Route to get all stocks from the database
 router.post('/portfoliostocks', addStockToPortfolio) // Route to post a stock to the portfolio

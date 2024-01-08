@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { StockDetail } from '../types/StockDetail'
 import { StockCriteria } from '../types/StockCriteria'
 import { Stock } from '../types/Stock'
+import { StockSureData } from '../types/SureData'
 
 interface StockCriteriaWithPagination extends StockCriteria {
     criteria: StockCriteria
@@ -89,6 +90,10 @@ export const stockApi = createApi({
                 body: { symbol },
             }),
         }),
+
+        getStockSureData: builder.query<StockSureData, string>({
+            query: (symbol) => `/api/stocksuredata?symbol=${symbol}`,
+        }),
     }),
 })
 
@@ -104,4 +109,5 @@ export const {
     useGetAllConsiderStocksQuery,
     useAddStockToConsiderMutation,
     useRemoveStockFromConsiderMutation,
+    useGetStockSureDataQuery,
 } = stockApi

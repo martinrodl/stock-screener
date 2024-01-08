@@ -3,6 +3,7 @@ import { useState } from 'react'
 import BarChart from '../components/BarChart'
 import BasicInfoTable from '../components/BasicInfoTable'
 import DetailMetricsTable from '../components/DetailMetricsTable'
+import StockTable from '../components/SureTable'
 import { useGetStockDetailQuery, useUpdateStockValuesMutation } from '../services/stockApi'
 import { getProperties } from '../helpers/getPropertyData'
 import { mergeDataSets } from '../helpers/mergeDatasets'
@@ -18,7 +19,7 @@ const StockDetails = () => {
     const [updateStockValues, { isLoading: updateLoading }] = useUpdateStockValuesMutation()
 
     const handleBackButtonClick = () => {
-        navigate('/')
+        navigate(-1) // Navigates back to the last page in history
     }
 
     const handleUpdateButtonClick = async () => {
@@ -140,7 +141,7 @@ const StockDetails = () => {
             </div>
 
             <DetailMetricsTable stockDetail={stock} />
-
+            <StockTable symbol={stock.symbol} />
             <div className="my-4 flex flex-col gap-y-10 mt-20">
                 <h1 className="text-lg font-semibold text-center">Growth Metrics Graph</h1>
                 <div className="h-[300px] w-[800px]">
@@ -151,6 +152,7 @@ const StockDetails = () => {
                         <BarChart mergedDatasets={datasets2} maxValue={1} />
                     )}
                 </div>
+                StockTable
             </div>
         </div>
     )

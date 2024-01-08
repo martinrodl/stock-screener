@@ -18,3 +18,18 @@ export const getStock = async (req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const getStockSureData = async (req, res) => {
+    try {
+        const { symbol } = req.query
+        const stock = await Stock.findOne({ symbol })
+        console.log(stock)
+        if (!stock) {
+            res.json({ error: 'Stock not found' })
+        } else {
+            res.json(stock.sureData)
+        }
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
