@@ -7,6 +7,7 @@ import balanceSheetStatement from './balanceSheet.js'
 import incomeStatement from './incomeStatement.js'
 import cashflowStatement from './cashflowStatement.js'
 import values from './values.js'
+import sureData from './sureData.js'
 
 const stockSchema = new mongoose.Schema({
     symbol: {
@@ -29,6 +30,7 @@ const stockSchema = new mongoose.Schema({
     incomeStatementsQuarters: { type: [incomeStatement.schema], required: true },
     cashflowStatements: { type: [cashflowStatement.schema], required: true },
     values: { type: values.schema },
+    sureData: { type: sureData.schema },
 })
 
 const Stock = mongoose.model('Stock', stockSchema)

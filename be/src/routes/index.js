@@ -25,6 +25,9 @@ import {
     removeStockFromConsider,
 } from '../controllers/portfolioStock.js'
 
+import { updateExcel } from '../controllers/sureExcel.js'
+import { fileUploadController } from '../controllers/uploadFile.js'
+
 const router = express.Router()
 
 // Status route
@@ -39,6 +42,9 @@ router.delete('/portfoliostocks', removeStockFromPortfolio) // Route to delete a
 router.get('/considerstocks', getAllConsiderStocks) // Route to get all stocks from the database
 router.post('/considerstocks', addStockToConsider) // Route to post a stock to the portfolio
 router.delete('/considerstocks', removeStockFromConsider) // Route to post a stock to the portfolio
+
+// Update excel
+router.post('/updateexcel', fileUploadController, updateExcel)
 
 // Update routes
 router.post('/launchsavestockslist', launchSaveStockList) // Route to launch the saveStockList function
