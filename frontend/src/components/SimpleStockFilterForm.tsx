@@ -43,9 +43,6 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
         roic10yMin: savedStockCriteria?.roic10yMin ?? '',
         roeMin: savedStockCriteria?.roeMin ?? '',
         roe10yMin: savedStockCriteria?.roe10yMin ?? '',
-        // intrinsicValueZeroGrowthMin: savedStockCriteria?.intrinsicValueZeroGrowthMin ?? '',
-        // intrinsicValueAverageGrowthMin: savedStockCriteria?.intrinsicValueAverageGrowthMin ?? '',
-        // intrinsicValueLastYearGrowthMin: savedStockCriteria?.intrinsicValueLastYearGrowthMin ?? '',
         averageProfitGrowthMin: savedStockCriteria?.averageProfitGrowthMin ?? '',
         averageDividendGrowthMin: savedStockCriteria?.averageDividendGrowthMin ?? '',
         averageNetIncomeGrowthMin: savedStockCriteria?.averageNetIncomeGrowthMin ?? '',
@@ -57,6 +54,9 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
         debtToEquityMax: savedStockCriteria?.debtToEquityMax ?? '',
         // netDebtToEBITDAMax: savedStockCriteria?.netDebtToEBITDAMax ?? '',
         // yearReturnMin: savedStockCriteria?.yearReturnMin ?? '',
+        IntrinsicRatioZeroMin: savedStockCriteria?.IntrinsicRatioZeroMin ?? '',
+        IntrinsicRatioAverageMin: savedStockCriteria?.IntrinsicRatioAverageMin ?? '',
+        IntrinsicRatioLastYearMin: savedStockCriteria?.IntrinsicRatioLastYearMin ?? '',
     })
     const [isFormVisible, setIsFormVisible] = useState(true)
 

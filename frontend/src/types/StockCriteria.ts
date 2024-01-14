@@ -32,9 +32,9 @@ export type SimpleStockCriteria = {
     roic10yMin?: string
     roeMin?: string
     roe10yMin?: string
-    intrinsicValueZeroGrowthMin?: string
-    intrinsicValueAverageGrowthMin?: string
-    intrinsicValueLastYearGrowthMin?: string
+    IntrinsicRatioZeroMin?: string
+    IntrinsicRatioAverageMin?: string
+    IntrinsicRatioLastYearMin?: string
     averageProfitGrowthMin?: string
     averageDividendGrowthMin?: string
     averageNetIncomeGrowthMin?: string

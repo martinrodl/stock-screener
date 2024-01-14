@@ -167,9 +167,9 @@ export const simpleFilterStocks = async (req, res) => {
             roic10yMin,
             roeMin,
             roe10yMin,
-            intrinsicValueZeroGrowthMin,
-            intrinsicValueAverageGrowthMin,
-            intrinsicValueLastYearGrowthMin,
+            IntrinsicRatioZeroMin,
+            IntrinsicRatioAverageMin,
+            IntrinsicRatioLastYearMin,
             averageProfitGrowthMin,
             averageDividendGrowthMin,
             averageNetIncomeGrowthMin,
@@ -185,79 +185,118 @@ export const simpleFilterStocks = async (req, res) => {
             skip = 0, // Default offset
         } = req.body
 
-        const stockPromise = Stock.find({}).select('symbol name values')
+        let matchConditions = {}
+        console.log('IntrinsicRatioZeroMin ', IntrinsicRatioZeroMin)
+        console.log('IntrinsicRatioAverageMin ', IntrinsicRatioAverageMin)
 
         if (marketCapMin) {
-            stockPromise.where('values.marketCap').gte(marketCapMin)
+            matchConditions['values.marketCap'] = { $gte: parseFloat(marketCapMin) }
         }
-
-        if (peRatioMin) {
-            stockPromise.where('values.peRatio').gte(peRatioMin)
-        }
-        if (peRatioMax) {
-            stockPromise.where('values.peRatio').lte(peRatioMax)
+        if (peRatioMin || peRatioMax) {
+            matchConditions['values.peRatio'] = {}
+            if (peRatioMin) {
+                matchConditions['values.peRatio'].$gte = parseFloat(peRatioMin)
+            }
+            if (peRatioMax) {
+                matchConditions['values.peRatio'].$lte = parseFloat(peRatioMax)
+            }
         }
         if (roicMin) {
-            stockPromise.where('keyMetrics.roic').gte(roicMin)
+            matchConditions['keyMetrics.roic'] = { $gte: parseFloat(roicMin) }
         }
         if (roic10yMin) {
-            stockPromise.where('keyMetrics.roic10y').gte(roic10yMin)
+            matchConditions['keyMetrics.roic10y'] = { $gte: parseFloat(roic10yMin) }
         }
         if (roeMin) {
-            stockPromise.where('keyMetrics.roe').gte(roeMin)
+            matchConditions['keyMetrics.roe'] = { $gte: parseFloat(roeMin) }
         }
         if (roe10yMin) {
-            stockPromise.where('keyMetrics.roe10y').gte(roe10yMin)
-        }
-        if (intrinsicValueZeroGrowthMin) {
-            stockPromise.where('values.intrinsicValueZeroGrowth').gte(intrinsicValueZeroGrowthMin)
-        }
-        if (intrinsicValueAverageGrowthMin) {
-            stockPromise
-                .where('values.intrinsicValueAverageGrowth')
-                .gte(intrinsicValueAverageGrowthMin)
-        }
-        if (intrinsicValueLastYearGrowthMin) {
-            stockPromise
-                .where('values.intrinsicValueLastYearGrowth')
-                .gte(intrinsicValueLastYearGrowthMin)
+            matchConditions['keyMetrics.roe10y'] = { $gte: parseFloat(roe10yMin) }
         }
         if (averageProfitGrowthMin) {
-            stockPromise.where('values.averageProfitGrowth').gte(averageProfitGrowthMin)
+            matchConditions['values.averageProfitGrowth'] = {
+                $gte: parseFloat(averageProfitGrowthMin),
+            }
         }
         if (averageDividendGrowthMin) {
-            stockPromise.where('values.averageDividendGrowth').gte(averageDividendGrowthMin)
+            matchConditions['values.averageDividendGrowth'] = {
+                $gte: parseFloat(averageDividendGrowthMin),
+            }
         }
         if (averageNetIncomeGrowthMin) {
-            stockPromise.where('values.averageNetIncomeGrowth').gte(averageNetIncomeGrowthMin)
+            matchConditions['values.averageNetIncomeGrowth'] = {
+                $gte: parseFloat(averageNetIncomeGrowthMin),
+            }
         }
         if (averageProfitMarginMin) {
-            stockPromise.where('values.averageProfitMargin').gte(averageProfitMarginMin)
+            matchConditions['values.averageProfitMargin'] = {
+                $gte: parseFloat(averageProfitMarginMin),
+            }
         }
         if (profitMarginMin) {
-            stockPromise.where('values.profitMargin').gte(profitMarginMin)
+            matchConditions['values.profitMargin'] = { $gte: parseFloat(profitMarginMin) }
         }
         if (dividendYieldMin) {
-            stockPromise.where('keyMetrics.dividendYield').gte(dividendYieldMin)
+            matchConditions['keyMetrics.dividendYield'] = { $gte: parseFloat(dividendYieldMin) }
         }
         if (dividendYield10yMin) {
-            stockPromise.where('keyMetrics.dividendYield10y').gte(dividendYield10yMin)
+            matchConditions['keyMetrics.dividendYield10y'] = {
+                $gte: parseFloat(dividendYield10yMin),
+            }
         }
         if (debtToAssetsMax) {
-            stockPromise.where('keyMetrics.debtToAssets').lte(debtToAssetsMax)
+            matchConditions['keyMetrics.debtToAssets'] = { $lte: parseFloat(debtToAssetsMax) }
         }
         if (debtToEquityMax) {
-            stockPromise.where('keyMetrics.debtToEquity').lte(debtToEquityMax)
+            matchConditions['keyMetrics.debtToEquity'] = { $lte: parseFloat(debtToEquityMax) }
         }
         if (netDebtToEBITDAMax) {
-            stockPromise.where('keyMetrics.netDebtToEBITDA').lte(netDebtToEBITDAMax)
+            matchConditions['keyMetrics.netDebtToEBITDA'] = { $lte: parseFloat(netDebtToEBITDAMax) }
         }
         if (yearReturnMin) {
-            stockPromise.where('values.yearReturn').gte(yearReturnMin)
+            matchConditions['values.yearReturn'] = { $gte: parseFloat(yearReturnMin) }
         }
 
-        const stocks = await stockPromise.skip(skip).limit(limit)
+        let aggregationPipeline = []
 
+        if (IntrinsicRatioZeroMin) {
+            aggregationPipeline.push({
+                $addFields: {
+                    intrinsicRatioZero: {
+                        $divide: ['$values.intrinsicValueZeroGrowth', '$values.price'],
+                    },
+                },
+            })
+            matchConditions['intrinsicRatioZero'] = { $gte: 1 / parseFloat(IntrinsicRatioZeroMin) }
+        }
+        if (IntrinsicRatioAverageMin) {
+            aggregationPipeline.push({
+                $addFields: {
+                    intrinsicRatioAverage: {
+                        $divide: ['$values.intrinsicValueAverageGrowth', '$values.price'],
+                    },
+                },
+            })
+            matchConditions['intrinsicRatioAverage'] = {
+                $gte: 1 / parseFloat(IntrinsicRatioAverageMin),
+            }
+        }
+        if (IntrinsicRatioLastYearMin) {
+            aggregationPipeline.push({
+                $addFields: {
+                    intrinsicRatioLastYear: {
+                        $divide: ['$values.intrinsicValueLastYearGrowth', '$values.price'],
+                    },
+                },
+            })
+            matchConditions['intrinsicRatioLastYear'] = {
+                $gte: 1 / parseFloat(IntrinsicRatioLastYearMin),
+            }
+        }
+
+        aggregationPipeline.push({ $match: matchConditions })
+
+        const stocks = await Stock.aggregate(aggregationPipeline).skip(skip).limit(limit)
         const filteredStocks = stocks.map((stock) => ({
             symbol: stock.symbol,
             name: stock.name,
