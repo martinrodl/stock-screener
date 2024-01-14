@@ -8,6 +8,7 @@ import incomeStatement from './incomeStatement.js'
 import cashflowStatement from './cashflowStatement.js'
 import values from './values.js'
 import sureData from './sureData.js'
+import outlookData from './outlookData.js'
 
 const stockSchema = new mongoose.Schema({
     symbol: {
@@ -31,6 +32,7 @@ const stockSchema = new mongoose.Schema({
     cashflowStatements: { type: [cashflowStatement.schema], required: true },
     values: { type: values.schema },
     sureData: { type: sureData.schema },
+    outlookData: { type: outlookData.schema },
 })
 
 const Stock = mongoose.model('Stock', stockSchema)
