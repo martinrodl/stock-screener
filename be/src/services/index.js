@@ -118,3 +118,14 @@ export const getStockPeers = async (stockSymbol) => {
         console.error('Error in fetching StockPeers data:', error)
     }
 }
+
+export const getOutlookData = async (stockSymbol) => {
+    try {
+        const response = await axios.get(
+            `https://financialmodelingprep.com/api/v4/company-outlook?symbol=${stockSymbol}&apikey=${process.env.API_KEY}`
+        )
+        return response.data
+    } catch (error) {
+        console.error('Error in fetching Outlook data:', error)
+    }
+}

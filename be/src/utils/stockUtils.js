@@ -9,6 +9,7 @@ import {
     getStockIncomeStatement,
     getStockBalanceSheet,
     getStockCashflow,
+    getOutlookData,
 } from '../services/index.js'
 import { delay } from '../helpers/delay.js'
 import { updateStockValuesUtils } from './updateStockValues.js'
@@ -181,21 +182,77 @@ export const updateCashflowStatements = async (stockSymbol, limit = 10) => {
     }
 }
 
+export const updateStockOutlookData = async (stockSymbol) => {
+    try {
+        const stock = await Stock.findOne({ symbol: stockSymbol })
+        if (!stock) {
+            throw new Error(`Stock with symbol ${stockSymbol} not found`)
+        }
+        const outLookData = await getOutlookData(stockSymbol)
+        stock.outlookData.description = outLookData.description
+        stock.outlookData.sector = outLookData.sector
+        stock.outlookData.industry = outLookData.industry
+        stock.outlookData.country = outLookData.country
+        stock.outlookData.splitsHistory = outLookData.splitsHistory
+        stock.outlookData.stockDividends = outLookData.stockDividends
+        stock.outlookData.stockNews = outLookData.stockNews
+        stock.outlookData.ratings = outLookData.ratings
+    } catch (error) {
+        console.error('Error in fetching stock data:', error)
+    }
+}
+
 export const updateAllStocksSubdocuments = async () => {
     try {
         const stocks = await Stock.find({})
         for (const stock of stocks) {
             try {
-                await updateKeyMetrics(stock.symbol)
-                await updateGrowthCashflowMetrics(stock.symbol)
-                await updateGrowthIncomegrowthmetrics(stock.symbol)
-                await updateIncomeStatements(stock.symbol)
-                await updateBalancedSheets(stock.symbol)
-                await updateCashflowStatements(stock.symbol)
+                try {
+                    console.log('Updating stock outlook data for:', stock.symbol)
+                    await updateStockOutlookData(stock.symbol)
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
+                try {
+                    console.log('Updating key metrics for:', stock.symbol)
+                    await updateKeyMetrics(stock.symbol)
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
+                try {
+                    console.log('Updating growth cashflow metrics for:', stock.symbol)
+                    await updateGrowthCashflowMetrics(stock.symbol)
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
+                try {
+                    console.log('Updating growth income metrics for:', stock.symbol)
+                    await updateGrowthIncomegrowthmetrics(stock.symbol)
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
+                try {
+                    console.log('Updating income statements for:', stock.symbol)
+                    await updateIncomeStatements(stock.symbol)
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
+                try {
+                    console.log('Updating balanced sheets for:', stock.symbol)
+                    await updateBalancedSheets(stock.symbol)
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
+                try {
+                    console.log('Updating cashflow statements for:', stock.symbol)
+                    await updateCashflowStatements(stock.symbol)
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
+
                 delay(1500) // Delay to avoid rate limiting
             } catch (error) {
                 console.error('Error in fetching stock data:', error)
-                continue
             }
         }
     } catch (error) {
