@@ -90,6 +90,7 @@ const StockDetails = () => {
                 <h2 className="mt-5 ml-5">Stock not found</h2>
             </div>
         )
+    console.log(stock)
     return (
         <div className="p-4 flex flex-col items-center">
             {getTopButtons()}
@@ -98,6 +99,15 @@ const StockDetails = () => {
                     {stock.name} ({stock.symbol})
                 </h1>
                 <p>Exchange: {stock.values.exchange}</p>
+            </div>
+            <div className="flex flex-col gap-y-1 my-2">
+                <h3 className="font-semibold">Description:</h3>
+                <p className="text-sm">{stock.outlookData.description}</p>
+                <div className="flex flex-col">
+                    <h3 className="">Sector: {stock.outlookData.sector}</h3>
+                    <h3 className="">Inudstry: {stock.outlookData.industry}</h3>
+                    <h3 className="">Country: {stock.outlookData.country}</h3>
+                </div>
             </div>
             <div className="mb-14">
                 <BasicInfoTable

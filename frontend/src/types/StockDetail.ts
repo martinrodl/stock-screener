@@ -18,6 +18,12 @@ export interface StockDetail {
     keyMetrics: KeyMetrics[]
     lastUpdateAt: string
     values: Values
+    outlookData: {
+        description: string
+        industry: string
+        country: string
+        sector: string
+    }
 }
 
 // Define other interfaces similarly with all their respective fields

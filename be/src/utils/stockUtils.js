@@ -189,14 +189,21 @@ export const updateStockOutlookData = async (stockSymbol) => {
             throw new Error(`Stock with symbol ${stockSymbol} not found`)
         }
         const outLookData = await getOutlookData(stockSymbol)
-        stock.outlookData.description = outLookData.description
-        stock.outlookData.sector = outLookData.sector
-        stock.outlookData.industry = outLookData.industry
-        stock.outlookData.country = outLookData.country
+        if (!stock.outlookData) {
+            stock.outlookData = {}
+        }
+        stock.outlookData.description = outLookData.profile.description
+        stock.outlookData.sector = outLookData.profile.sector
+        stock.outlookData.industry = outLookData.profile.industry
+        stock.outlookData.country = outLookData.profile.country
+        stock.outlookData.isEtf = outLookData.profile.isEtf
+        stock.outlookData.fullTimeEmployees = outLookData.profile.fullTimeEmployees
         stock.outlookData.splitsHistory = outLookData.splitsHistory
-        stock.outlookData.stockDividends = outLookData.stockDividends
+        stock.outlookData.stockDividends = outLookData.stockDividend
         stock.outlookData.stockNews = outLookData.stockNews
-        stock.outlookData.ratings = outLookData.ratings
+        stock.outlookData.ratings = outLookData.rating
+        // stock.outlookData.quarter = outLookData.financialsQuarter
+        await stock.save()
     } catch (error) {
         console.error('Error in fetching stock data:', error)
     }

@@ -12,6 +12,7 @@ import {
     launchUpdateAllStocksSubdocuments,
     updateStockValues,
     updateStocksValues,
+    updateOutlookData,
 } from '../controllers/updateStocks.js'
 
 import { filterStocks, simpleFilterStocks } from '../controllers/filterStocks.js'
@@ -59,6 +60,7 @@ router.post('/launchUpdateCashflowStatement', launchUpdateCashflowStatement) // 
 router.post('/launchUpdateAllStocksSubdocuments', launchUpdateAllStocksSubdocuments) // Route to launch the updateIncomeStatement function
 router.post('/updateStockValues', updateStockValues)
 router.post('/updateStocksValues', updateStocksValues)
+router.post('/updateOutlookData', updateOutlookData)
 
 // Filter routes
 router.post('/filterstocks', filterStocks) // Route to filter stock

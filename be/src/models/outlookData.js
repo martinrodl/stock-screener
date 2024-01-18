@@ -6,6 +6,8 @@ const outLookData = new mongoose.Schema(
         sector: String,
         industry: String,
         country: String,
+        isEtf: Boolean,
+        fullTimeEmployees: Number,
         splitsHistory: {
             type: [
                 {
