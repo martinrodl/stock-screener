@@ -90,7 +90,7 @@ const outLookData = new mongoose.Schema(
             ],
         },
     },
-    { timestamps: true }
+    { timestamps: true, strict: false }
 )
 
 const Outlook = mongoose.model('OutlookData', outLookData)
