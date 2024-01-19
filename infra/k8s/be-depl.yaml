@@ -14,14 +14,14 @@ spec:
         spec:
             containers:
                 - name: be
-                  image: mrodl/stocks-be:1.0.29
+                  image: mrodl/stocks-be:1.0.30
                   imagePullPolicy: Always
                   resources:
                       limits:
-                          memory: 2048Mi
+                          memory: 4096Mi
                           cpu: '0.8'
                       requests:
-                          memory: 256Mi
+                          memory: 512Mi
                           cpu: '0.2'
                   env:
                       - name: MONGO_URI

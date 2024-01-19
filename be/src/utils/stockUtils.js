@@ -212,7 +212,9 @@ export const updateStockOutlookData = async (stockSymbol) => {
 export const updateAllStocksSubdocuments = async () => {
     try {
         const stocks = await Stock.find({})
+
         for (const stock of stocks) {
+            console.log('Updating all subdocuments for:', stock.symbol)
             try {
                 try {
                     console.log('Updating stock outlook data for:', stock.symbol)
