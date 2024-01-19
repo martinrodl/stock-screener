@@ -90,7 +90,6 @@ const StockDetails = () => {
                 <h2 className="mt-5 ml-5">Stock not found</h2>
             </div>
         )
-
     return (
         <div className="p-4 flex flex-col items-center">
             {getTopButtons()}

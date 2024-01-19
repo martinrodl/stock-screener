@@ -201,7 +201,7 @@ export const updateStockOutlookData = async (stockSymbol) => {
         stock.outlookData.splitsHistory = outLookData.splitsHistory
         stock.outlookData.stockDividends = outLookData.stockDividend
         stock.outlookData.stockNews = outLookData.stockNews
-        stock.outlookData.ratings = outLookData.rating
+        // stock.outlookData.ratings = outLookData.rating
         // stock.outlookData.quarter = outLookData.financialsQuarter
         await stock.save()
     } catch (error) {
