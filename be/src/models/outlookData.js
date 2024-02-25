@@ -28,7 +28,7 @@ const outLookData = new mongoose.Schema(
         stockNews: {
             type: [
                 {
-                    date: Date,
+                    publishedDate: Date,
                     title: String,
                     text: String,
                     site: String,
@@ -66,26 +66,6 @@ const outLookData = new mongoose.Schema(
                     value: Number,
                     type: String,
                     price: Number,
-                },
-            ],
-        },
-        quarter: {
-            type: [
-                {
-                    date: Date,
-                    revenue: Number,
-                    earnings: Number,
-                    earningsPerShare: Number,
-                    cash: Number,
-                    debt: Number,
-                    freeCashFlow: Number,
-                    operatingCashFlow: Number,
-                    operatingIncome: Number,
-                    operatingRevenue: Number,
-                    totalAssets: Number,
-                    totalLiabilities: Number,
-                    totalRevenue: Number,
-                    totalShareholderEquity: Number,
                 },
             ],
         },

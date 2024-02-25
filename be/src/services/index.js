@@ -75,7 +75,11 @@ export const getStockIncomegrowthMetric = async (
     }
 }
 
-export const getStockIncomeStatement = async (stockSymbol, limit = 10, period = PERIODS.annual) => {
+export const getStockIncomeStatement = async (
+    stockSymbol,
+    limit = 10,
+    period = PERIODS.quarter
+) => {
     try {
         const response = await axios.get(
             `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${PERIODS[period]}&apikey=${process.env.API_KEY}&limit=${limit}`

@@ -197,15 +197,46 @@ export const updateStockOutlookData = async (stockSymbol) => {
         stock.outlookData.industry = outLookData.profile.industry
         stock.outlookData.country = outLookData.profile.country
         stock.outlookData.isEtf = outLookData.profile.isEtf
-        stock.outlookData.fullTimeEmployees = outLookData.profile.fullTimeEmployees
+        stock.outlookData.fullTimeEmployees = outLookData.profile?.fullTimeEmployees
         stock.outlookData.splitsHistory = outLookData.splitsHistory
         stock.outlookData.stockDividends = outLookData.stockDividend
         stock.outlookData.stockNews = outLookData.stockNews
         // stock.outlookData.ratings = outLookData.rating
-        // stock.outlookData.quarter = outLookData.financialsQuarter
+
+        if (outLookData.financialsQuarter) {
+            if (outLookData.financialsQuarter.income) {
+                stock.incomeStatementsQuarters = outLookData.financialsQuarter.income
+            }
+
+            if (outLookData.financialsQuarter.balance) {
+                stock.balanceSheetStatementsQuarters = outLookData.financialsQuarter.balance
+            }
+
+            if (outLookData.financialsQuarter.cash) {
+                stock.cashflowStatementsQuarters = outLookData.financialsQuarter.cash
+            }
+        }
+
         await stock.save()
     } catch (error) {
         console.error('Error in fetching stock data:', error)
+    }
+}
+
+export const updateAllStockOutlookData = async () => {
+    try {
+        const cursor = Stock.find({}).cursor()
+
+        for (let stock = await cursor.next(); stock != null; stock = await cursor.next()) {
+            console.log('Updating outlook data for:', stock.symbol)
+            try {
+                await updateStockOutlookData(stock.symbol)
+            } catch (error) {
+                console.error('Error in fetching stock data:', error)
+            }
+        }
+    } catch (error) {
+        console.error('Error in fetching stocks:', error)
     }
 }
 

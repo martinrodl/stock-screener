@@ -10,6 +10,7 @@ import {
     updateAllStocksSubdocuments,
     updateStocksValuesUtils,
     updateStockOutlookData,
+    updateAllStockOutlookData,
 } from '../utils/stockUtils.js'
 import { updateStockValuesUtils } from '../utils/updateStockValues.js'
 export const launchSaveStockList = async (req, res) => {
@@ -74,6 +75,15 @@ export const updateOutlookData = async (req, res) => {
     const { symbol } = req.body
     try {
         await updateStockOutlookData(symbol)
+        res.sendStatus(204)
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
+export const launchAllStocksOutlookData = async (req, res) => {
+    try {
+        updateAllStockOutlookData()
         res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)

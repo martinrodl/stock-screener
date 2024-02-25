@@ -53,6 +53,7 @@ export const updateIntrinsicValue = async (ticker) => {
         const outstandingShares = stockQuote.sharesOutstanding
 
         const incomeResponse = await getStockIncomeStatement(ticker)
+        console.log('incomeResponse', incomeResponse)
         const netIncomeData = getFirstArrayElement(incomeResponse)
         if (!netIncomeData) {
             throw new Error(`Net income data with symbol ${ticker} not found`)
@@ -61,7 +62,7 @@ export const updateIntrinsicValue = async (ticker) => {
         const eps = netIncome / outstandingShares
 
         // Calculate Intrinsic Value using the Graham Formula
-        // Intrinsic value = [EPS × (8.5 + 2g) × 4.4]/Y
+        // Intrinsic value = [EPS × (7.5 + 2g) × 4.4]/Y
         // Example growth rate 0.05 (5%)
         const otherData = await OtherData.findOne().sort({ _id: -1 })
         const currentYield = otherData.currentYield / 100 // Example current yield on 20-year AAA corporate bonds (3%)
@@ -70,7 +71,7 @@ export const updateIntrinsicValue = async (ticker) => {
                 .slice(0, 5)
                 .reduce((sum, metric) => sum + metric.growthRevenue, 0) / 5
         const lastYearGrowth = getFirstArrayElement(stock.growthIncomeMetrics).growthRevenue
-        const intrinsicValueZeroGrowth = (eps * (8.5 + 2 * 0 * 100) * 4.4) / (currentYield * 100)
+        const intrinsicValueZeroGrowth = (eps * (7.5 + 2 * 0 * 100) * 4.4) / (currentYield * 100)
         const intrinsicValue10yGrowth =
             (eps * (8.5 + 2 * averageGrowth * 100) * 4.4) / (currentYield * 100)
         const intrinsicValueLastYearGrowth =

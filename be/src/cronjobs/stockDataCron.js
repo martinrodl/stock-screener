@@ -1,6 +1,10 @@
 import cron from 'node-cron'
 
-import { saveStockList, updateAllStocksSubdocuments } from '../utils/stockUtils.js'
+import {
+    saveStockList,
+    updateAllStocksSubdocuments,
+    updateAllStockOutlookData,
+} from '../utils/stockUtils.js'
 import { updateStocksValuesUtils } from '../utils/updateStockValues.js'
 import { updateBondYield } from '../utils/otherData.js'
 
@@ -18,10 +22,15 @@ cron.schedule('0 8 1 * *', () => {
     saveStockList('AMEX')
 })
 
+cron.schedule('0 0 10 1,3,5,7,9,11 *', async () => {
+    console.log('Running a task on the 1st of every two months - updateAllStocksSubdocuments')
+    updateAllStocksSubdocuments()
+})
+
 // Scheduled to run two times per month
 cron.schedule('0 0 1,15 * *', async () => {
     console.log('Running a task every 1st and 15th of the month - updateAllStocksSubdocuments')
-    updateAllStocksSubdocuments()
+    updateAllStockOutlookData()
 })
 
 // Running a task every day at 4:00 AM'
