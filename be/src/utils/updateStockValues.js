@@ -45,22 +45,10 @@ export const updateIntrinsicValue = async (ticker) => {
         if (!stock) {
             throw new Error(`Stock with symbol ${ticker} not found`)
         }
-        const stockQuoteResponse = await getStockQuote(ticker)
-        const stockQuote = getFirstArrayElement(stockQuoteResponse)
-        if (!stockQuote) {
-            throw new Error(`Stock quote with symbol ${ticker} not found`)
-        }
-        const outstandingShares = stockQuote.sharesOutstanding
-
-        const incomeResponse = await getStockIncomeStatement(ticker)
-        console.log('incomeResponse', incomeResponse)
-        const netIncomeData = getFirstArrayElement(incomeResponse)
-        if (!netIncomeData) {
-            throw new Error(`Net income data with symbol ${ticker} not found`)
-        }
+        const outstandingShares = stock.values.sharesOutstanding
+        const netIncomeData = getFirstArrayElement(stock.incomeStatements)
         const netIncome = netIncomeData.netIncome
         const eps = netIncome / outstandingShares
-
         // Calculate Intrinsic Value using the Graham Formula
         // Intrinsic value = [EPS × (7.5 + 2g) × 4.4]/Y
         // Example growth rate 0.05 (5%)
@@ -109,27 +97,18 @@ const calculatePeterLynchFairValue = async (ticker) => {
             throw new Error(`Stock with symbol ${ticker} not found`)
         }
 
-        const stockIncomegrowthMetricResponse = await getStockIncomegrowthMetric(ticker)
-        const stockIncomegrowthMetric = getFirstArrayElement(stockIncomegrowthMetricResponse)
+        const stockIncomegrowthMetric = getFirstArrayElement(stock.growthIncomeMetrics)
         if (!stockIncomegrowthMetric) {
             throw new Error(`Stock Incomegrowth Metric with symbol ${ticker} not found`)
         }
 
-        const stockQuoteResponse = await getStockQuote(ticker)
-        const stockQuote = getFirstArrayElement(stockQuoteResponse)
-        if (!stockQuote) {
-            throw new Error(`Stock quote with symbol ${ticker} not found`)
-        }
-        const outstandingShares = stockQuote.sharesOutstanding
-
-        const incomeResponse = await getStockIncomeStatement(ticker)
-        const netIncomeData = getFirstArrayElement(incomeResponse)
+        const outstandingShares = stock.values?.sharesOutstanding
+        const netIncomeData = getFirstArrayElement(stock.incomeStatements)
         if (!netIncomeData) {
             throw new Error(`Net income data with symbol ${ticker} not found`)
         }
         const netIncome = netIncomeData.netIncome
         const eps = netIncome / outstandingShares
-
         const growthRate = stockIncomegrowthMetric.growthRevenue // Assuming revenue growth as a proxy for earnings growth
         // Peter Lynch Fair Value Calculation
         const peForNoGrowthCompany = 15 // This can be adjusted
@@ -155,8 +134,10 @@ export const calculateCapeRatio = async (ticker) => {
             }, 0)
             return totalEPS / incomeStatements.length
         }
-        const incomeStatements = await getStockIncomeStatement(ticker)
-        const averageEPS = calculateAverageEPS(incomeStatements, stock.values.sharesOutstanding)
+        const averageEPS = calculateAverageEPS(
+            stock.incomeStatements,
+            stock.values.sharesOutstanding
+        )
 
         const capeRatio = stock.values.price / averageEPS
         stock.values.capeRatio = capeRatio
