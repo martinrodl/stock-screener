@@ -302,17 +302,25 @@ export const updateAllStocksSubdocuments = async () => {
 
 export const updateStocksValuesUtils = async () => {
     try {
-        const stocks = await Stock.find({})
-        for (const stock of stocks) {
-            try {
-                console.log('Updating stock values for:', stock.symbol)
-                await updateStockValuesUtils(stock.symbol)
-            } catch (error) {
-                console.error('Error in fetching stock data:', error)
-                continue
+        const batchSize = 10
+        const stockCount = await Stock.countDocuments()
+        const batches = Math.ceil(stockCount / batchSize)
+
+        for (let i = 0; i < batches; i++) {
+            const stocks = await Stock.find({})
+                .skip(i * batchSize)
+                .limit(batchSize) // Fetch stocks in batches
+
+            for (const stock of stocks) {
+                try {
+                    console.log('Updating stock values for:', stock.symbol)
+                    await updateStockValuesUtils(stock.symbol) // Assuming this updates a single stock
+                } catch (error) {
+                    console.error('Error in fetching stock data:', error)
+                }
             }
         }
     } catch (error) {
-        console.error('Error in fetching stock data:', error)
+        console.error('Error in fetching stocks data:', error)
     }
 }
