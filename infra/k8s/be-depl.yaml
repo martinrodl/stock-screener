@@ -14,11 +14,11 @@ spec:
         spec:
             containers:
                 - name: be
-                  image: mrodl/stocks-be:1.0.34
+                  image: mrodl/stocks-be:1.0.35
                   imagePullPolicy: Always
                   resources:
                       limits:
-                          memory: 4096Mi
+                          memory: 8192Mi
                           cpu: '0.8'
                       requests:
                           memory: 512Mi
