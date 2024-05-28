@@ -19,6 +19,7 @@ const AppRoutes = () => {
                 <Route path="portfolio-list" element={<PortfolioStocks />} />
                 <Route path="consider-list" element={<ConsiderStocks />} />
                 <Route path="graham-list" element={<GrahamList />} />
+                <Route path="stocks/page/:pageNumber" element={<SimpleStockList />} />
             </Route>
         </Routes>
     )

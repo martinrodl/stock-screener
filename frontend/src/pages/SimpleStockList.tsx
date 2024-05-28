@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useParams, useNavigate } from 'react-router-dom'
 
 import SimpleStockFilterForm from '../components/SimpleStockFilterForm'
 import { Stock } from '../types/Stock'
@@ -12,8 +13,10 @@ import { LineStock } from '../components/LineStock'
 const pageSize = 20
 
 const SimpleStockList = () => {
-    const [page, setPage] = useState(0)
+    const navigate = useNavigate()
     const dispatch = useDispatch()
+    const { pageNumber } = useParams<{ pageNumber?: string }>()
+    const [page, setPage] = useState<number>(Number(pageNumber) || 1)
     const [fetchStocks, { data, isLoading, error }] = useSimpleFetchStocksMutation()
     const stocks = useSelector((state: RootState) => state.stock.simpleResults)
     const savedStockCriteria = useSelector((state: RootState) => state.stock.simpleCriteria)
@@ -28,8 +31,9 @@ const SimpleStockList = () => {
     }, [data, dispatch])
 
     useEffect(() => {
+        navigate(`/stocks/page/${page}`)
         fetchStocks({ criteria: savedStockCriteria, skip: page * pageSize, limit: pageSize })
-    }, [fetchStocks, page, savedStockCriteria])
+    }, [fetchStocks, navigate, page, savedStockCriteria])
 
     const handlePreviousPage = () => {
         setPage((currentPage) => Math.max(currentPage - 1, 1))

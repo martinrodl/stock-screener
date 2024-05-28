@@ -1,0 +1,183 @@
+
+### Set Variables
+@apikey = {{apiKey}}
+@period = annual
+@ticker = AAPL
+
+
+
+### Fetch Income Statement
+GET https://financialmodelingprep.com/api/v3/income-statement/{{ticker}}?limit=120&apikey={{apikey}}
+
+### Fetch Historical Chart Data
+GET https://financialmodelingprep.com/api/v3/historical-chart/1min/{{ticker}}?apikey={{apikey}}
+
+### Fetch NASDAQ Symbol List
+GET https://financialmodelingprep.com/api/v3/symbol/NASDAQ?apikey={{apikey}}
+
+### Fetch NYSE Symbol List
+GET https://financialmodelingprep.com/api/v3/symbol/NYSE?apikey={{apikey}}
+
+### Fetch S&P 500 List
+GET https://financialmodelingprep.com/api/v3/sp500_constituent?apikey={{apikey}}
+
+### Fetch Key Metrics of a Stock
+GET https://financialmodelingprep.com/api/v3/key-metrics/{{ticker}}?period={{period}}&apikey={{apikey}}&limit=-1
+
+### Fetch Cashflow Growth
+GET https://financialmodelingprep.com/api/v3/cash-flow-statement-growth/{{ticker}}?period={{period}}&apikey={{apikey}}
+
+### Fetch Income Growth
+GET https://financialmodelingprep.com/api/v3/income-statement-growth/{{ticker}}?period={{period}}&apikey={{apikey}}
+
+### Fetch Balance Sheet
+GET https://financialmodelingprep.com/api/v3/balance-sheet-statement/{{ticker}}?limit=2&apikey={{apikey}}
+
+### Fetch Income Statement
+GET https://financialmodelingprep.com/api/v3/income-statement/{{ticker}}?period={{period}}&apikey={{apikey}}&limit=2
+
+### Fetch Cashflow Statement
+GET https://financialmodelingprep.com/api/v3/cash-flow-statement/{{ticker}}?period={{period}}&apikey={{apikey}}&limit=2
+
+### Fetch Price Targets
+GET https://financialmodelingprep.com/api/v4/stock/price-target-consensus?apikey={{apikey}}&ticker={{ticker}}
+
+### Fetch Stock Recommendations
+GET https://financialmodelingprep.com/api/v3/analyst-stock-recommendations/BMY?apikey={{apikey}}
+
+### Fetch Company Outlook
+GET https://financialmodelingprep.com/api/v4/company-outlook?symbol=BMY&apikey={{apikey}}
+
+### Stock Screener
+POST https://financialmodelingprep.com/api/v3/stock-screener?apikey={{apikey}}
+Content-Type: application/json
+
+{
+    "marketCapMoreThan": 10000000,
+    "dividendMoreThan": 3,
+    "sector": "Consumer Cyclical, Energy, Technology, Industrials, Financial Services, Basic Materials, Communication Services, Consumer Defensive, Healthcare, Real Estate, Utilities, Industrial Goods, Financial, Services, Conglomerates",
+    "Industry": "Autos, Banks, Banks Diversified, Software, Banks Regional, Beverages Alcoholic, Beverages Brewers, Beverages Non-Alcoholic",
+    "Country": "US, UK, MX, BR, RU, HK, CA",
+    "exchange": "nyse, nasdaq, amex, euronext, tsx, etf, mutual_fund"
+}
+
+### Fetch Market Valuations
+GET https://financialmodelingprep.com/api/v3/market-valuations/SPY?apikey={{apikey}}
+
+### Fetch Industry Price-Earnings Ratio
+GET https://financialmodelingprep.com/api/v4/industry_price_earning_ratio?date=2023-10-10&exchange=NYSE&apikey={{apikey}}
+
+### BE Requests
+
+### Get Filtered Stocks
+POST https://martinrodl.me/be-stocks/api/filterstocks
+Content-Type: application/json
+
+{
+    "peRatioMin": 1,
+    "peRatioMax": 20,
+    "marketCapMin": 10000000,
+    "priceToIntrinsicValueRatioMax": 1
+}
+
+### Simple Filtered Stocks
+POST http://localhost:3000/be-stocks/api/simplefilterstocks
+Content-Type: application/json
+
+{
+    "peRatioMin": 1,
+    "yearReturn": 10
+}
+
+### Launch Updating All Subdocuments
+POST https://martinrodl.me/be-stocks/api/launchUpdateAllStocksSubdocuments
+Content-Type: application/json
+
+{
+    "symbol": "{{ticker}}"
+}
+
+### Update Stock List
+POST http://localhost:3000/be-stocks/api/launchsavestockslist
+Content-Type: application/json
+
+{
+    "exchange": "AMEX"
+}
+
+### Get Service Status
+GET https://martinrodl.me/be-stocks/api/status
+
+### Get Stock
+GET https://martinrodl.me/be-stocks/api/onestock?symbol={{ticker}}
+
+### Get Stock Sure Data
+GET https://martinrodl.me/be-stocks/api/stocksuredata?symbol={{ticker}}
+
+### Get Stocks
+GET https://martinrodl.me/be-stocks/api/stocks
+
+### Add Portfolio Stocks
+POST http://localhost:3000/be-stocks/api/portfoliostocks
+Content-Type: application/json
+
+{
+    "symbol": "SON"
+}
+
+### Get Portfolio Stocks
+GET http://localhost:3000/be-stocks/api/portfoliostocks
+
+### Remove Portfolio Stocks
+POST http://localhost:3000/be-stocks/api/portfoliostocks/delete
+Content-Type: application/json
+
+{
+    "symbol": "SON"
+}
+
+### Update Bond Yield
+POST https://martinrodl.me/be-stocks/api/updatebondyield
+
+### Update Stock Price
+POST http://localhost:3000/be-stocks/api/updateStockValues
+Content-Type: application/json
+
+{
+    "symbol": "{{ticker}}"
+}
+
+### Update Stock Outlook
+POST http://localhost:3000/be-stocks/api/updateStockValues
+Content-Type: application/json
+
+{
+    "symbol": "{{ticker}}"
+}
+
+### Update Stocks Price
+POST https://martinrodl.me/be-stocks/api/updateStocksValues
+Content-Type: application/json
+
+{
+    "symbol": "{{ticker}}"
+}
+
+### Launch Updating All Outlook Data
+POST https://martinrodl.me/be-stocks/api/launchallstocksoutlookdata
+Content-Type: application/json
+
+{
+    "symbol": "{{ticker}}"
+}
+
+### Update Sure Dividend
+POST https://martinrodl.me/be-stocks/api/updateexcel
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="excel"; filename="excel.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< /Users/martin/Desktop/excel.xlsx
+--boundary--
