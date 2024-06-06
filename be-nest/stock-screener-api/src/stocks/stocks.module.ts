@@ -5,7 +5,7 @@ import { StocksController } from './stocks.controller';
 import { StocksService } from './stocks.service';
 import { StocksRepository } from './stocks.repository';
 import { Stock, StockSchema } from './schemas/stock.schema';
-import { FmpModule } from './fmp/fmp.module';
+import { FmpModule } from './fmpModule/fmp.module';
 
 @Module({
   imports: [

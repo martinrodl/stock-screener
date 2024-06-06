@@ -190,4 +190,3 @@ export class KeyMetrics {
 }
 
 export const KeyMetricsSchema = SchemaFactory.createForClass(KeyMetrics);
-// KeyMetricsSchema.index({ symbol: 1, date: 1 }, { unique: true });

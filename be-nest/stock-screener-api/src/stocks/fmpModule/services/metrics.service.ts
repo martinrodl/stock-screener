@@ -18,21 +18,36 @@ export class MetricsService {
   ) {}
 
   async fetchMetrics(symbol: string) {
-    const keyMetricsUrl = `https://financialmodelingprep.com/api/v3/key-metrics/${symbol}?apikey=${this.apiKey}`;
-    const incomeGrowthMetricsUrl = `https://financialmodelingprep.com/api/v3/income-statement-growth/${symbol}?apikey=${this.apiKey}`;
-    const profitGrowthMetricsUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement-growth/${symbol}?apikey=${this.apiKey}`;
+    const keyMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/key-metrics/${symbol}?period=quarter&apikey=${this.apiKey}`;
+    const keyMetricsAnnualUrl = `https://financialmodelingprep.com/api/v3/key-metrics/${symbol}?apikey=${this.apiKey}`;
+    const incomeGrowthMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/income-statement-growth/${symbol}?period=quarter&apikey=${this.apiKey}`;
+    const incomeGrowthMetricsAnnualUrl = `https://financialmodelingprep.com/api/v3/income-statement-growth/${symbol}?apikey=${this.apiKey}`;
+    const profitGrowthMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement-growth/${symbol}?period=quarter&apikey=${this.apiKey}`;
+    const profitGrowthMetricsAnnualUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement-growth/${symbol}?apikey=${this.apiKey}`;
 
-    const [keyMetrics, incomeGrowthMetrics, profitGrowthMetrics] =
-      await Promise.all([
-        firstValueFrom(this.httpService.get(keyMetricsUrl)),
-        firstValueFrom(this.httpService.get(incomeGrowthMetricsUrl)),
-        firstValueFrom(this.httpService.get(profitGrowthMetricsUrl)),
-      ]);
+    const [
+      keyMetricsQuarterly,
+      keyMetricsAnnual,
+      incomeGrowthMetricsQuarterly,
+      incomeGrowthMetricsAnnual,
+      profitGrowthMetricsQuarterly,
+      profitGrowthMetricsAnnual,
+    ] = await Promise.all([
+      firstValueFrom(this.httpService.get(keyMetricsQuarterlyUrl)),
+      firstValueFrom(this.httpService.get(keyMetricsAnnualUrl)),
+      firstValueFrom(this.httpService.get(incomeGrowthMetricsQuarterlyUrl)),
+      firstValueFrom(this.httpService.get(incomeGrowthMetricsAnnualUrl)),
+      firstValueFrom(this.httpService.get(profitGrowthMetricsQuarterlyUrl)),
+      firstValueFrom(this.httpService.get(profitGrowthMetricsAnnualUrl)),
+    ]);
 
     return {
-      keyMetrics: keyMetrics.data,
-      incomeGrowthMetrics: incomeGrowthMetrics.data,
-      profitGrowthMetrics: profitGrowthMetrics.data,
+      keyMetricsQuarterly: keyMetricsQuarterly.data,
+      keyMetricsAnnual: keyMetricsAnnual.data,
+      incomeGrowthMetricsQuarterly: incomeGrowthMetricsQuarterly.data,
+      incomeGrowthMetricsAnnual: incomeGrowthMetricsAnnual.data,
+      profitGrowthMetricsQuarterly: profitGrowthMetricsQuarterly.data,
+      profitGrowthMetricsAnnual: profitGrowthMetricsAnnual.data,
     };
   }
 
@@ -40,17 +55,26 @@ export class MetricsService {
     const metrics = await this.fetchMetrics(symbol);
     const stock = await this.stocksService.getStock(symbol);
 
-    const keyMetrics = metrics.keyMetrics.map((metric) => ({
+    const keyMetrics = [
+      ...metrics.keyMetricsQuarterly,
+      ...metrics.keyMetricsAnnual,
+    ].map((metric) => ({
       ...metric,
       stock: (stock as StockDocument)._id,
     }));
 
-    const incomeGrowthMetrics = metrics.incomeGrowthMetrics.map((metric) => ({
+    const incomeGrowthMetrics = [
+      ...metrics.incomeGrowthMetricsQuarterly,
+      ...metrics.incomeGrowthMetricsAnnual,
+    ].map((metric) => ({
       ...metric,
       stock: (stock as StockDocument)._id,
     }));
 
-    const profitGrowthMetrics = metrics.profitGrowthMetrics.map((metric) => ({
+    const profitGrowthMetrics = [
+      ...metrics.profitGrowthMetricsQuarterly,
+      ...metrics.profitGrowthMetricsAnnual,
+    ].map((metric) => ({
       ...metric,
       stock: (stock as StockDocument)._id,
     }));

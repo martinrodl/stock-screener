@@ -108,5 +108,5 @@ export class ProfitGrowthMetrics {
   growthFreeCashFlow: number;
 }
 
-export const ProfitGrowthSchema =
+export const ProfitGrowthMetricsSchema =
   SchemaFactory.createForClass(ProfitGrowthMetrics);
