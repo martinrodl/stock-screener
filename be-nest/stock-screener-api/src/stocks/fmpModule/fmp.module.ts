@@ -80,6 +80,6 @@ import { StocksModule } from '../stocks.module';
     OutlookRepository,
   ],
   controllers: [FmpController],
-  exports: [MongooseModule],
+  exports: [MongooseModule, MetricsRepository],
 })
 export class FmpModule {}

@@ -6,12 +6,14 @@ import { StocksService } from './stocks.service';
 import { StocksRepository } from './stocks.repository';
 import { Stock, StockSchema } from './schemas/stock.schema';
 import { FmpModule } from './fmpModule/fmp.module';
+import { CountedModule } from './countedModule/counted.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Stock.name, schema: StockSchema }]),
     HttpModule,
-    forwardRef(() => FmpModule), // Use forwardRef here
+    forwardRef(() => FmpModule),
+    CountedModule, // Use forwardRef here
   ],
   controllers: [StocksController],
   providers: [StocksService, StocksRepository],
