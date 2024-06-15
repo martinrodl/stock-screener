@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 
 import { StocksModule } from './stocks/stocks.module';
 import { UsersModule } from './users/users.module';
@@ -18,6 +19,7 @@ import { StatusModule } from './status/status.module';
       }),
       inject: [ConfigService],
     }),
+    HttpModule.register({}),
     StocksModule,
     UsersModule,
     StatusModule,

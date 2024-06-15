@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { StockExchange } from '../stocks.enum';
+import { StockExchange } from '../enums';
 
 export class UpdateStockListDto {
   @IsEnum(StockExchange, {

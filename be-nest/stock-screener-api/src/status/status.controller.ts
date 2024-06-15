@@ -1,7 +1,9 @@
 import { Controller, Get, Res, HttpStatus } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { StatusService } from './status.service';
 import { Response } from 'express';
 
+@ApiTags('status')
 @Controller('status')
 export class StatusController {
   constructor(private readonly statusService: StatusService) {}
