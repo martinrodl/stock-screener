@@ -1,3 +1,8 @@
+### Set Variables
+@apikey = {{apiKey}}
+@period = annual
+@ticker = AAPL
+
 ### List all stocks
 GET http://localhost:3000/stocks
 
@@ -9,8 +14,8 @@ POST http://localhost:3000/users
 content-type: application/json
 
 {
-    "email": 123,
-    "password": ""
+    "email": "user@example.com",
+    "password": "securepassword"
 }
 
 ### Update stock list by EXCHANGE
@@ -22,7 +27,7 @@ content-type: application/json
 }
 
 ### Update statement of stock
-POST http://localhost:3000/statements/AAPL/update-statements
+POST http://localhost:3000/fmp/AAPL/update-statements
 content-type: application/json
 
 ### Update metrics of stock
@@ -32,7 +37,6 @@ content-type: application/json
 ### Update analyst rating of stock
 POST http://localhost:3000/fmp/AAPL/update-analyst-ratings
 
-
 ### Get combined data for a stock symbol and period type
 GET http://localhost:3000/statements/AAPL/combine?periodType=quarter&properties=inventory&properties=totalInvestments&properties=operatingExpenses
 
@@ -41,3 +45,18 @@ POST  http://localhost:3000/fmp/AAPL/update-outlook
 
 ### Post to update  update-analyst-ratings
 POST  http://localhost:3000/fmp/AAPL/update-analyst-ratings
+
+### Update and Calculate Stock Values
+POST http://localhost:3000/counted/update/{{ticker}}
+Content-Type: application/json
+
+{
+    "periodType": "{{period}}"
+}
+
+### Get current bond yield
+GET http://localhost:3000/bond-yield
+
+### Update current bond yield
+POST http://localhost:3000/bond-yield/update
+content-type: application/json

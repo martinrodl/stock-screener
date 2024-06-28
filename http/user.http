@@ -1,0 +1,75 @@
+### Set Variables
+
+@stockId = 6652f9ee06baf75ceb6c219e
+@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOiI2NjZjODg3MmQzYTNlYzI2N2ZiYjMwYjQiLCJpYXQiOjE3MTg0NzA2OTMsImV4cCI6MTcxODQ3NDI5M30.IH466uadJJK9o4mXy91bPAd9DaY2MdI1oHZA3RafzRo
+### User Registration
+POST http://localhost:3000/user/register
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "securepassword"
+}
+
+### User Login
+POST http://localhost:3000/user/login
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "securepassword"
+}
+
+### Save Access Token
+> {% 
+  const jsonResponse = JSON.parse(responseBody);
+  pm.environment.set("access_token", jsonResponse.access_token);
+%}
+
+### Add Ticker to Portfolio List
+PUT http://localhost:3000/user/portfolio
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "email": "user@example.com",
+    "stockId": "{{stockId}}"
+}
+
+### Remove Ticker from Portfolio List
+DELETE http://localhost:3000/user/portfolio
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "email": "user@example.com",
+    "stockId": "{{stockId}}"
+}
+
+### Add Ticker to Consider List
+PUT http://localhost:3000/user/consider
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "email": "user@example.com",
+    "stockId": "{{stockId}}"
+}
+
+### Remove Ticker from Consider List
+DELETE http://localhost:3000/user/consider
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "email": "user@example.com",
+    "stockId": "{{stockId}}"
+}
+
+### Get Portfolio List
+GET http://localhost:3000/user/portfolio?email=user@example.com
+Authorization: Bearer {{access_token}}
+
+### Get Consider List
+GET http://localhost:3000/user/consider?email=user@example.com
+Authorization: Bearer {{access_token}}

@@ -41,4 +41,11 @@ export class StocksRepository {
     await Promise.all(promises);
     return this.findAll();
   }
+
+  async *getStockStream(): AsyncIterable<Stock> {
+    const cursor = this.stockModel.find().cursor();
+    for await (const stock of cursor) {
+      yield stock;
+    }
+  }
 }

@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -52,9 +51,5 @@ export class StocksService {
       console.error('Error updating stocks list:', error);
       throw new Error('Failed to update stocks list');
     }
-  }
-  @Cron('45 * * * * *')
-  cronTest() {
-    return 'Stocks list updated!';
   }
 }

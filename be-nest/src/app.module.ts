@@ -6,6 +6,8 @@ import { HttpModule } from '@nestjs/axios';
 import { StocksModule } from './stocks/stocks.module';
 import { UsersModule } from './users/users.module';
 import { StatusModule } from './status/status.module';
+import { UtilsModule } from './utils/utils.module';
+import { OtherModule } from './other/other.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { StatusModule } from './status/status.module';
     StocksModule,
     UsersModule,
     StatusModule,
+    UtilsModule,
+    OtherModule,
   ],
   controllers: [],
   providers: [],

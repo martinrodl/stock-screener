@@ -8,13 +8,14 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Types } from 'mongoose';
 
-import { StocksService } from '../services';
+import { StocksService } from './stocks.service';
 import {
   MetricsRepository,
   StatementsRepository,
   ActualValuesRepository,
 } from '../repositories';
 import { StockDocument } from '../schemas';
+import { OtherRepository } from '../../other/repositories/other.repository';
 
 @Injectable()
 export class CountedService {
@@ -26,6 +27,7 @@ export class CountedService {
     private readonly metricsRepository: MetricsRepository,
     private readonly statementsRepository: StatementsRepository,
     private readonly actualValuesRepository: ActualValuesRepository,
+    private readonly otherRepository: OtherRepository,
     private readonly httpService: HttpService,
   ) {}
 
@@ -94,14 +96,15 @@ export class CountedService {
         .reduce((sum, metric) => sum + metric.growthRevenue, 0) / 5;
     const lastYearGrowth = latestGrowthMetric.growthRevenue;
 
-    const intrinsicValueZeroGrowth =
-      (eps * (7.5 + 2 * 0 * 100) * 4.4) / (latestKeyMetric.earningsYield * 100);
+    // Fetch current yield from OtherRepository
+    const other = await this.otherRepository.findLatest();
+    const currentYield = other ? other.currentYield : 4.4; // Use default value if not found
+
+    const intrinsicValueZeroGrowth = (eps * (8.5 + 2 * 0) * 4.4) / currentYield;
     const intrinsicValueAverageGrowth5y =
-      (eps * (8.5 + 2 * averageGrowth * 100) * 4.4) /
-      (latestKeyMetric.earningsYield * 100);
+      (eps * (8.5 + 2 * averageGrowth) * 4.4) / currentYield;
     const intrinsicValueLastYearGrowth =
-      (eps * (8.5 + 2 * lastYearGrowth * 100) * 4.4) /
-      (latestKeyMetric.earningsYield * 100);
+      (eps * (8.5 + 2 * lastYearGrowth) * 4.4) / currentYield;
 
     const averagePE5y =
       keyMetrics

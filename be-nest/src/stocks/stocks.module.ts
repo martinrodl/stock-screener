@@ -38,6 +38,7 @@ import {
 } from './schemas';
 import {
   AnalystRatingsService,
+  CronService,
   MetricsService,
   CountedService,
   OutlookService,
@@ -57,6 +58,7 @@ import {
   OutlookRepository,
   StocksRepository,
 } from './repositories';
+import { OtherModule } from '../other/other.module';
 
 @Module({
   imports: [
@@ -82,9 +84,11 @@ import {
       { name: Profile.name, schema: ProfileSchema },
     ]),
     HttpModule,
+    OtherModule,
   ],
   controllers: [StocksController, FmpController, CountedController],
   providers: [
+    CronService,
     StocksService,
     MetricsService,
     CountedService,

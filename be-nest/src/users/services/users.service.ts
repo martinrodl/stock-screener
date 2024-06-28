@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UsersRepository } from '../repositories/users.repository';
-import { User, UserDocument } from '../schemas/user.schema';
+
+import { UsersRepository } from '../repositories';
+import { User, UserDocument } from '../schemas';
 import {
   RegisterDto,
   LoginDto,

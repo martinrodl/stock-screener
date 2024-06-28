@@ -16,4 +16,12 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: mrodl/be-stocks-nest
+      context: be-nest
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
     
