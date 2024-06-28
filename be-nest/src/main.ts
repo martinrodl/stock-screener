@@ -8,6 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log'],
   });
+  app.setGlobalPrefix('be-nest-stocks/api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true })); // whitelist: true will remove any additional properties that are not defined in the DTO
   app.use(morgan('combined'));
   const config = new DocumentBuilder()
