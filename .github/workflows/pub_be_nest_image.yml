@@ -1,26 +1,26 @@
 name: Update Version
 
 on:
-  push:
-    branches:
-      - prod
+    push:
+        branches:
+            - prod
 
 jobs:
-  update-version:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
+    update-version:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out the code
+              uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
+            - name: Setup Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '16'
 
-      - name: Build and Push Docker Image
-        run: |
-          cd be
-          VERSION=$(node -p "require('./package.json').version")
-          docker build -t mrodl/stocks-be-nest:${VERSION} .
-          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-          docker push mrodl/stocks-be-nest:${VERSION}
+            - name: Build and Push Docker Image
+              run: |
+                  cd be
+                  VERSION=$(node -p "require('./be-nest/package.json').version")
+                  docker build -t mrodl/stocks-be-nest:${VERSION} .
+                  echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+                  docker push mrodl/stocks-be-nest:${VERSION}
