@@ -19,7 +19,7 @@ jobs:
 
             - name: Build and Push Docker Image
               run: |
-                  cd be
+                  cd be-nest
                   VERSION=$(node -p "require('./package.json').version")
                   docker build -t mrodl/stocks-be-nest:${VERSION} .
                   echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
