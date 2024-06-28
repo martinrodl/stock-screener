@@ -1,4 +1,4 @@
-name: Update Version
+name: Update Docker Image Be Nest
 
 on:
     push:
@@ -20,7 +20,7 @@ jobs:
             - name: Build and Push Docker Image
               run: |
                   cd be
-                  VERSION=$(node -p "require('./be-nest/package.json').version")
+                  VERSION=$(node -p "require('./package.json').version")
                   docker build -t mrodl/stocks-be-nest:${VERSION} .
                   echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
                   docker push mrodl/stocks-be-nest:${VERSION}
