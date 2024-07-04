@@ -35,6 +35,8 @@ import {
   Profile,
   ActualValuesSchema,
   ActualValues,
+  Filter,
+  FilterSchema,
 } from './schemas';
 import {
   AnalystRatingsService,
@@ -44,11 +46,13 @@ import {
   OutlookService,
   StatementsService,
   StocksService,
+  FilterService,
 } from './services';
 import {
   FmpController,
   CountedController,
   StocksController,
+  FilterController,
 } from './controllers';
 import {
   StatementsRepository,
@@ -57,6 +61,7 @@ import {
   ActualValuesRepository,
   OutlookRepository,
   StocksRepository,
+  FilterRepository,
 } from './repositories';
 import { OtherModule } from '../other/other.module';
 
@@ -82,11 +87,17 @@ import { OtherModule } from '../other/other.module';
       { name: StockDividend.name, schema: StockDividendSchema },
       { name: StockNews.name, schema: StockNewsSchema },
       { name: Profile.name, schema: ProfileSchema },
+      { name: Filter.name, schema: FilterSchema },
     ]),
     HttpModule,
     OtherModule,
   ],
-  controllers: [StocksController, FmpController, CountedController],
+  controllers: [
+    StocksController,
+    FmpController,
+    CountedController,
+    FilterController,
+  ],
   providers: [
     CronService,
     StocksService,
@@ -101,6 +112,8 @@ import { OtherModule } from '../other/other.module';
     ActualValuesRepository,
     OutlookRepository,
     StocksRepository,
+    FilterRepository,
+    FilterService,
   ],
 })
 export class StocksModule {}
