@@ -14,6 +14,7 @@ import {
   UpdatePortfolioDto,
   UpdateConsiderDto,
 } from '../dto';
+import { Stock } from '../../stocks/schemas'; // Import the Stock schema
 
 @Injectable()
 export class UsersService {
@@ -22,61 +23,88 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<User> {
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<{ accessToken: string; name: string; email: string }> {
     const existingUser = await this.usersRepository.findUserByEmail(
       registerDto.email,
     );
     if (existingUser) {
       throw new ConflictException('Email already in use');
     }
-    return this.usersRepository.createUser(registerDto);
+    const user = await this.usersRepository.createUser(registerDto);
+    const payload = {
+      email: user.email,
+      sub: user._id.toString(),
+      name: user.name,
+    };
+    const accessToken = this.jwtService.sign(payload);
+    return { accessToken, name: user.name, email: user.email };
   }
 
-  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ accessToken: string; name: string; email: string }> {
     const user = await this.usersRepository.findUserByEmail(loginDto.email);
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { email: user.email, sub: user._id.toString() };
-    return {
-      access_token: this.jwtService.sign(payload),
+    const payload = {
+      email: user.email,
+      sub: user._id.toString(),
+      name: user.name,
     };
+    const accessToken = this.jwtService.sign(payload);
+    return { accessToken, name: user.name, email: user.email };
   }
 
-  async addToPortfolio(updatePortfolioDto: UpdatePortfolioDto): Promise<User> {
-    return this.usersRepository.addToPortfolio(updatePortfolioDto);
+  async logout(email: string): Promise<void> {
+    // Implement your logout logic here.
+    // For example, you could invalidate the user's JWT token by adding it to a blacklist.
+  }
+
+  async addToPortfolio(
+    userId: string,
+    updatePortfolioDto: UpdatePortfolioDto,
+  ): Promise<User> {
+    return this.usersRepository.addToPortfolio(userId, updatePortfolioDto);
   }
 
   async removeFromPortfolio(
+    userId: string,
     updatePortfolioDto: UpdatePortfolioDto,
   ): Promise<User> {
-    return this.usersRepository.removeFromPortfolio(updatePortfolioDto);
+    return this.usersRepository.removeFromPortfolio(userId, updatePortfolioDto);
   }
 
-  async addToConsider(updateConsiderDto: UpdateConsiderDto): Promise<User> {
-    return this.usersRepository.addToConsider(updateConsiderDto);
+  async addToConsider(
+    userId: string,
+    updateConsiderDto: UpdateConsiderDto,
+  ): Promise<User> {
+    return this.usersRepository.addToConsider(userId, updateConsiderDto);
   }
 
   async removeFromConsider(
+    userId: string,
     updateConsiderDto: UpdateConsiderDto,
   ): Promise<User> {
-    return this.usersRepository.removeFromConsider(updateConsiderDto);
+    return this.usersRepository.removeFromConsider(userId, updateConsiderDto);
   }
 
-  async getPortfolioList(email: string): Promise<string[]> {
-    const user = await this.usersRepository.findUserByEmail(email);
+  async getPortfolioList(userId: string): Promise<Stock[]> {
+    const user = await this.usersRepository.findUserById(userId);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    return user.portfolioList.map((id) => id.toString());
+    return user.portfolioList as unknown as Stock[]; // Convert to unknown first then to Stock[]
   }
 
-  async getConsiderList(email: string): Promise<string[]> {
-    const user = await this.usersRepository.findUserByEmail(email);
+  async getConsiderList(userId: string): Promise<Stock[]> {
+    const user = await this.usersRepository.findUserById(userId);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    return user.considerList.map((id) => id.toString());
+    return user.considerList as unknown as Stock[]; // Convert to unknown first then to Stock[]
   }
 
   async findUserByEmail(email: string): Promise<UserDocument> {

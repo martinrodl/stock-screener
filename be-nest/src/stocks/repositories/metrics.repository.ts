@@ -2,40 +2,46 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
-  KeyMetrics,
-  KeyMetricsDocument,
   IncomeGrowthMetrics,
   IncomeGrowthMetricDocument,
   ProfitGrowthMetrics,
   ProfitGrowthDocument,
+  KeyMetrics,
+  KeyMetricsDocument,
 } from '../schemas';
 
 @Injectable()
 export class MetricsRepository {
   constructor(
     @InjectModel(KeyMetrics.name)
-    private keyMetricsModel: Model<KeyMetricsDocument>,
+    public keyMetricsModel: Model<KeyMetricsDocument>,
     @InjectModel(IncomeGrowthMetrics.name)
-    private incomeGrowthMetricsModel: Model<IncomeGrowthMetricDocument>,
+    public incomeGrowthMetricsModel: Model<IncomeGrowthMetricDocument>,
     @InjectModel(ProfitGrowthMetrics.name)
-    private profitGrowthMetricsModel: Model<ProfitGrowthDocument>,
+    public profitGrowthMetricsModel: Model<ProfitGrowthDocument>,
   ) {}
 
-  private async insertManyIfNotExistsHelper(
+  public async insertManyIfNotExistsHelper(
     model: Model<any>,
     documents: any[],
-  ): Promise<void> {
+  ): Promise<any[]> {
+    const insertedDocuments = [];
     for (const doc of documents) {
       const existingDoc = await model
         .findOne({
           date: doc.date,
           period: doc.period,
+          stock: doc.stock,
         })
         .exec();
       if (!existingDoc) {
-        await model.create(doc);
+        const newDoc = await model.create(doc);
+        insertedDocuments.push(newDoc);
+      } else {
+        insertedDocuments.push(existingDoc);
       }
     }
+    return insertedDocuments;
   }
 
   async insertManyIfNotExists(
@@ -54,15 +60,15 @@ export class MetricsRepository {
     );
   }
 
-  async findKeyMetrics(filter: any): Promise<KeyMetrics[]> {
-    return this.keyMetricsModel.find(filter).exec();
+  findKeyMetrics(filter: any) {
+    return this.keyMetricsModel.find(filter);
   }
 
-  async findIncomeGrowthMetrics(filter: any): Promise<IncomeGrowthMetrics[]> {
-    return this.incomeGrowthMetricsModel.find(filter).exec();
+  findIncomeGrowthMetrics(filter: any) {
+    return this.incomeGrowthMetricsModel.find(filter);
   }
 
-  async findProfitGrowthMetrics(filter: any): Promise<ProfitGrowthMetrics[]> {
-    return this.profitGrowthMetricsModel.find(filter).exec();
+  findProfitGrowthMetrics(filter: any) {
+    return this.profitGrowthMetricsModel.find(filter);
   }
 }

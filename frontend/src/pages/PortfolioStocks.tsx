@@ -1,37 +1,43 @@
 import { useState } from 'react'
-
 import {
-    useGetAllPortfolioStocksQuery,
-    useAddStockToPortfolioMutation,
-    useRemoveStockFromPortfolioMutation,
-} from '../services/stockApi'
-import { Stock } from '../types/Stock'
-import { PortofilLineStock } from '../components/PortofilLineStock'
+    useUsersControllerGetPortfolioListQuery,
+    useUsersControllerRemoveFromPortfolioMutation,
+} from '../services/beGeneratedApi'
+import { PortfolioLineStock } from '../components/PortfolioLineStock'
+import { useAddStockToPortfolioBySymbolMutation } from '../services/beApi'
 
-const ConsiderStocks = () => {
-    const { data: stocks, isLoading, error, refetch } = useGetAllPortfolioStocksQuery('')
-    const [addStockToPortfolio, { isLoading: isAdding }] = useAddStockToPortfolioMutation()
-    const [removeStockFromPortfolio] = useRemoveStockFromPortfolioMutation()
+const PortfolioStocks = () => {
+    const {
+        data: stocks,
+        isLoading: isLoadingPortfolio,
+        error: portfolioError,
+        refetch: refetchPortfolio,
+    } = useUsersControllerGetPortfolioListQuery()
+    const [removeStockFromPortfolio] = useUsersControllerRemoveFromPortfolioMutation()
+    const [stockSymbol, setStockSymbol] = useState('')
 
-    const [newStockSymbol, setNewStockSymbol] = useState('')
+    const [addStockToPortfolio, { error: fetchError, isLoading: isAdding }] =
+        useAddStockToPortfolioBySymbolMutation()
 
     const handleAddStock = async (e) => {
         e.preventDefault()
-        if (newStockSymbol) {
-            await addStockToPortfolio(newStockSymbol)
-            setNewStockSymbol('')
-            await refetch()
+        try {
+            await addStockToPortfolio({ symbol: stockSymbol }).unwrap()
+            setStockSymbol('')
+            await refetchPortfolio()
+        } catch (error) {
+            alert('Stock is not in DB')
         }
     }
 
-    const handleRemoveStock = async (symbol: string) => {
-        await removeStockFromPortfolio(symbol)
-        await refetch()
+    const handleRemoveStock = async (stockId: string) => {
+        await removeStockFromPortfolio({ updatePortfolioDto: { stockId } })
+        await refetchPortfolio()
     }
 
-    const renderStocks = (stocks: Stock[]) => {
+    const renderStocks = (stocks) => {
         return stocks.map((stock, index) => (
-            <PortofilLineStock
+            <PortfolioLineStock
                 key={'portfoliostock' + index}
                 stock={stock}
                 index={index}
@@ -46,11 +52,12 @@ const ConsiderStocks = () => {
             <form onSubmit={handleAddStock} className="mb-4">
                 <input
                     type="text"
-                    value={newStockSymbol}
-                    onChange={(e) => setNewStockSymbol(e.target.value)}
+                    value={stockSymbol}
+                    onChange={(e) => setStockSymbol(e.target.value)}
                     placeholder="Enter stock symbol"
                     className="border p-2 mr-2"
                 />
+                {fetchError && <h2>Error: {String(fetchError?.message)}</h2>}
                 <button
                     type="submit"
                     disabled={isAdding}
@@ -59,9 +66,9 @@ const ConsiderStocks = () => {
                     Add Stock
                 </button>
             </form>
+            {portfolioError && <p className="text-red-500">{String(portfolioError?.message)}</p>}
             <div className="mt-6 w-full">
-                {isLoading && <h2>Loading...</h2>}
-                {error && <h2>Error: {String(error)}</h2>}
+                {isLoadingPortfolio && <h2>Loading...</h2>}
                 {stocks && !stocks.length && <h2>No stocks found</h2>}
                 {stocks && stocks.length && renderStocks(stocks)}
             </div>
@@ -69,4 +76,4 @@ const ConsiderStocks = () => {
     )
 }
 
-export default ConsiderStocks
+export default PortfolioStocks

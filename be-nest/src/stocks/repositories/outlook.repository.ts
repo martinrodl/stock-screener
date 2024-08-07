@@ -1,4 +1,3 @@
-// src/repositories/outlook.repository.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -24,6 +23,7 @@ import {
 } from '../schemas/stock-dividend.schema';
 import { StockNews, StockNewsDocument } from '../schemas/stock-news.schema';
 import { Profile, ProfileDocument } from '../schemas/profile.schema';
+import { Stock, StockDocument } from '../schemas/stock.schema'; // Add this import
 
 @Injectable()
 export class OutlookRepository {
@@ -41,6 +41,7 @@ export class OutlookRepository {
     @InjectModel(StockNews.name)
     private stockNewsModel: Model<StockNewsDocument>,
     @InjectModel(Profile.name) private profileModel: Model<ProfileDocument>,
+    @InjectModel(Stock.name) private stockModel: Model<StockDocument>, // Add this
   ) {}
 
   private async insertManyIfNotExistsHelper(
@@ -90,14 +91,36 @@ export class OutlookRepository {
       .exec();
     if (!existingProfile) {
       await this.profileModel.create(profile);
+      await this.stockModel
+        .updateOne(
+          { _id: profile.stock },
+          {
+            profile: profile._id,
+            country: profile.country,
+            sector: profile.sector,
+            industry: profile.industry,
+          },
+        )
+        .exec();
     } else {
       await this.profileModel
         .updateOne({ stock: profile.stock }, profile)
         .exec();
+      await this.stockModel
+        .updateOne(
+          { _id: profile.stock },
+          {
+            profile: existingProfile._id,
+            country: profile.country,
+            sector: profile.sector,
+            industry: profile.industry,
+          },
+        )
+        .exec();
     }
   }
 
-  async findProfile(filter: any): Promise<Profile[]> {
-    return this.profileModel.find(filter).exec();
+  async findProfile(filter: any): Promise<ProfileDocument | null> {
+    return this.profileModel.findOne(filter).exec();
   }
 }

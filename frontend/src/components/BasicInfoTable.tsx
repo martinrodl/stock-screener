@@ -19,8 +19,8 @@ interface BasicInfoProps {
     peterlynchValue?: number
     sharesOutstanding?: number
     sharesOutstanding5y?: number
-    roe10y?: number
-    roic10y?: number
+    roe5y?: number
+    roic5s?: number
     averageProfitGrowth?: number
     averageDividendGrowth?: number
     averageNetIncomeGrowth?: number
@@ -80,8 +80,8 @@ const BasicInfoTable: React.FC<BasicInfoProps> = (props) => {
         },
         { key: 'sharesOutstanding', label: 'Shares Outstanding', format: formatBigNumber },
         { key: 'sharesOutstanding5y', label: 'Shares Outstanding (5Y)', format: formatBigNumber },
-        { key: 'roe10y', label: 'ROE (10Y)', format: (n: number) => `${(n * 100).toFixed(2)}%` },
-        { key: 'roic10y', label: 'ROIC (10Y)', format: (n: number) => `${(n * 100).toFixed(2)}%` },
+        { key: 'roe5y', label: 'ROE (5Y)', format: (n: number) => `${(n * 100).toFixed(2)}%` },
+        { key: 'roic5y', label: 'ROIC (5Y)', format: (n: number) => `${(n * 100).toFixed(2)}%` },
         {
             key: 'averageProfitGrowth',
             label: 'Average Profit Growth',

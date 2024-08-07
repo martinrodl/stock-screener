@@ -7,8 +7,8 @@ import {
   Put,
   Delete,
   Get,
-  Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from '../services';
@@ -18,7 +18,8 @@ import {
   UpdatePortfolioDto,
   UpdateConsiderDto,
 } from '../dto';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CustomRequest } from '../../types/express-request.interface';
 
 @ApiTags('users')
 @Controller('user')
@@ -41,10 +42,27 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  @ApiOperation({ summary: 'Logout a user' })
+  async logout(@Req() req: CustomRequest) {
+    const user = req.user;
+    return this.usersService.logout(user.email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
   @Put('portfolio')
   @ApiOperation({ summary: 'Add a stock to portfolio list' })
-  async addToPortfolio(@Body() updatePortfolioDto: UpdatePortfolioDto) {
-    return this.usersService.addToPortfolio(updatePortfolioDto);
+  async addToPortfolio(
+    @Req() req: CustomRequest,
+    @Body() updatePortfolioDto: UpdatePortfolioDto,
+  ) {
+    const user = req.user;
+    return this.usersService.addToPortfolio(
+      user._id.toString(),
+      updatePortfolioDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -52,8 +70,15 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @Delete('portfolio')
   @ApiOperation({ summary: 'Remove a stock from portfolio list' })
-  async removeFromPortfolio(@Body() updatePortfolioDto: UpdatePortfolioDto) {
-    return this.usersService.removeFromPortfolio(updatePortfolioDto);
+  async removeFromPortfolio(
+    @Req() req: CustomRequest,
+    @Body() updatePortfolioDto: UpdatePortfolioDto,
+  ) {
+    const user = req.user;
+    return this.usersService.removeFromPortfolio(
+      user._id.toString(),
+      updatePortfolioDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -61,8 +86,15 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @Put('consider')
   @ApiOperation({ summary: 'Add a stock to consider list' })
-  async addToConsider(@Body() updateConsiderDto: UpdateConsiderDto) {
-    return this.usersService.addToConsider(updateConsiderDto);
+  async addToConsider(
+    @Req() req: CustomRequest,
+    @Body() updateConsiderDto: UpdateConsiderDto,
+  ) {
+    const user = req.user;
+    return this.usersService.addToConsider(
+      user._id.toString(),
+      updateConsiderDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -70,23 +102,32 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @Delete('consider')
   @ApiOperation({ summary: 'Remove a stock from consider list' })
-  async removeFromConsider(@Body() updateConsiderDto: UpdateConsiderDto) {
-    return this.usersService.removeFromConsider(updateConsiderDto);
+  async removeFromConsider(
+    @Req() req: CustomRequest,
+    @Body() updateConsiderDto: UpdateConsiderDto,
+  ) {
+    const user = req.user;
+    return this.usersService.removeFromConsider(
+      user._id.toString(),
+      updateConsiderDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('portfolio')
   @ApiOperation({ summary: 'Get portfolio list' })
-  async getPortfolioList(@Query('email') email: string) {
-    return this.usersService.getPortfolioList(email);
+  async getPortfolioList(@Req() req: CustomRequest) {
+    const user = req.user;
+    return this.usersService.getPortfolioList(user._id.toString());
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('consider')
   @ApiOperation({ summary: 'Get consider list' })
-  async getConsiderList(@Query('email') email: string) {
-    return this.usersService.getConsiderList(email);
+  async getConsiderList(@Req() req: CustomRequest) {
+    const user = req.user;
+    return this.usersService.getConsiderList(user._id.toString());
   }
 }

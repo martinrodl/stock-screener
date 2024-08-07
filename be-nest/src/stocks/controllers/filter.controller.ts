@@ -6,6 +6,11 @@ import {
   Param,
   Delete,
   Put,
+  UseGuards,
+  Req,
+  HttpCode,
+  HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -13,69 +18,115 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { FilterService } from '../services/filter.service';
 import { Filter } from '../schemas/filter.schema';
-import { CreateFilterDto } from '../dto/create-filter.dto';
-import { Stock } from '../schemas/stock.schema';
+import { CreateFilterDto, ApplyFilterDto } from '../dto/create-filter.dto';
 import {
-  FilterNumberProperty,
-  FilterStringProperty,
-  FilterCondition,
-} from '../enums';
+  IndustriesResponseDto,
+  SectorsResponseDto,
+  CountriesResponseDto,
+} from '../dto/filter-response.dto';
+import { Stock } from '../schemas/stock.schema';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CustomRequest } from '../../types/express-request.interface';
 
 @ApiTags('stocks-filters')
 @Controller('filters')
 export class FilterController {
   constructor(private readonly filterService: FilterService) {}
 
+  @Get('countries')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get unique countries' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all unique countries',
+    type: CountriesResponseDto,
+  })
+  async getCountries(): Promise<CountriesResponseDto> {
+    const countries = await this.filterService.getUniqueCountries();
+    return { countries };
+  }
+
+  @Get('sectors')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get unique sectors' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all unique sectors',
+    type: SectorsResponseDto,
+  })
+  async getSectors(): Promise<SectorsResponseDto> {
+    const sectors = await this.filterService.getUniqueSectors();
+    return { sectors };
+  }
+
+  @Get('industries')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get unique industries' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all unique industries',
+    type: IndustriesResponseDto,
+  })
+  async getIndustries(): Promise<IndustriesResponseDto> {
+    const industries = await this.filterService.getUniqueIndustries();
+    return { industries };
+  }
+
+  @Post('/apply-direct')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Apply a filter directly from the payload' })
+  @ApiBody({
+    type: CreateFilterDto,
+    description: 'The filter data to apply directly',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the stocks matching the filter criteria',
+    type: [Stock],
+  })
+  async applyFilterDirectly(
+    @Req() req: CustomRequest,
+    @Body() applyFilterDto: ApplyFilterDto,
+  ): Promise<Stock[]> {
+    console.log(applyFilterDto);
+    return this.filterService.applyFilterDirectly(
+      applyFilterDto.numberCriteria,
+      applyFilterDto.stringCriteria,
+      applyFilterDto.ratioCriteria,
+      applyFilterDto.multiCriteria,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new filter' })
   @ApiBody({
     type: CreateFilterDto,
     description: 'The filter data to create',
-    examples: {
-      example1: {
-        summary: 'A sample filter creation payload',
-        value: {
-          name: 'Sample Filter',
-          numberCriteria: [
-            {
-              property: FilterNumberProperty.PRICE,
-              condition: FilterCondition.LESS_THAN,
-              value: 100,
-            },
-          ],
-          stringCriteria: [
-            {
-              property: FilterStringProperty.EXCHANGE,
-              condition: FilterCondition.EQUAL,
-              value: 'NYSE',
-            },
-          ],
-          ratioCriteria: [
-            {
-              numerator: FilterNumberProperty.MARKETCAP,
-              denominator: FilterNumberProperty.REVENUEPERSHARE,
-              condition: FilterCondition.LESS_THAN,
-              value: 2,
-            },
-          ],
-          user: '60b8d295f1dfb862d8f51d3b',
-        },
-      },
-    },
   })
   @ApiResponse({
     status: 201,
     description: 'The filter has been successfully created.',
     type: Filter,
   })
-  async create(@Body() createFilterDto: CreateFilterDto): Promise<Filter> {
-    return this.filterService.createFilter(createFilterDto);
+  async create(
+    @Req() req: CustomRequest,
+    @Body() createFilterDto: CreateFilterDto,
+  ): Promise<Filter> {
+    const userId = req.user._id.toString();
+    return this.filterService.createFilter(createFilterDto, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all filters' })
   @ApiResponse({
     status: 200,
@@ -86,7 +137,26 @@ export class FilterController {
     return this.filterService.getAllFilters();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('userFilters')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get filters by user ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the filters for the given user ID',
+    type: [Filter],
+  })
+  async findByUser(@Req() req: CustomRequest): Promise<Filter[]> {
+    const userId = req.user._id.toString();
+    console.log('findByUser', userId);
+    return this.filterService.getFiltersByUser(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a filter by ID' })
   @ApiParam({
     name: 'id',
@@ -103,24 +173,10 @@ export class FilterController {
     return this.filterService.getFilterById(id);
   }
 
-  @Get('/user/:userId')
-  @ApiOperation({ summary: 'Get filters by user ID' })
-  @ApiParam({
-    name: 'userId',
-    required: true,
-    description: 'User ID to retrieve filters for',
-    example: '60b8d295f1dfb862d8f51d3b',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Return the filters for the given user ID',
-    type: [Filter],
-  })
-  async findByUser(@Param('userId') userId: string): Promise<Filter[]> {
-    return this.filterService.getFiltersByUser(userId);
-  }
-
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Put(':id')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a filter by ID' })
   @ApiParam({
     name: 'id',
@@ -131,37 +187,6 @@ export class FilterController {
   @ApiBody({
     type: CreateFilterDto,
     description: 'The updated filter data',
-    examples: {
-      example1: {
-        summary: 'A sample filter update payload',
-        value: {
-          name: 'Updated Filter',
-          numberCriteria: [
-            {
-              property: FilterNumberProperty.PRICE,
-              condition: FilterCondition.LESS_THAN,
-              value: 200,
-            },
-          ],
-          stringCriteria: [
-            {
-              property: FilterStringProperty.NAME,
-              condition: FilterCondition.NOT_EQUAL,
-              value: 'Some Name',
-            },
-          ],
-          ratioCriteria: [
-            {
-              numerator: FilterNumberProperty.MARKETCAP,
-              denominator: FilterNumberProperty.REVENUEPERSHARE,
-              condition: FilterCondition.LESS_THAN,
-              value: 1,
-            },
-          ],
-          user: '60b8d295f1dfb862d8f51d3b',
-        },
-      },
-    },
   })
   @ApiResponse({
     status: 200,
@@ -169,13 +194,24 @@ export class FilterController {
     type: Filter,
   })
   async update(
+    @Req() req: CustomRequest,
     @Param('id') id: string,
     @Body() updateFilterDto: Partial<CreateFilterDto>,
   ): Promise<Filter> {
-    return this.filterService.updateFilterById(id, updateFilterDto);
+    const userId = req.user._id.toString();
+    const filter = await this.filterService.getFilterById(id);
+    if (filter.user.toString() !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to update this filter',
+      );
+    }
+    return this.filterService.updateFilterById(id, updateFilterDto, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete(':id')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a filter by ID' })
   @ApiParam({
     name: 'id',
@@ -187,11 +223,24 @@ export class FilterController {
     status: 200,
     description: 'The filter has been successfully deleted.',
   })
-  async remove(@Param('id') id: string): Promise<any> {
+  async remove(
+    @Req() req: CustomRequest,
+    @Param('id') id: string,
+  ): Promise<any> {
+    const userId = req.user._id.toString();
+    const filter = await this.filterService.getFilterById(id);
+    if (filter.user.toString() !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to delete this filter',
+      );
+    }
     return this.filterService.deleteFilterById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get(':id/apply')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Apply a filter by ID' })
   @ApiParam({
     name: 'id',
@@ -206,57 +255,5 @@ export class FilterController {
   })
   async applyFilter(@Param('id') id: string): Promise<Stock[]> {
     return this.filterService.applyFilter(id);
-  }
-
-  @Post('/apply-direct')
-  @ApiOperation({ summary: 'Apply a filter directly from the payload' })
-  @ApiBody({
-    type: CreateFilterDto,
-    description: 'The filter data to apply directly',
-    examples: {
-      example1: {
-        summary: 'A sample filter apply directly payload',
-        value: {
-          name: 'Temporary Filter',
-          numberCriteria: [
-            {
-              property: FilterNumberProperty.PRICE,
-              condition: FilterCondition.GREATER_THAN,
-              value: 150,
-            },
-          ],
-          stringCriteria: [
-            {
-              property: FilterStringProperty.EXCHANGE,
-              condition: FilterCondition.EQUAL,
-              value: 'NASDAQ',
-            },
-          ],
-          ratioCriteria: [
-            {
-              numerator: FilterNumberProperty.MARKETCAP,
-              denominator: FilterNumberProperty.REVENUEPERSHARE,
-              condition: FilterCondition.GREATER_THAN,
-              value: 1.5,
-            },
-          ],
-          user: '60b8d295f1dfb862d8f51d3b',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Return the stocks matching the filter criteria',
-    type: [Stock],
-  })
-  async applyFilterDirectly(
-    @Body() applyFilterDto: CreateFilterDto,
-  ): Promise<Stock[]> {
-    return this.filterService.applyFilterDirectly(
-      applyFilterDto.numberCriteria,
-      applyFilterDto.stringCriteria,
-      applyFilterDto.ratioCriteria,
-    );
   }
 }

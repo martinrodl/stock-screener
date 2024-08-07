@@ -50,7 +50,6 @@ import {
 } from './services';
 import {
   FmpController,
-  CountedController,
   StocksController,
   FilterController,
 } from './controllers';
@@ -58,7 +57,6 @@ import {
   StatementsRepository,
   MetricsRepository,
   AnalystRatingsRepository,
-  ActualValuesRepository,
   OutlookRepository,
   StocksRepository,
   FilterRepository,
@@ -92,12 +90,7 @@ import { OtherModule } from '../other/other.module';
     HttpModule,
     OtherModule,
   ],
-  controllers: [
-    StocksController,
-    FmpController,
-    CountedController,
-    FilterController,
-  ],
+  controllers: [StocksController, FmpController, FilterController],
   providers: [
     CronService,
     StocksService,
@@ -109,7 +102,6 @@ import { OtherModule } from '../other/other.module';
     MetricsRepository,
     StatementsRepository,
     AnalystRatingsRepository,
-    ActualValuesRepository,
     OutlookRepository,
     StocksRepository,
     FilterRepository,

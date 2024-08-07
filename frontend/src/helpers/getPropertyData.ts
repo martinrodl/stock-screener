@@ -1,40 +1,26 @@
-import { StockDetail } from '../types/StockDetail'
-import { BalanceSheetStatement } from '../types/BalanceSheetStatement'
-import { CashflowStatement } from '../types/CashflowStatement'
-import { GrowthCashflowMetrics } from '../types/CashflowGrowthMetrics'
-import { GrowthIncomeMetrics } from '../types/GrowthIncomeMetrics'
-import { IncomeStatement } from '../types/IncomeStatement'
-import { KeyMetrics } from '../types/KeyMetrics'
-
-type StatementType = keyof StockDetail
-type PropertyType =
-    | keyof BalanceSheetStatement
-    | keyof CashflowStatement
-    | keyof GrowthCashflowMetrics
-    | keyof GrowthIncomeMetrics
-    | keyof IncomeStatement
-    | keyof KeyMetrics
-
 export function getProperties(
-    stockDetail: StockDetail,
-    statementType: StatementType,
-    properties: PropertyType[]
+    groupStatements: any[],
+    properties: string[]
 ): Array<{ [key: string]: any; date: string }> {
-    if (!Object.prototype.hasOwnProperty.call(stockDetail, statementType)) {
-        console.error('Invalid statement type.')
+    if (!Array.isArray(groupStatements)) {
+        console.error('groupStatements should be an array of objects.')
         return []
     }
 
-    const statements = stockDetail[statementType]
-    if (!Array.isArray(statements)) {
-        return []
-    }
+    console.log('properties ', properties)
 
-    const result = statements.map((statement) => {
+    const result = groupStatements.map((statement) => {
         const data: { [key: string]: any; date: string } = { date: statement.date } // Initialize with date
         properties.forEach((property) => {
             if (Object.prototype.hasOwnProperty.call(statement, property)) {
+                console.log('Property exists:', property, statement[property])
                 data[property] = statement[property]
+            } else {
+                console.warn(
+                    `Property ${property} does not exist on statement. Setting value to 0.`,
+                    statement
+                )
+                data[property] = null // Set the value to 0 if the property doesn't exist
             }
         })
         return data
@@ -42,8 +28,3 @@ export function getProperties(
 
     return result.reverse()
 }
-
-// Example usage:
-// const stockDetail: StockDetail = ... // load your JSON data here
-// const data = getProperties(stockDetail, "balanceSheetStatements", ["inventory", "cashAndCashEquivalents"]);
-// console.log(data);

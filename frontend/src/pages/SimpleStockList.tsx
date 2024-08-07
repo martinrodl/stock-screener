@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import SimpleStockFilterForm from '../components/SimpleStockFilterForm'
 import { Stock } from '../types/Stock'
 import { SimpleStockCriteria } from '../types/StockCriteria'
-import { useSimpleFetchStocksMutation } from '../services/stockApi'
+import { useFilterControllerApplyFilterDirectlyMutation } from '../services/beGeneratedApi'
 import { setSimpleResults } from '../store/stockSlice'
 import { RootState } from '../store/RootState'
 import { LineStock } from '../components/LineStock'
@@ -17,11 +17,17 @@ const SimpleStockList = () => {
     const dispatch = useDispatch()
     const { pageNumber } = useParams<{ pageNumber?: string }>()
     const [page, setPage] = useState<number>(Number(pageNumber) || 1)
-    const [fetchStocks, { data, isLoading, error }] = useSimpleFetchStocksMutation()
+    const [fetchStocks, { data, isLoading, error }] =
+        useFilterControllerApplyFilterDirectlyMutation()
     const stocks = useSelector((state: RootState) => state.stock.simpleResults)
     const savedStockCriteria = useSelector((state: RootState) => state.stock.simpleCriteria)
+
     const handleSubmit = (criteria: SimpleStockCriteria) => {
-        fetchStocks({ criteria, skip: page * pageSize, limit: pageSize })
+        fetchStocks({
+            createFilterDto: { ...criteria, user: '' },
+            skip: (page - 1) * pageSize,
+            limit: pageSize,
+        })
     }
 
     useEffect(() => {
@@ -32,7 +38,11 @@ const SimpleStockList = () => {
 
     useEffect(() => {
         navigate(`/stocks/page/${page}`)
-        fetchStocks({ criteria: savedStockCriteria, skip: page * pageSize, limit: pageSize })
+        fetchStocks({
+            createFilterDto: savedStockCriteria,
+            skip: (page - 1) * pageSize,
+            limit: pageSize,
+        })
     }, [fetchStocks, navigate, page, savedStockCriteria])
 
     const handlePreviousPage = () => {
@@ -57,6 +67,7 @@ const SimpleStockList = () => {
     const renderStocks = (stocks: Stock[]) => {
         return stocks.map((stock, index) => <LineStock key={index} stock={stock} index={index} />)
     }
+
     return (
         <div className="flex flex-col items-center p-2">
             <h1 className="text-xl font-bold mb-2">Simple stocks screener</h1>

@@ -12,21 +12,21 @@ import { StocksService } from './stocks.service';
 import {
   MetricsRepository,
   StatementsRepository,
-  ActualValuesRepository,
+  StocksRepository,
 } from '../repositories';
 import { StockDocument } from '../schemas';
 import { OtherRepository } from '../../other/repositories/other.repository';
 
 @Injectable()
 export class CountedService {
-  private readonly apiKey = process.env.FINANCIAL_MODELING_PREP_API_KEY;
+  private readonly apiKey = process.env.API_KEY;
 
   constructor(
     @Inject(forwardRef(() => StocksService))
     private stocksService: StocksService,
     private readonly metricsRepository: MetricsRepository,
     private readonly statementsRepository: StatementsRepository,
-    private readonly actualValuesRepository: ActualValuesRepository,
+    private readonly stockRepository: StocksRepository,
     private readonly otherRepository: OtherRepository,
     private readonly httpService: HttpService,
   ) {}
@@ -45,9 +45,10 @@ export class CountedService {
       periodType,
     );
 
-    await this.actualValuesRepository.updateValues(
+    // Update the stock document with the new actual values
+    await this.stockRepository.updateActualValues(
       stock._id.toString(),
-      updatedValues, // Ensure the stock field is of type ObjectId
+      updatedValues,
     );
   }
 
@@ -62,12 +63,25 @@ export class CountedService {
         periodType === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
     };
 
+    console.log(
+      `Fetching income statements for filter: ${JSON.stringify(filter)}`,
+    );
     const incomeStatements =
       await this.statementsRepository.findIncomeStatements(filter);
+    console.log('incomeStatements', incomeStatements);
+    console.log(
+      `Fetching cash flow statements for filter: ${JSON.stringify(filter)}`,
+    );
     const cashFlowStatements =
       await this.statementsRepository.findCashFlowStatements(filter);
+
+    console.log(
+      `Fetching growth metrics for filter: ${JSON.stringify(filter)}`,
+    );
     const growthMetrics =
       await this.metricsRepository.findIncomeGrowthMetrics(filter);
+
+    console.log(`Fetching key metrics for filter: ${JSON.stringify(filter)}`);
     const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
 
     if (
@@ -76,6 +90,9 @@ export class CountedService {
       !growthMetrics.length ||
       !keyMetrics.length
     ) {
+      console.error(
+        `Data missing: incomeStatements: ${incomeStatements.length}, cashFlowStatements: ${cashFlowStatements.length}, growthMetrics: ${growthMetrics.length}, keyMetrics: ${keyMetrics.length}`,
+      );
       throw new NotFoundException(
         `Financial data not found for stock with id ${stockId}`,
       );
@@ -138,7 +155,7 @@ export class CountedService {
       latestKeyMetric.marketCap;
 
     return {
-      stock: stockId as unknown as Types.ObjectId, // Ensure stockId is of type ObjectId
+      stock: stockId, // Include the stock field in the values
       date: new Date().toISOString(),
       capeRatio,
       averagePE5y,

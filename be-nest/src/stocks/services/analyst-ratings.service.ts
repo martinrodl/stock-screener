@@ -9,7 +9,7 @@ import { Types } from 'mongoose';
 
 @Injectable()
 export class AnalystRatingsService {
-  private readonly apiKey = process.env.FINANCIAL_MODELING_PREP_API_KEY;
+  private readonly apiKey = process.env.API_KEY;
 
   constructor(
     private readonly analystRatingsRepository: AnalystRatingsRepository,

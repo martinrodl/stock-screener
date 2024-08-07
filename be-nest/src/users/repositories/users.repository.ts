@@ -17,10 +17,27 @@ export class UsersRepository {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async addToPortfolio(updatePortfolioDto: UpdatePortfolioDto): Promise<User> {
+  async findUserById(id: string): Promise<UserDocument> {
+    return this.userModel
+      .findById(id)
+      .populate({
+        path: 'portfolioList',
+        model: 'Stock',
+      })
+      .populate({
+        path: 'considerList',
+        model: 'Stock',
+      })
+      .exec();
+  }
+
+  async addToPortfolio(
+    userId: string,
+    updatePortfolioDto: UpdatePortfolioDto,
+  ): Promise<User> {
     const user = await this.userModel
-      .findOneAndUpdate(
-        { email: updatePortfolioDto.email },
+      .findByIdAndUpdate(
+        userId,
         {
           $addToSet: {
             portfolioList: new Types.ObjectId(updatePortfolioDto.stockId),
@@ -30,19 +47,18 @@ export class UsersRepository {
       )
       .populate('portfolioList');
     if (!user) {
-      throw new NotFoundException(
-        `User with email ${updatePortfolioDto.email} not found`,
-      );
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
     return user;
   }
 
   async removeFromPortfolio(
+    userId: string,
     updatePortfolioDto: UpdatePortfolioDto,
   ): Promise<User> {
     const user = await this.userModel
-      .findOneAndUpdate(
-        { email: updatePortfolioDto.email },
+      .findByIdAndUpdate(
+        userId,
         {
           $pull: {
             portfolioList: new Types.ObjectId(updatePortfolioDto.stockId),
@@ -52,17 +68,18 @@ export class UsersRepository {
       )
       .populate('portfolioList');
     if (!user) {
-      throw new NotFoundException(
-        `User with email ${updatePortfolioDto.email} not found`,
-      );
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
     return user;
   }
 
-  async addToConsider(updateConsiderDto: UpdateConsiderDto): Promise<User> {
+  async addToConsider(
+    userId: string,
+    updateConsiderDto: UpdateConsiderDto,
+  ): Promise<User> {
     const user = await this.userModel
-      .findOneAndUpdate(
-        { email: updateConsiderDto.email },
+      .findByIdAndUpdate(
+        userId,
         {
           $addToSet: {
             considerList: new Types.ObjectId(updateConsiderDto.stockId),
@@ -72,19 +89,18 @@ export class UsersRepository {
       )
       .populate('considerList');
     if (!user) {
-      throw new NotFoundException(
-        `User with email ${updateConsiderDto.email} not found`,
-      );
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
     return user;
   }
 
   async removeFromConsider(
+    userId: string,
     updateConsiderDto: UpdateConsiderDto,
   ): Promise<User> {
     const user = await this.userModel
-      .findOneAndUpdate(
-        { email: updateConsiderDto.email },
+      .findByIdAndUpdate(
+        userId,
         {
           $pull: {
             considerList: new Types.ObjectId(updateConsiderDto.stockId),
@@ -94,9 +110,7 @@ export class UsersRepository {
       )
       .populate('considerList');
     if (!user) {
-      throw new NotFoundException(
-        `User with email ${updateConsiderDto.email} not found`,
-      );
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
     return user;
   }

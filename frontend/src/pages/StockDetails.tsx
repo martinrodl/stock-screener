@@ -1,180 +1,261 @@
-import { useParams, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import BarChart from '../components/BarChart'
-import BasicInfoTable from '../components/BasicInfoTable'
-import DetailMetricsTable from '../components/DetailMetricsTable'
-import StockTable from '../components/SureTable'
-import { useGetStockDetailQuery, useUpdateStockValuesMutation } from '../services/stockApi'
-import { getProperties } from '../helpers/getPropertyData'
-import { mergeDataSets } from '../helpers/mergeDatasets'
-import { useEffect } from 'react'
-import { delay } from '../helpers/delay'
+import React, { useState, FormEvent, useEffect } from 'react'
+import NumericLineFilter from '../components/filter/NumericLineFilter'
+import RatioLineFilter from '../components/filter/RatioLineFilter'
+import MultiSelectFilter from '../components/filter/MultiSelectFilter'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../store'
+import { setSimpleCriteria } from '../store/stockSlice.ts'
+import { filteredCriteria } from '../helpers/filteredCriteria'
+import {
+    FilterNumberProperty,
+    FilterNumberCondition,
+    FilterStringCondition,
+} from '../types/filter.enum.ts'
 
-const StockDetails = () => {
-    const [datasets, setDatasets] = useState<any[]>([])
-    const [datasets2, setDatasets2] = useState<any[]>([])
-    const { symbol } = useParams()
-    const navigate = useNavigate()
-    const { data: stock, error, isLoading, refetch } = useGetStockDetailQuery(symbol ?? '')
-    const [updateStockValues, { isLoading: updateLoading }] = useUpdateStockValuesMutation()
+const SimpleStockFilterForm: React.FC = () => {
+    const dispatch = useDispatch()
+    const simpleCriteria = useSelector((state: RootState) => state.stock.simpleCriteria)
 
-    const handleBackButtonClick = () => {
-        navigate(-1) // Navigates back to the last page in history
-    }
-
-    const handleUpdateButtonClick = async () => {
-        try {
-            await updateStockValues(symbol ?? '').unwrap()
-            delay(2000)
-            refetch()
-        } catch (error) {
-            console.error('Failed to update stock values:', error)
-        }
-    }
+    const [isFormVisible, setIsFormVisible] = useState(false)
+    const [formState, setFormState] = useState(simpleCriteria)
 
     useEffect(() => {
-        if (stock) {
-            const inventory = getProperties(stock, 'cashflowStatements', ['netIncome'])
-            const revenue = getProperties(stock, 'incomeStatements', ['revenue'])
-            const mergedDataSets = mergeDataSets(inventory, revenue)
-            setDatasets(mergedDataSets)
+        setFormState(simpleCriteria)
+    }, [simpleCriteria])
 
-            const growthNetIncome = getProperties(stock, 'growthCashflowtMetrics', [
-                'growthNetIncome',
-            ])
-            const growthRevenue = getProperties(stock, 'growthIncomeMetrics', [
-                'growthRevenue',
-                'growthInventory',
-            ])
-            const mergedDataSets2 = mergeDataSets(growthNetIncome, growthRevenue)
-            setDatasets2(mergedDataSets2)
-        }
-    }, [stock])
-
-    const getTopButtons = () => (
-        <div className="flex w-full p-4 justify-around">
-            <button
-                onClick={handleBackButtonClick}
-                className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                Back to Stocks
-            </button>
-            <button
-                onClick={handleUpdateButtonClick}
-                className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                Update Stock Values
-            </button>
-        </div>
-    )
-
-    if (isLoading || updateLoading) {
-        return (
-            <div>
-                {getTopButtons()}
-                <h2 className="mt-5 ml-5">Loading...</h2>
-            </div>
-        )
+    const handleNumericFilterChange = (criteria: {
+        property: FilterNumberProperty
+        condition: FilterNumberCondition
+        value: number | string
+    }) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            [criteria.property]: criteria.value,
+        }))
     }
-    if (error)
-        return (
-            <div>
-                {getTopButtons()}
-                <div className="mt-5 ml-5">Error: {String(error)}</div>
-            </div>
-        )
-    if (!stock)
-        return (
-            <div>
-                {getTopButtons()}
-                <h2 className="mt-5 ml-5">Stock not found</h2>
-            </div>
-        )
-    return (
-        <div className="p-4 flex flex-col items-center">
-            {getTopButtons()}
-            <div className="flex gap-x-3 items-center mb-4">
-                <h1 className="text-xl font-bold">
-                    {stock.name} ({stock.symbol})
-                </h1>
-                <p>Exchange: {stock.values.exchange}</p>
-            </div>
-            {stock?.outlookData && (
-                <div className="flex flex-col gap-y-1 my-2">
-                    <h3 className="font-semibold">Description:</h3>
-                    {stock.outlookData?.description && (
-                        <p className="text-sm">{stock.outlookData?.description}</p>
-                    )}
-                    <div className="flex flex-col">
-                        {stock.outlookData?.sector && (
-                            <h3 className="">Sector: {stock.outlookData?.sector}</h3>
-                        )}
-                        {stock.outlookData?.industry && (
-                            <h3 className="">Inudstry: {stock?.outlookData?.industry}</h3>
-                        )}
-                        {stock.outlookData?.country && (
-                            <h3 className="">Country: {stock?.outlookData?.country}</h3>
-                        )}
-                    </div>
-                </div>
-            )}
-            <div className="mb-14">
-                <BasicInfoTable
-                    marketCap={stock.values.marketCap}
-                    peRatio={stock.values.peRatio}
-                    roic={stock.keyMetrics[0]?.roic || NaN}
-                    roe={stock.keyMetrics[0]?.roe || NaN}
-                    debtToEquity={stock.keyMetrics[0]?.debtToEquity || NaN}
-                    dateMetrics={stock.keyMetrics[0]?.date}
-                    price={stock.values.price}
-                    dcf={stock.values.dcf}
-                    date={stock.values.date}
-                    capeRatio={stock.values.capeRatio}
-                    intrinsicValueZeroGrowth={stock.values.intrinsicValueZeroGrowth}
-                    intrinsicValueAverageGrowth={stock.values.intrinsicValueAverageGrowth}
-                    intrinsicValueLastYearGrowth={stock.values.intrinsicValueLastYearGrowth}
-                    peterlynchValue={stock.values.peterlynchValue}
-                    sharesOutstanding={stock.values.sharesOutstanding}
-                    sharesOutstanding5y={stock.values.sharesOutstanding5y}
-                    roe10y={stock.values.roe10y}
-                    roic10y={stock.values.roic10y}
-                    averageProfitGrowth={stock.values.averageProfitGrowth}
-                    averageDividendGrowth={stock.values.averageDividendGrowth}
-                    averageNetIncomeGrowth={stock.values.averageNetIncomeGrowth}
-                    averageProfitMargin={stock.values.averageProfitMargin}
-                    profitMargin={stock.values.profitMargin}
-                    eps={stock.values.eps}
-                    debtPerShare={stock.values.debtPerShare}
-                    dividendYield={stock.values.dividendYield}
-                    dividendYield10y={stock.values.dividendYield10y}
-                    dividendPayoutRatio={stock.values.dividendPayoutRatio}
-                    freeCashFlowPerShare={stock.values.freeCashFlowPerShare}
-                    buybackYield={stock.values.buybackYield}
-                    buybackPayoutRatio={stock.values.buybackPayoutRatio}
-                    debtToAssets={stock.values.debtToAssets}
-                    netDebtToEBITDA={stock.values.netDebtToEBITDA}
-                    similarCompanies={stock.values.similarCompanies}
-                    averagePESimilarCompanies={stock.values.averagePESimilarCompanies}
-                    yearReturn={stock.values.yearReturn}
-                />
-            </div>
 
-            <DetailMetricsTable stockDetail={stock} />
-            <StockTable symbol={stock.symbol} />
-            <div className="my-4 flex flex-col gap-y-10 mt-20">
-                <h1 className="text-lg font-semibold text-center">Growth Metrics Graph</h1>
-                <div className="h-[300px] w-[800px]">
-                    {stock && datasets.length > 0 && <BarChart mergedDatasets={datasets} />}
-                </div>
-                <div className="h-[300px] w-[800px]">
-                    {stock && datasets.length > 0 && (
-                        <BarChart mergedDatasets={datasets2} maxValue={1} />
-                    )}
-                </div>
-                StockTable
-            </div>
+    const handleRatioFilterChange = (
+        criteria: {
+            numerator: FilterNumberProperty
+            denominator: FilterNumberProperty
+            condition: FilterNumberCondition
+            value: number
+        },
+        type: 'ratioIntristicValue0growth' | 'ratioIntristicValue5ygrowth'
+    ) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            [type]: criteria,
+        }))
+    }
+
+    const handleMultiSelectChange = (type: string, values: string[]) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            [type]: values,
+        }))
+    }
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        const numberCriteria = Object.keys(FilterNumberProperty)
+            .map((key) => {
+                const property = FilterNumberProperty[key as keyof typeof FilterNumberProperty]
+                const value = formState[property]
+                return {
+                    property,
+                    condition: FilterNumberCondition.GREATER_THAN, // Default condition
+                    value: !isNaN(Number(value)) ? Number(value) : undefined,
+                }
+            })
+            .filter(
+                (criteria) =>
+                    !isNaN(criteria.value as number) &&
+                    criteria.value !== '' &&
+                    criteria.value !== undefined
+            )
+
+        const requestBody = {
+            numberCriteria,
+            stringCriteria: [
+                // {
+                //     property: 'symbol',
+                //     condition: FilterStringCondition.EQUAL,
+                //     value: formState.stockSymbol,
+                // },
+            ].filter((criteria) => criteria.value !== ''),
+            ratioCriteria: [
+                {
+                    numerator: formState.ratioIntristicValue0growth.numerator,
+                    denominator: formState.ratioIntristicValue0growth.denominator,
+                    condition: formState.ratioIntristicValue0growth.condition,
+                    value: formState.ratioIntristicValue0growth.value,
+                },
+                {
+                    numerator: formState.ratioIntristicValue5ygrowth.numerator,
+                    denominator: formState.ratioIntristicValue5ygrowth.denominator,
+                    condition: formState.ratioIntristicValue5ygrowth.condition,
+                    value: formState.ratioIntristicValue5ygrowth.value,
+                },
+            ].filter((criteria) => criteria.value !== ''),
+            multiCriteria: [
+                {
+                    type: 'country',
+                    values: formState.countries,
+                },
+                {
+                    type: 'sector',
+                    values: formState.sectors,
+                },
+                {
+                    type: 'industry',
+                    values: formState.industries,
+                },
+            ].filter((criteria) => criteria.values.length > 0),
+        }
+
+        const filteredState = filteredCriteria(requestBody)
+        dispatch(setSimpleCriteria(filteredState))
+        console.log('Filtered State:', filteredState) // For demonstration purposes
+    }
+
+    const toggleFormVisibility = () => {
+        setIsFormVisible(!isFormVisible)
+    }
+
+    return (
+        <div>
+            <button
+                onClick={toggleFormVisibility}
+                className="mb-2 text-indigo-600 hover:text-indigo-800"
+            >
+                {isFormVisible ? 'Hide Form' : 'Show Form'}
+            </button>
+            {isFormVisible && (
+                <form onSubmit={handleSubmit} className="md:max-w-xl max-w-xs mx-auto p-4">
+                    <div className="flex flex-col gap-4">
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.MARKETCAP}
+                            initialValue={formState[FilterNumberProperty.MARKETCAP]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.LESS_THAN}
+                            initialProperty={FilterNumberProperty.PERATIO}
+                            initialValue={formState[FilterNumberProperty.PERATIO]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROIC}
+                            initialValue={formState[FilterNumberProperty.ROIC]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROIC5Y}
+                            initialValue={formState[FilterNumberProperty.ROIC5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROE}
+                            initialValue={formState[FilterNumberProperty.ROE]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROE5Y}
+                            initialValue={formState[FilterNumberProperty.ROE5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGEPROFITGROWTH5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGEPROFITGROWTH5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGEDIVIDENDGROWTH5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGEDIVIDENDGROWTH5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGENETINCOMEGROWTH5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGENETINCOMEGROWTH5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGEPROFITMARGIN5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGEPROFITMARGIN5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.DIVIDENDYIELD5Y}
+                            initialValue={formState[FilterNumberProperty.DIVIDENDYIELD5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.LESS_THAN}
+                            initialProperty={FilterNumberProperty.DEBTTOASSETS}
+                            initialValue={formState[FilterNumberProperty.DEBTTOASSETS]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.LESS_THAN}
+                            initialProperty={FilterNumberProperty.DEBTTOEQUITY}
+                            initialValue={formState[FilterNumberProperty.DEBTTOEQUITY]}
+                        />
+                        <RatioLineFilter
+                            onChange={(criteria) =>
+                                handleRatioFilterChange(criteria, 'ratioIntristicValue0growth')
+                            }
+                            initialCondition={formState.ratioIntristicValue0growth.condition}
+                            initialNumerator={formState.ratioIntristicValue0growth.numerator}
+                            initialDenominator={formState.ratioIntristicValue0growth.denominator}
+                            initialValue={formState.ratioIntristicValue0growth.value}
+                        />
+                        <RatioLineFilter
+                            onChange={(criteria) =>
+                                handleRatioFilterChange(criteria, 'ratioIntristicValue5ygrowth')
+                            }
+                            initialCondition={formState.ratioIntristicValue5ygrowth.condition}
+                            initialNumerator={formState.ratioIntristicValue5ygrowth.numerator}
+                            initialDenominator={formState.ratioIntristicValue5ygrowth.denominator}
+                            initialValue={formState.ratioIntristicValue5ygrowth.value}
+                        />
+                        <MultiSelectFilter
+                            type="country"
+                            onChange={(values) => handleMultiSelectChange('countries', values)}
+                        />
+                        <MultiSelectFilter
+                            type="sector"
+                            onChange={(values) => handleMultiSelectChange('sectors', values)}
+                        />
+                        <MultiSelectFilter
+                            type="industry"
+                            onChange={(values) => handleMultiSelectChange('industries', values)}
+                        />
+                    </div>
+                    <div className="mt-4">
+                        <button
+                            type="submit"
+                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Filter Stocks
+                        </button>
+                    </div>
+                </form>
+            )}
         </div>
     )
 }
 
-export default StockDetails
+export default SimpleStockFilterForm

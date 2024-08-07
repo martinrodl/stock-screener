@@ -1,5 +1,5 @@
-# Use a specific Node.js version that is stable and supported
-FROM node:16-alpine
+# Use Node.js 18-alpine as the base image
+FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /app
@@ -14,7 +14,10 @@ RUN npm install --only=production && npm install -g @nestjs/cli
 COPY . .
 
 # Build the application
-RUN nest build
+RUN npm run build
+
+# Expose the application port (if applicable, specify the correct port)
+EXPOSE 3000
 
 # Command to run the application
 CMD ["npm", "run", "start:prod"]

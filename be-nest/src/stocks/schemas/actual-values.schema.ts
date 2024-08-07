@@ -1,14 +1,11 @@
 // src/stocks/counted/schemas/actual-values.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type ActualValuesDocument = ActualValues & Document;
 
 @Schema({ timestamps: true })
 export class ActualValues {
-  @Prop({ type: Types.ObjectId, ref: 'Stock' })
-  stock: Types.ObjectId; // Reference to Stock
-
   @Prop({ type: String })
   date: string;
 

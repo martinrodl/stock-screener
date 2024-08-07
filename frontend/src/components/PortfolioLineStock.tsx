@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom'
 import { Stock } from '../types/Stock'
 
-interface PortofilLineStockProps {
+interface PortfolioLineStockProps {
     stock: Stock
     index: number
-    handleRemoveStock: (symbol: string) => void
+    handleRemoveStock: (stockId: string) => void
 }
 
-export const PortofilLineStock = ({ stock, index, handleRemoveStock }: PortofilLineStockProps) => {
+export const PortfolioLineStock = ({
+    stock,
+    index,
+    handleRemoveStock,
+}: PortfolioLineStockProps) => {
     return (
         <div key={index} className="flex justify-between items-center p-4 border-b border-gray-200">
             <Link to={`/stock/${stock.symbol}`} className="flex gap-x-2 items-center">
@@ -27,7 +31,7 @@ export const PortofilLineStock = ({ stock, index, handleRemoveStock }: PortofilL
                 </div>
             </Link>
             <button
-                onClick={() => handleRemoveStock(stock.symbol)}
+                onClick={() => handleRemoveStock(stock.id)}
                 className="bg-red-500 text-white px-4 py-2 rounded"
             >
                 Remove

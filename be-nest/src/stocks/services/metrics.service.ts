@@ -1,59 +1,100 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { MetricsRepository } from '../repositories/';
-import { StocksService } from '../services';
-import { StockDocument } from '../schemas';
-import { CombinedData } from '../interfaces';
+import { plainToClass } from 'class-transformer';
+
+import { MetricsRepository, StocksRepository } from '../repositories';
+import { StocksService } from './stocks.service';
+import { StockDocument } from '../schemas/stock.schema';
+import { PeriodType } from '../enums';
+import {
+  IncomeGrowthMetricDto,
+  ProfitGrowthMetricDto,
+  KeyMetricDto,
+  CombinedMetricsDto,
+} from '../dto';
 
 @Injectable()
 export class MetricsService {
-  private readonly apiKey = process.env.FINANCIAL_MODELING_PREP_API_KEY;
+  private readonly apiKey = process.env.API_KEY;
 
   constructor(
     private readonly metricsRepository: MetricsRepository,
+    private readonly stocksRepository: StocksRepository,
     private readonly httpService: HttpService,
     @Inject(forwardRef(() => StocksService))
     private stocksService: StocksService,
   ) {}
 
-  async fetchMetrics(symbol: string) {
-    const keyMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/key-metrics/${symbol}?period=quarter&apikey=${this.apiKey}`;
+  private async fetchMetrics(symbol: string) {
     const keyMetricsAnnualUrl = `https://financialmodelingprep.com/api/v3/key-metrics/${symbol}?apikey=${this.apiKey}`;
-    const incomeGrowthMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/income-statement-growth/${symbol}?period=quarter&apikey=${this.apiKey}`;
     const incomeGrowthMetricsAnnualUrl = `https://financialmodelingprep.com/api/v3/income-statement-growth/${symbol}?apikey=${this.apiKey}`;
-    const profitGrowthMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement-growth/${symbol}?period=quarter&apikey=${this.apiKey}`;
     const profitGrowthMetricsAnnualUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement-growth/${symbol}?apikey=${this.apiKey}`;
 
+    const keyMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/key-metrics/${symbol}?period=quarter&apikey=${this.apiKey}`;
+    const incomeGrowthMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/income-statement-growth/${symbol}?period=quarter&apikey=${this.apiKey}`;
+    const profitGrowthMetricsQuarterlyUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement-growth/${symbol}?period=quarter&apikey=${this.apiKey}`;
+
     const [
-      keyMetricsQuarterly,
       keyMetricsAnnual,
-      incomeGrowthMetricsQuarterly,
       incomeGrowthMetricsAnnual,
-      profitGrowthMetricsQuarterly,
       profitGrowthMetricsAnnual,
+      keyMetricsQuarterly,
+      incomeGrowthMetricsQuarterly,
+      profitGrowthMetricsQuarterly,
     ] = await Promise.all([
-      firstValueFrom(this.httpService.get(keyMetricsQuarterlyUrl)),
       firstValueFrom(this.httpService.get(keyMetricsAnnualUrl)),
-      firstValueFrom(this.httpService.get(incomeGrowthMetricsQuarterlyUrl)),
       firstValueFrom(this.httpService.get(incomeGrowthMetricsAnnualUrl)),
-      firstValueFrom(this.httpService.get(profitGrowthMetricsQuarterlyUrl)),
       firstValueFrom(this.httpService.get(profitGrowthMetricsAnnualUrl)),
+      firstValueFrom(this.httpService.get(keyMetricsQuarterlyUrl)),
+      firstValueFrom(this.httpService.get(incomeGrowthMetricsQuarterlyUrl)),
+      firstValueFrom(this.httpService.get(profitGrowthMetricsQuarterlyUrl)),
     ]);
 
     return {
-      keyMetricsQuarterly: keyMetricsQuarterly.data,
       keyMetricsAnnual: keyMetricsAnnual.data,
-      incomeGrowthMetricsQuarterly: incomeGrowthMetricsQuarterly.data,
       incomeGrowthMetricsAnnual: incomeGrowthMetricsAnnual.data,
-      profitGrowthMetricsQuarterly: profitGrowthMetricsQuarterly.data,
       profitGrowthMetricsAnnual: profitGrowthMetricsAnnual.data,
+      keyMetricsQuarterly: keyMetricsQuarterly.data,
+      incomeGrowthMetricsQuarterly: incomeGrowthMetricsQuarterly.data,
+      profitGrowthMetricsQuarterly: profitGrowthMetricsQuarterly.data,
     };
   }
 
-  async saveMetrics(symbol: string) {
+  public async saveMetrics(symbol: string) {
     const metrics = await this.fetchMetrics(symbol);
-    const stock = await this.stocksService.getStock(symbol);
+    const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
+
+    if (
+      !metrics.keyMetricsAnnual ||
+      !metrics.incomeGrowthMetricsAnnual ||
+      !metrics.profitGrowthMetricsAnnual
+    ) {
+      console.error('Metrics data is missing:', metrics);
+      throw new Error('Metrics data is incomplete.');
+    }
+
+    const lastAnnualKeyMetrics = metrics.keyMetricsAnnual.find(
+      (metric) => metric.period === 'FY',
+    );
+    // console.log('lastAnnualKeyMetrics', lastAnnualKeyMetrics);
+    const lastAnnualIncomeGrowthMetrics =
+      metrics.incomeGrowthMetricsAnnual.find(
+        (metric) => metric.period === 'FY',
+      );
+    const lastAnnualProfitGrowthMetrics =
+      metrics.profitGrowthMetricsAnnual.find(
+        (metric) => metric.period === 'FY',
+      );
+
+    // Update the stock document with the last annual metrics
+    const updatedStock = {
+      lastAnnualKeyMetrics: lastAnnualKeyMetrics || null,
+      lastAnnualIncomeGrowthMetrics: lastAnnualIncomeGrowthMetrics || null,
+      lastAnnualProfitGrowthMetrics: lastAnnualProfitGrowthMetrics || null,
+    };
+
+    await this.stocksRepository.update(stock.symbol, updatedStock);
 
     const keyMetrics = [
       ...metrics.keyMetricsQuarterly,
@@ -86,21 +127,65 @@ export class MetricsService {
     );
   }
 
-  async getCombinedData(
+  public async getMetrics(
+    identifier: string,
+    { periodType }: { periodType: PeriodType },
+  ) {
+    // Find stock by identifier (could be either symbol or ID)
+    const stock = (await this.stocksRepository.findByIdOrSymbol(
+      identifier,
+    )) as StockDocument;
+    if (!stock) {
+      throw new Error(`Stock with identifier ${identifier} not found`);
+    }
+
+    const filter =
+      periodType === PeriodType.ANNUAL
+        ? { stock: stock._id, period: 'FY' }
+        : { stock: stock._id, period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] } };
+
+    const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
+    const incomeGrowthMetrics =
+      await this.metricsRepository.findIncomeGrowthMetrics(filter);
+    const profitGrowthMetrics =
+      await this.metricsRepository.findProfitGrowthMetrics(filter);
+
+    return {
+      keyMetrics: plainToClass(KeyMetricDto, keyMetrics, {
+        excludeExtraneousValues: true,
+      }),
+      incomeGrowthMetrics: plainToClass(
+        IncomeGrowthMetricDto,
+        incomeGrowthMetrics,
+        {
+          excludeExtraneousValues: true,
+        },
+      ),
+      profitGrowthMetrics: plainToClass(
+        ProfitGrowthMetricDto,
+        profitGrowthMetrics,
+        {
+          excludeExtraneousValues: true,
+        },
+      ),
+    };
+  }
+
+  public async getCombinedData(
     symbol: string,
-    periodType: string,
+    periodType: PeriodType,
     properties: string[],
   ) {
-    const stock = await this.stocksService.getStock(symbol);
+    const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
     if (!stock) {
       throw new Error(`Stock with symbol ${symbol} not found`);
     }
 
     const filter =
-      periodType === 'annual'
-        ? { stock: (stock as StockDocument)._id, period: 'FY' }
+      periodType === PeriodType.ANNUAL
+        ? { stock: stock._id, period: 'FY' }
         : {
-            stock: (stock as StockDocument)._id,
+            stock: stock._id,
             period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
           };
 
@@ -110,7 +195,7 @@ export class MetricsService {
     const profitGrowthMetrics =
       await this.metricsRepository.findProfitGrowthMetrics(filter);
 
-    const combinedData: { [key: string]: CombinedData } = {};
+    const combinedData: { [key: string]: any } = {};
 
     const combineMetrics = (metrics) => {
       metrics.forEach((metric) => {
@@ -142,5 +227,86 @@ export class MetricsService {
     });
 
     return sortedData;
+  }
+
+  public async getGroupMetrics(
+    symbol: string,
+    periodType: PeriodType,
+  ): Promise<CombinedMetricsDto[]> {
+    const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+
+    const filter =
+      periodType === PeriodType.ANNUAL
+        ? { stock: stock._id, period: 'FY' }
+        : {
+            stock: stock._id,
+            period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
+          };
+
+    const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
+    const incomeGrowthMetrics =
+      await this.metricsRepository.findIncomeGrowthMetrics(filter);
+    const profitGrowthMetrics =
+      await this.metricsRepository.findProfitGrowthMetrics(filter);
+
+    const filteredKeyMetrics = plainToClass(KeyMetricDto, keyMetrics, {
+      excludeExtraneousValues: true,
+    });
+
+    const filteredIncomeGrowthMetrics = plainToClass(
+      IncomeGrowthMetricDto,
+      incomeGrowthMetrics,
+      {
+        excludeExtraneousValues: true,
+      },
+    );
+
+    const filteredProfitGrowthMetrics = plainToClass(
+      ProfitGrowthMetricDto,
+      profitGrowthMetrics,
+      {
+        excludeExtraneousValues: true,
+      },
+    );
+
+    const mergedMetrics = this.mergeMetrics(
+      filteredKeyMetrics,
+      filteredIncomeGrowthMetrics,
+      filteredProfitGrowthMetrics,
+    );
+
+    return plainToClass(CombinedMetricsDto, mergedMetrics, {
+      excludeExtraneousValues: true,
+    }).slice(0, 10);
+  }
+
+  private mergeMetrics(
+    keyMetrics: KeyMetricDto[],
+    incomeGrowthMetrics: IncomeGrowthMetricDto[],
+    profitGrowthMetrics: ProfitGrowthMetricDto[],
+  ): any[] {
+    const merged = {};
+
+    const mergeObjects = (obj1, obj2) => ({ ...obj1, ...obj2 });
+
+    const addToMerged = (array) => {
+      array.forEach((item) => {
+        const key = `${item.date}-${item.period}`;
+        if (merged[key]) {
+          merged[key] = mergeObjects(merged[key], item);
+        } else {
+          merged[key] = { ...item };
+        }
+      });
+    };
+
+    addToMerged(keyMetrics);
+    addToMerged(incomeGrowthMetrics);
+    addToMerged(profitGrowthMetrics);
+
+    return Object.values(merged);
   }
 }

@@ -1,172 +1,151 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+import React, { useState, FormEvent } from 'react'
+import NumericLineFilter from './filter/NumericLineFilter'
+import RatioLineFilter from './filter/RatioLineFilter'
+import MultiSelectFilter from './filter/MultiSelectFilter'
 import { useDispatch } from 'react-redux'
-
-import { SimpleStockCriteria } from '../types/StockCriteria'
-import { filteredCriteria } from '../helpers/filteredCriteria'
 import { setSimpleCriteria } from '../store/stockSlice'
+import { filteredCriteria } from '../helpers/filteredCriteria'
+import { SimpleStockCriteria } from '../types/StockCriteria'
+import {
+    FilterNumberProperty,
+    FilterNumberCondition,
+    FilterStringCondition,
+} from '../types/filter.enum'
 
-const marketCapOptions = [
-    { label: '', value: '' },
-    { label: '0', value: 0 },
-    { label: '1B', value: 1000000000 },
-    { label: '5B', value: 5000000000 },
-    { label: '10B', value: 100000000000 },
-    { label: '50B', value: 50000000000 },
-    { label: '100B', value: 100000000000 },
-]
-interface SimpleStockFilterFormProps {
-    onSubmit: (formState: SimpleStockCriteria) => void
-    savedStockCriteria: SimpleStockCriteria
-    displayedCriteria?: string[]
-}
-
-// Tooltip information for each metric
-const tooltips: { [key: string]: string } = {
-    marketCapMin: 'Minimum market capitalization.',
-    peRatioMax: 'Maximum price-to-earnings ratio.',
-    numberYears:
-        'Number of years to consider for criteria \n positiveProfitYears \n positiveOperatingCashFlowYears \n positiveFreeCashFlowYears \n positiveDividendGrowthYears',
-}
-
-const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
-    onSubmit,
-    savedStockCriteria,
-    displayedCriteria,
-}) => {
+const SimpleStockFilterForm: React.FC = () => {
     const dispatch = useDispatch()
+    const [isFormVisible, setIsFormVisible] = useState(false)
     const [formState, setFormState] = useState<SimpleStockCriteria>({
-        marketCapMin: savedStockCriteria?.marketCapMin ?? '',
-        peRatioMin: savedStockCriteria?.peRatioMin ?? '',
-        peRatioMax: savedStockCriteria?.peRatioMax ?? '',
-        roicMin: savedStockCriteria?.roicMin ?? '',
-        roic10yMin: savedStockCriteria?.roic10yMin ?? '',
-        roeMin: savedStockCriteria?.roeMin ?? '',
-        roe10yMin: savedStockCriteria?.roe10yMin ?? '',
-        averageProfitGrowthMin: savedStockCriteria?.averageProfitGrowthMin ?? '',
-        averageDividendGrowthMin: savedStockCriteria?.averageDividendGrowthMin ?? '',
-        averageNetIncomeGrowthMin: savedStockCriteria?.averageNetIncomeGrowthMin ?? '',
-        averageProfitMarginMin: savedStockCriteria?.averageProfitMarginMin ?? '',
-        profitMarginMin: savedStockCriteria?.profitMarginMin ?? '',
-        dividendYieldMin: savedStockCriteria?.dividendYieldMin ?? '',
-        dividendYield10yMin: savedStockCriteria?.dividendYield10yMin ?? '',
-        debtToAssetsMax: savedStockCriteria?.debtToAssetsMax ?? '',
-        debtToEquityMax: savedStockCriteria?.debtToEquityMax ?? '',
-        // netDebtToEBITDAMax: savedStockCriteria?.netDebtToEBITDAMax ?? '',
-        // yearReturnMin: savedStockCriteria?.yearReturnMin ?? '',
-        IntrinsicRatioZeroMin: savedStockCriteria?.IntrinsicRatioZeroMin ?? '',
-        IntrinsicRatioAverageMin: savedStockCriteria?.IntrinsicRatioAverageMin ?? '',
-        IntrinsicRatioLastYearMin: savedStockCriteria?.IntrinsicRatioLastYearMin ?? '',
+        [FilterNumberProperty.MARKETCAP]: 1000000000,
+        [FilterNumberProperty.PERATIO]: 12,
+        [FilterNumberProperty.ROIC5Y]: 0.1,
+        [FilterNumberProperty.ROE5Y]: NaN,
+        [FilterNumberProperty.AVERAGEPROFITGROWTH5Y]: 0.1,
+        [FilterNumberProperty.AVERAGEDIVIDENDGROWTH5Y]: NaN,
+        [FilterNumberProperty.AVERAGENETINCOMEGROWTH5Y]: NaN,
+        [FilterNumberProperty.AVERAGEPROFITMARGIN5Y]: 0.15,
+        [FilterNumberProperty.DIVIDENDYIELD5Y]: NaN,
+        [FilterNumberProperty.DEBTTOASSETS]: NaN,
+        [FilterNumberProperty.DEBTTOEQUITY]: NaN,
+        IntrinsicRatioZeroMin: NaN,
+        IntrinsicRatioAverageMin: NaN,
+        IntrinsicRatioLastYearMin: NaN,
+        countries: [] as string[],
+        sectors: [] as string[],
+        industries: [] as string[],
+        ratioIntristicValue0growth: {
+            numerator: FilterNumberProperty.PRICE,
+            denominator: FilterNumberProperty.INTRINSICVALUEZEROGROWTH,
+            condition: FilterNumberCondition.LESS_THAN,
+            value: 0.8,
+        },
+        ratioIntristicValue5ygrowth: {
+            numerator: FilterNumberProperty.PRICE,
+            denominator: FilterNumberProperty.INTRINSICVALUEAVERAGEGROWTH5Y,
+            condition: FilterNumberCondition.LESS_THAN,
+            value: 0.6,
+        },
     })
-    const [isFormVisible, setIsFormVisible] = useState(true)
 
-    const percentageFields = [
-        'roeMin',
-        'roe10yMin',
-        'roicMin',
-        'roic10yMin',
-        'averageProfitGrowthMin',
-        'averageDividendGrowthMin',
-        'averageNetIncomeGrowthMin',
-        'averageProfitMarginMin',
-        'profitMarginMin',
-        'dividendYieldMin',
-        'dividendYield10yMin',
-        'debtToAssetsMax',
-        'debtToEquityMax',
-    ]
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        let { name, value } = e.target
-
-        if (percentageFields.includes(name) && value) {
-            value = (parseFloat(value) / 100).toString()
-        }
-
-        // Update the state with the new value, even if it's an empty string
+    const handleNumericFilterChange = (criteria: {
+        property: FilterNumberProperty
+        condition: FilterNumberCondition
+        value: number | string
+    }) => {
         setFormState((prevState) => ({
             ...prevState,
-            [name]: value,
+            [criteria.property]: criteria.value,
+        }))
+    }
+
+    const handleRatioFilterChange = (
+        criteria: {
+            numerator: FilterNumberProperty
+            denominator: FilterNumberProperty
+            condition: FilterNumberCondition
+            value: number
+        },
+        type: 'ratioIntristicValue0growth' | 'ratioIntristicValue5ygrowth'
+    ) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            [type]: criteria,
+        }))
+    }
+
+    const handleMultiSelectChange = (type: string, values: string[]) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            [type]: values,
         }))
     }
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        onSubmit(filteredCriteria(formState))
-        dispatch(setSimpleCriteria(filteredCriteria(formState)))
+
+        const numberCriteria = Object.keys(FilterNumberProperty)
+            .map((key) => {
+                const property = FilterNumberProperty[key as keyof typeof FilterNumberProperty]
+                const value = formState[property]
+                return {
+                    property,
+                    condition: FilterNumberCondition.GREATER_THAN, // Default condition
+                    value: !isNaN(Number(value)) ? Number(value) : undefined,
+                }
+            })
+            .filter(
+                (criteria) =>
+                    !isNaN(criteria.value as number) &&
+                    criteria.value !== '' &&
+                    criteria.value !== undefined
+            )
+
+        const requestBody = {
+            numberCriteria,
+            stringCriteria: [
+                // {
+                //     property: 'symbol',
+                //     condition: FilterStringCondition.EQUAL,
+                //     value: formState.stockSymbol,
+                // },
+            ].filter((criteria) => criteria.value !== ''),
+            ratioCriteria: [
+                {
+                    numerator: formState.ratioIntristicValue0growth.numerator,
+                    denominator: formState.ratioIntristicValue0growth.denominator,
+                    condition: formState.ratioIntristicValue0growth.condition,
+                    value: formState.ratioIntristicValue0growth.value,
+                },
+                {
+                    numerator: formState.ratioIntristicValue5ygrowth.numerator,
+                    denominator: formState.ratioIntristicValue5ygrowth.denominator,
+                    condition: formState.ratioIntristicValue5ygrowth.condition,
+                    value: formState.ratioIntristicValue5ygrowth.value,
+                },
+            ].filter((criteria) => criteria.value !== ''),
+            multiCriteria: [
+                {
+                    type: 'country',
+                    values: formState.countries,
+                },
+                {
+                    type: 'sector',
+                    values: formState.sectors,
+                },
+                {
+                    type: 'industry',
+                    values: formState.industries,
+                },
+            ].filter((criteria) => criteria.values.length > 0),
+        }
+
+        const filteredState = filteredCriteria(requestBody)
+        dispatch(setSimpleCriteria(filteredState))
+        console.log('Filtered State:', filteredState) // For demonstration purposes
     }
 
     const toggleFormVisibility = () => {
         setIsFormVisible(!isFormVisible)
-    }
-
-    const prepareFieldValue = (key: string, value: string) => {
-        if (percentageFields.includes(key) && value) {
-            return (parseFloat(value) * 100).toFixed(0)
-        }
-        return value
-    }
-
-    const renderFormField = (key: string, value: string) => {
-        switch (key) {
-            case 'marketCapMin':
-                return (
-                    <select
-                        name={key}
-                        id={key}
-                        value={value}
-                        onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    >
-                        {marketCapOptions.map((option) => (
-                            <option key={option.label} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                )
-            case 'dividendYieldMin':
-            case 'roicMin':
-            case 'roeMin':
-            case 'roic10yMin':
-            case 'roe10yMin':
-            case 'averageProfitGrowthMin':
-            case 'averageDividendGrowthMin':
-            case 'averageNetIncomeGrowthMin':
-            case 'averageProfitMarginMin':
-            case 'profitMarginMin':
-            case 'dividendYield10yMin':
-            case 'debtToAssetsMax':
-            case 'debtToEquityMax':
-                return (
-                    <div className="relative">
-                        <input
-                            type="number"
-                            name={key}
-                            id={key}
-                            value={prepareFieldValue(key, value)}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
-                        {value && (
-                            <span className="absolute inset-y-0 right-16 top-1 flex items-center text-sm leading-5">
-                                %
-                            </span>
-                        )}
-                    </div>
-                )
-            default:
-                return (
-                    <input
-                        type="number"
-                        name={key}
-                        id={key}
-                        value={value}
-                        onChange={handleChange}
-                        className="h-10 mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                )
-        }
     }
 
     return (
@@ -178,37 +157,123 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
                 {isFormVisible ? 'Hide Form' : 'Show Form'}
             </button>
             {isFormVisible && (
-                <form onSubmit={handleSubmit} className="md:max-w-xl max-w-xs x-auto p-4">
-                    {/* Input fields with labels and tooltips */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-3">
-                        {Object.entries(formState)
-                            .filter(
-                                ([key]) =>
-                                    !displayedCriteria ||
-                                    displayedCriteria.length === 0 ||
-                                    displayedCriteria.includes(key)
-                            ) // Check if displayedCriteria is empty or contains the key
-                            .map(([key, value]) => (
-                                <div key={key} className="grid grid-rows-2 items-end">
-                                    {/* ... other fields */}
-                                    <label
-                                        htmlFor={key}
-                                        className="text-sm line-clamp-2 font-medium text-gray-700 capitalize max-h-10"
-                                    >
-                                        {key.replace(/([A-Z])/g, ' $1')}:
-                                        <span
-                                            className="ml-1 cursor-pointer text-indigo-600 hover:text-indigo-800"
-                                            title={tooltips[key]}
-                                            data-tooltip-id={key}
-                                        >
-                                            ⓘ
-                                        </span>
-                                    </label>
-                                    {renderFormField(key, value)}
-                                </div>
-                            ))}
+                <form onSubmit={handleSubmit} className="md:max-w-xl max-w-xs mx-auto p-4">
+                    <div className="flex flex-col gap-4">
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.MARKETCAP}
+                            initialValue={formState[FilterNumberProperty.MARKETCAP]}
+                        />
+                        {/* <StringLineFilter
+                            onChange={handleStringFilterChange}
+                            initialCondition={FilterStringCondition.EQUAL}
+                            initialProperty="symbol"
+                            initialValue={formState.stockSymbol}
+                        /> */}
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.LESS_THAN}
+                            initialProperty={FilterNumberProperty.PERATIO}
+                            initialValue={formState[FilterNumberProperty.PERATIO]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROIC}
+                            initialValue={formState[FilterNumberProperty.ROIC]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROIC5Y}
+                            initialValue={formState[FilterNumberProperty.ROIC5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROE}
+                            initialValue={formState[FilterNumberProperty.ROE]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.ROE5Y}
+                            initialValue={formState[FilterNumberProperty.ROE5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGEPROFITGROWTH5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGEPROFITGROWTH5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGEDIVIDENDGROWTH5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGEDIVIDENDGROWTH5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGENETINCOMEGROWTH5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGENETINCOMEGROWTH5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.AVERAGEPROFITMARGIN5Y}
+                            initialValue={formState[FilterNumberProperty.AVERAGEPROFITMARGIN5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.GREATER_THAN}
+                            initialProperty={FilterNumberProperty.DIVIDENDYIELD5Y}
+                            initialValue={formState[FilterNumberProperty.DIVIDENDYIELD5Y]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.LESS_THAN}
+                            initialProperty={FilterNumberProperty.DEBTTOASSETS}
+                            initialValue={formState[FilterNumberProperty.DEBTTOASSETS]}
+                        />
+                        <NumericLineFilter
+                            onChange={handleNumericFilterChange}
+                            initialCondition={FilterNumberCondition.LESS_THAN}
+                            initialProperty={FilterNumberProperty.DEBTTOEQUITY}
+                            initialValue={formState[FilterNumberProperty.DEBTTOEQUITY]}
+                        />
+                        <RatioLineFilter
+                            onChange={(criteria) =>
+                                handleRatioFilterChange(criteria, 'ratioIntristicValue0growth')
+                            }
+                            initialCondition={formState.ratioIntristicValue0growth.condition}
+                            initialNumerator={formState.ratioIntristicValue0growth.numerator}
+                            initialDenominator={formState.ratioIntristicValue0growth.denominator}
+                            initialValue={formState.ratioIntristicValue0growth.value}
+                        />
+                        <RatioLineFilter
+                            onChange={(criteria) =>
+                                handleRatioFilterChange(criteria, 'ratioIntristicValue5ygrowth')
+                            }
+                            initialCondition={formState.ratioIntristicValue5ygrowth.condition}
+                            initialNumerator={formState.ratioIntristicValue5ygrowth.numerator}
+                            initialDenominator={formState.ratioIntristicValue5ygrowth.denominator}
+                            initialValue={formState.ratioIntristicValue5ygrowth.value}
+                        />
+                        <MultiSelectFilter
+                            type="country"
+                            onChange={(values) => handleMultiSelectChange('countries', values)}
+                        />
+                        <MultiSelectFilter
+                            type="sector"
+                            onChange={(values) => handleMultiSelectChange('sectors', values)}
+                        />
+                        <MultiSelectFilter
+                            type="industry"
+                            onChange={(values) => handleMultiSelectChange('industries', values)}
+                        />
                     </div>
-                    {/* Submit button */}
                     <div className="mt-4">
                         <button
                             type="submit"
@@ -219,12 +284,6 @@ const SimpleStockFilterForm: React.FC<SimpleStockFilterFormProps> = ({
                     </div>
                 </form>
             )}
-            <ReactTooltip
-                id="numberYears"
-                place="bottom"
-                variant="info"
-                content={tooltips.numberYears}
-            />
         </div>
     )
 }

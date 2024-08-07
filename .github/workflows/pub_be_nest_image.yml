@@ -8,6 +8,7 @@ on:
 jobs:
     update-version:
         runs-on: ubuntu-latest
+
         steps:
             - name: Check out the code
               uses: actions/checkout@v2
@@ -15,12 +16,35 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v2
               with:
-                  node-version: '16'
+                  node-version: '18' # Update to Node.js 18
 
-            - name: Build and Push Docker Image
+            # - name: Cache Node.js modules
+            #   uses: actions/cache@v2
+            #   with:
+            #       path: ~/.npm
+            #       key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+            #       restore-keys: |
+            #           ${{ runner.os }}-node-
+
+            - name: Install dependencies
+              run: |
+                  cd be-nest
+                  npm ci
+
+            - name: Build Docker image
               run: |
                   cd be-nest
                   VERSION=$(node -p "require('./package.json').version")
                   docker build -t mrodl/stocks-be-nest:${VERSION} .
-                  echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+            - name: Log in to Docker Hub
+              env:
+                  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+                  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+              run: echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+            - name: Push Docker image to Docker Hub
+              run: |
+                  cd be-nest
+                  VERSION=$(node -p "require('./package.json').version")
                   docker push mrodl/stocks-be-nest:${VERSION}

@@ -1,6 +1,8 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { stockApi } from '../services/stockApi'
+import { beApi } from '../services/beApi'
+import authReducer from './authSlice'
 import storage from 'redux-persist/lib/storage'
 import {
     persistReducer,
@@ -17,17 +19,16 @@ import stockReducer from './stockSlice'
 
 const rootReducer = combineReducers({
     stock: stockReducer,
+    auth: authReducer,
     [stockApi.reducerPath]: stockApi.reducer,
+    [beApi.reducerPath]: beApi.reducer,
     // ... add other reducers
 })
 
 const persistConfig = {
     key: 'root',
     storage,
-    // Whitelist (Save specific reducers)
-    // whitelist: ['yourReducer'],
-    // Blacklist (Don't save specific reducers)
-    // blacklist: ['someOtherReducer'],
+    whitelist: ['stock'], // Ensure the 'stock' reducer is persisted
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -39,7 +40,9 @@ export const store = configureStore({
             serializableCheck: {
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
-        }).concat(stockApi.middleware),
+        })
+            .concat(stockApi.middleware)
+            .concat(beApi.middleware),
 })
 
 export const persistor = persistStore(store)

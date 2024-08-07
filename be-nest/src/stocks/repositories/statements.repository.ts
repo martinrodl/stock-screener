@@ -32,10 +32,12 @@ export class StatementsRepository {
     for (const doc of documents) {
       const existingDoc = await model
         .findOne({
+          stock: doc.stock,
           date: doc.date,
           period: doc.period,
         })
         .exec();
+
       if (!existingDoc) {
         await model.create(doc);
       }

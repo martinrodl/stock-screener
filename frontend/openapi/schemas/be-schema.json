@@ -1,0 +1,854 @@
+{
+    "openapi": "3.0.0",
+    "paths": {
+        "/be-nest-stocks/api/stocks": {
+            "get": {
+                "operationId": "StocksController_getStocks",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/stocks/{symbol}": {
+            "get": {
+                "operationId": "StocksController_getStock",
+                "parameters": [
+                    {
+                        "name": "symbol",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/stocks/update": {
+            "post": {
+                "operationId": "StocksController_updateStocksList",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateStockListDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/fmp/{symbol}/update-statements": {
+            "post": {
+                "operationId": "FmpController_fetchAndSaveStatements",
+                "parameters": [
+                    {
+                        "name": "symbol",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/fmp/{symbol}/update-metrics": {
+            "post": {
+                "operationId": "FmpController_fetchAndSaveMetrics",
+                "parameters": [
+                    {
+                        "name": "symbol",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/fmp/{symbol}/update-analyst-ratings": {
+            "post": {
+                "operationId": "FmpController_fetchAndSaveRarings",
+                "parameters": [
+                    {
+                        "name": "symbol",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/fmp/{symbol}/update-outlook": {
+            "post": {
+                "operationId": "FmpController_fetchAndSaveOutlook",
+                "parameters": [
+                    {
+                        "name": "symbol",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/fmp/{symbol}/combine": {
+            "get": {
+                "operationId": "FmpController_getCombinedData",
+                "parameters": [
+                    {
+                        "name": "symbol",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/counted/update/{symbol}": {
+            "post": {
+                "operationId": "CountedController_updateStockValues",
+                "parameters": [
+                    {
+                        "name": "symbol",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "periodType",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/filters": {
+            "post": {
+                "operationId": "FilterController_create",
+                "summary": "Create a new filter",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "The filter data to create",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFilterDto"
+                            },
+                            "examples": {
+                                "example1": {
+                                    "summary": "A sample filter creation payload",
+                                    "value": {
+                                        "name": "Sample Filter",
+                                        "numberCriteria": [
+                                            {
+                                                "property": "price",
+                                                "condition": "less_than",
+                                                "value": 100
+                                            }
+                                        ],
+                                        "stringCriteria": [
+                                            {
+                                                "property": "exchange",
+                                                "condition": "equal",
+                                                "value": "NYSE"
+                                            }
+                                        ],
+                                        "ratioCriteria": [
+                                            {
+                                                "numerator": "marketCap",
+                                                "denominator": "revenuePerShare",
+                                                "condition": "less_than",
+                                                "value": 2
+                                            }
+                                        ],
+                                        "user": "60b8d295f1dfb862d8f51d3b"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The filter has been successfully created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Filter"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["stocks-filters"]
+            },
+            "get": {
+                "operationId": "FilterController_findAll",
+                "summary": "Get all filters",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Return all filters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Filter"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["stocks-filters"]
+            }
+        },
+        "/be-nest-stocks/api/filters/{id}": {
+            "get": {
+                "operationId": "FilterController_findOne",
+                "summary": "Get a filter by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "description": "ID of the filter to retrieve",
+                        "example": "60b8d295f1dfb862d8f51d3b",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the filter with the given ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Filter"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["stocks-filters"]
+            },
+            "put": {
+                "operationId": "FilterController_update",
+                "summary": "Update a filter by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "description": "ID of the filter to update",
+                        "example": "60b8d295f1dfb862d8f51d3b",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "description": "The updated filter data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFilterDto"
+                            },
+                            "examples": {
+                                "example1": {
+                                    "summary": "A sample filter update payload",
+                                    "value": {
+                                        "name": "Updated Filter",
+                                        "numberCriteria": [
+                                            {
+                                                "property": "price",
+                                                "condition": "less_than",
+                                                "value": 200
+                                            }
+                                        ],
+                                        "stringCriteria": [
+                                            {
+                                                "property": "name",
+                                                "condition": "not_equal",
+                                                "value": "Some Name"
+                                            }
+                                        ],
+                                        "ratioCriteria": [
+                                            {
+                                                "numerator": "marketCap",
+                                                "denominator": "revenuePerShare",
+                                                "condition": "less_than",
+                                                "value": 1
+                                            }
+                                        ],
+                                        "user": "60b8d295f1dfb862d8f51d3b"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The filter has been successfully updated.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Filter"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["stocks-filters"]
+            },
+            "delete": {
+                "operationId": "FilterController_remove",
+                "summary": "Delete a filter by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "description": "ID of the filter to delete",
+                        "example": "60b8d295f1dfb862d8f51d3b",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The filter has been successfully deleted."
+                    }
+                },
+                "tags": ["stocks-filters"]
+            }
+        },
+        "/be-nest-stocks/api/filters/user/{userId}": {
+            "get": {
+                "operationId": "FilterController_findByUser",
+                "summary": "Get filters by user ID",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "required": true,
+                        "in": "path",
+                        "description": "User ID to retrieve filters for",
+                        "example": "60b8d295f1dfb862d8f51d3b",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the filters for the given user ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Filter"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["stocks-filters"]
+            }
+        },
+        "/be-nest-stocks/api/filters/{id}/apply": {
+            "get": {
+                "operationId": "FilterController_applyFilter",
+                "summary": "Apply a filter by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "description": "ID of the filter to apply",
+                        "example": "60b8d295f1dfb862d8f51d3b",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the stocks matching the filter criteria",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Stock"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["stocks-filters"]
+            }
+        },
+        "/be-nest-stocks/api/filters/apply-direct": {
+            "post": {
+                "operationId": "FilterController_applyFilterDirectly",
+                "summary": "Apply a filter directly from the payload",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "The filter data to apply directly",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFilterDto"
+                            },
+                            "examples": {
+                                "example1": {
+                                    "summary": "A sample filter apply directly payload",
+                                    "value": {
+                                        "name": "Temporary Filter",
+                                        "numberCriteria": [
+                                            {
+                                                "property": "price",
+                                                "condition": "greater_than",
+                                                "value": 150
+                                            }
+                                        ],
+                                        "stringCriteria": [
+                                            {
+                                                "property": "exchange",
+                                                "condition": "equal",
+                                                "value": "NASDAQ"
+                                            }
+                                        ],
+                                        "ratioCriteria": [
+                                            {
+                                                "numerator": "marketCap",
+                                                "denominator": "revenuePerShare",
+                                                "condition": "greater_than",
+                                                "value": 1.5
+                                            }
+                                        ],
+                                        "user": "60b8d295f1dfb862d8f51d3b"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return the stocks matching the filter criteria",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Stock"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["stocks-filters"]
+            }
+        },
+        "/be-nest-stocks/api/bond-yield": {
+            "get": {
+                "operationId": "BondYieldController_getBondYield",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/bond-yield/update": {
+            "post": {
+                "operationId": "BondYieldController_updateBondYield",
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/be-nest-stocks/api/user/register": {
+            "post": {
+                "operationId": "UsersController_register",
+                "summary": "Register a new user",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"]
+            }
+        },
+        "/be-nest-stocks/api/user/login": {
+            "post": {
+                "operationId": "UsersController_login",
+                "summary": "Login a user",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"]
+            }
+        },
+        "/be-nest-stocks/api/user/portfolio": {
+            "put": {
+                "operationId": "UsersController_addToPortfolio",
+                "summary": "Add a stock to portfolio list",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePortfolioDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "UsersController_removeFromPortfolio",
+                "summary": "Remove a stock from portfolio list",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePortfolioDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "get": {
+                "operationId": "UsersController_getPortfolioList",
+                "summary": "Get portfolio list",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/be-nest-stocks/api/user/consider": {
+            "put": {
+                "operationId": "UsersController_addToConsider",
+                "summary": "Add a stock to consider list",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateConsiderDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "UsersController_removeFromConsider",
+                "summary": "Remove a stock from consider list",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateConsiderDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "get": {
+                "operationId": "UsersController_getConsiderList",
+                "summary": "Get consider list",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["users"],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/be-nest-stocks/api/status": {
+            "get": {
+                "operationId": "StatusController_getStatus",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": ["status"]
+            }
+        }
+    },
+    "info": {
+        "title": "Stock Screener API",
+        "description": "API for stock screener application",
+        "version": "1.0",
+        "contact": {}
+    },
+    "tags": [],
+    "servers": [],
+    "components": {
+        "securitySchemes": {
+            "bearer": {
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "type": "http"
+            }
+        },
+        "schemas": {
+            "UpdateStockListDto": {
+                "type": "object",
+                "properties": {}
+            },
+            "CreateFilterDto": {
+                "type": "object",
+                "properties": {}
+            },
+            "Filter": {
+                "type": "object",
+                "properties": {}
+            },
+            "Stock": {
+                "type": "object",
+                "properties": {}
+            },
+            "RegisterDto": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "user@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "securepassword"
+                    }
+                },
+                "required": ["email", "password"]
+            },
+            "LoginDto": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "user@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "securepassword"
+                    }
+                },
+                "required": ["email", "password"]
+            },
+            "UpdatePortfolioDto": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "user@example.com"
+                    },
+                    "stockId": {
+                        "type": "string",
+                        "example": "6652f9ee06baf75ceb6c219e"
+                    }
+                },
+                "required": ["email", "stockId"]
+            },
+            "UpdateConsiderDto": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "user@example.com"
+                    },
+                    "stockId": {
+                        "type": "string",
+                        "example": "6652f9ee06baf75ceb6c219e"
+                    }
+                },
+                "required": ["email", "stockId"]
+            }
+        }
+    }
+}

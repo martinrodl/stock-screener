@@ -19,6 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@utils/*": ["src/utils/*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./types"]
   }
 }

@@ -5,6 +5,8 @@ import {
   MetricsService,
   OutlookService,
 } from '../services';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PeriodType } from '../enums';
 
 import { GetSpecificPropertiesDto } from '../dto';
 

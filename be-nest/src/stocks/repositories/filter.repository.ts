@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Filter, FilterDocument } from '../schemas/filter.schema';
 import { CreateFilterDto } from '../dto/create-filter.dto';
 
@@ -10,7 +10,7 @@ export class FilterRepository {
     @InjectModel(Filter.name) private filterModel: Model<FilterDocument>,
   ) {}
 
-  async create(filter: CreateFilterDto): Promise<Filter> {
+  async create(filter: CreateFilterDto & { user: string }): Promise<Filter> {
     const createdFilter = new this.filterModel(filter);
     return createdFilter.save();
   }
@@ -20,25 +20,37 @@ export class FilterRepository {
   }
 
   async findById(id: string): Promise<Filter> {
-    return this.filterModel.findById(id).exec();
+    const objectId = this.toObjectId(id);
+    return this.filterModel.findById(objectId).exec();
   }
 
   async findByUser(userId: string): Promise<Filter[]> {
-    return this.filterModel.find({ user: userId }).exec();
+    const objectId = this.toObjectId(userId);
+    const filters = await this.filterModel
+      .find({ user: objectId.toString() })
+      .exec();
+    return filters;
   }
 
   async updateById(
     id: string,
     updateFilterDto: Partial<CreateFilterDto>,
   ): Promise<Filter> {
+    const objectId = this.toObjectId(id);
     return this.filterModel
-      .findByIdAndUpdate(id, updateFilterDto, { new: true })
+      .findByIdAndUpdate(objectId, updateFilterDto, { new: true })
       .exec();
   }
 
   async deleteById(id: string): Promise<any> {
-    return this.filterModel.findByIdAndDelete(id).exec();
+    const objectId = this.toObjectId(id);
+    return this.filterModel.findByIdAndDelete(objectId).exec();
   }
 
-  // Additional logic for applying filters to stocks can be added here
+  private toObjectId(id: string): Types.ObjectId {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`Invalid ObjectId: ${id}`);
+    }
+    return new Types.ObjectId(id);
+  }
 }

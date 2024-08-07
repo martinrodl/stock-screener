@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { FilterRepository } from '../repositories/filter.repository';
+import { StocksRepository } from '../repositories/stocks.repository';
 import { Filter } from '../schemas/filter.schema';
 import {
   CreateFilterDto,
   NumberFilterCriteriaDto,
   StringFilterCriteriaDto,
   RatioCriteriaDto,
+  MultiCriteriaDto,
 } from '../dto';
-import { FilterCondition } from '../enums';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Stock, StockDocument } from '../schemas/stock.schema';
+import { FilterNumberCondition, FilterStringCondition } from '../enums';
+import { Stock } from '../schemas/stock.schema';
 
 @Injectable()
 export class FilterService {
   constructor(
     private readonly filterRepository: FilterRepository,
-    @InjectModel(Stock.name) private stockModel: Model<StockDocument>,
+    private readonly stocksRepository: StocksRepository,
   ) {}
 
-  async createFilter(createFilterDto: CreateFilterDto): Promise<Filter> {
-    return this.filterRepository.create(createFilterDto);
+  async createFilter(
+    createFilterDto: CreateFilterDto,
+    userId: string,
+  ): Promise<Filter> {
+    const filterData = {
+      ...createFilterDto,
+      user: userId,
+    };
+    const createdFilter = await this.filterRepository.create(filterData);
+    return createdFilter;
   }
 
   async getAllFilters(): Promise<Filter[]> {
@@ -42,8 +50,24 @@ export class FilterService {
   async updateFilterById(
     id: string,
     updateFilterDto: Partial<CreateFilterDto>,
+    userId: string,
   ): Promise<Filter> {
-    return this.filterRepository.updateById(id, updateFilterDto);
+    const filter = await this.filterRepository.findById(id);
+    if (!filter) {
+      throw new ForbiddenException('Filter not found');
+    }
+    if (filter.user.toString() !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to update this filter',
+      );
+    }
+
+    const updatedFilterData = {
+      ...updateFilterDto,
+      user: filter.user, // Ensure the user field is not updated
+    };
+
+    return this.filterRepository.updateById(id, updatedFilterData);
   }
 
   async applyFilter(filterId: string): Promise<Stock[]> {
@@ -56,75 +80,108 @@ export class FilterService {
       filter.numberCriteria,
       filter.stringCriteria,
       filter.ratioCriteria,
+      filter.multiCriteria,
     );
-    return this.stockModel.find(query).exec();
+    return this.stocksRepository.findAll(query);
   }
 
   async applyFilterDirectly(
     numberCriteria?: NumberFilterCriteriaDto[],
     stringCriteria?: StringFilterCriteriaDto[],
     ratioCriteria?: RatioCriteriaDto[],
+    multiCriteria?: MultiCriteriaDto[],
   ): Promise<Stock[]> {
     const query = this.buildQueryFromCriteria(
       numberCriteria,
       stringCriteria,
       ratioCriteria,
+      multiCriteria,
     );
-    return this.stockModel.find(query).exec();
+    return this.stocksRepository.findAll(query);
   }
 
   private buildQueryFromCriteria(
     numberCriteria?: NumberFilterCriteriaDto[],
     stringCriteria?: StringFilterCriteriaDto[],
     ratioCriteria?: RatioCriteriaDto[],
+    multiCriteria?: MultiCriteriaDto[],
   ): any {
     const query: any = {};
 
     numberCriteria?.forEach((criterion) => {
       const { property, condition, value } = criterion;
 
+      let matchCondition;
       switch (condition) {
-        case FilterCondition.GREATER_THAN:
-          query[property] = { $gt: value };
+        case FilterNumberCondition.GREATER_THAN:
+          matchCondition = { $gt: value };
           break;
-        case FilterCondition.LESS_THAN:
-          query[property] = { $lt: value };
+        case FilterNumberCondition.LESS_THAN:
+          matchCondition = { $lt: value };
           break;
         default:
           break;
+      }
+
+      if (property.includes('.')) {
+        const [root, nested] = property.split('.');
+        query[`${root}.${nested}`] = matchCondition;
+      } else {
+        query[property] = matchCondition;
       }
     });
 
     stringCriteria?.forEach((criterion) => {
       const { property, condition, value } = criterion;
 
-      switch (condition) {
-        case FilterCondition.EQUAL:
-          query[property] = value;
-          break;
-        case FilterCondition.NOT_EQUAL:
-          query[property] = { $ne: value };
-          break;
-        default:
-          break;
+      if (value !== null && value !== undefined && value !== '') {
+        switch (condition) {
+          case FilterStringCondition.EQUAL:
+            query[property] = value;
+            break;
+          case FilterStringCondition.NOT_EQUAL:
+            query[property] = { $ne: value };
+            break;
+          default:
+            break;
+        }
       }
     });
 
     if (ratioCriteria) {
       ratioCriteria.forEach((criterion) => {
         const { numerator, denominator, condition, value } = criterion;
+
         query['$expr'] = query['$expr'] || { $and: [] };
         let exprCondition;
 
         switch (condition) {
-          case FilterCondition.GREATER_THAN:
+          case FilterNumberCondition.GREATER_THAN:
             exprCondition = {
-              $gt: [{ $divide: [`$${numerator}`, `$${denominator}`] }, value],
+              $gt: [
+                {
+                  $cond: {
+                    if: { $eq: [`$${denominator}`, 0] },
+                    then: null,
+                    else: { $divide: [`$${numerator}`, `$${denominator}`] },
+                  },
+                },
+                value,
+              ],
             };
             break;
-          case FilterCondition.LESS_THAN:
+          case FilterNumberCondition.LESS_THAN:
             exprCondition = {
-              $lt: [{ $divide: [`$${numerator}`, `$${denominator}`] }, value],
+              $lt: [
+                {
+                  $cond: {
+                    if: { $eq: [`$${denominator}`, 0] },
+                    then: null,
+                    else: { $divide: [`$${numerator}`, `$${denominator}`] },
+                  },
+                },
+                value,
+              ],
             };
             break;
           default:
@@ -135,6 +192,26 @@ export class FilterService {
       });
     }
 
+    if (multiCriteria) {
+      multiCriteria.forEach(({ type, values }) => {
+        if (values && values.length > 0) {
+          query[type] = { $in: values };
+        }
+      });
+    }
+
     return query;
+  }
+
+  async getUniqueCountries(): Promise<string[]> {
+    return this.stocksRepository.getUniqueCountries();
+  }
+
+  async getUniqueSectors(): Promise<string[]> {
+    return this.stocksRepository.getUniqueSectors();
+  }
+
+  async getUniqueIndustries(): Promise<string[]> {
+    return this.stocksRepository.getUniqueIndustries();
   }
 }

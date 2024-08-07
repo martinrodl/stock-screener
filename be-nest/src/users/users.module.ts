@@ -7,7 +7,7 @@ import { User, UserSchema } from './schemas';
 import { UsersService, JwtStrategy } from './services';
 import { UsersController } from './controllers';
 import { UsersRepository } from './repositories';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60m' },
+        signOptions: { expiresIn: '60d' },
       }),
       inject: [ConfigService],
     }),

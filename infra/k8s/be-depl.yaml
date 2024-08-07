@@ -14,7 +14,7 @@ spec:
         spec:
             containers:
                 - name: be
-                  image: mrodl/stocks-be:1.0.36
+                  image: mrodl/stocks-be:1.0.40
                   imagePullPolicy: Always
                   resources:
                       limits:
