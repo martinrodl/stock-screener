@@ -63,25 +63,15 @@ export class CountedService {
         periodType === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
     };
 
-    console.log(
-      `Fetching income statements for filter: ${JSON.stringify(filter)}`,
-    );
     const incomeStatements =
       await this.statementsRepository.findIncomeStatements(filter);
-    console.log('incomeStatements', incomeStatements);
-    console.log(
-      `Fetching cash flow statements for filter: ${JSON.stringify(filter)}`,
-    );
+
     const cashFlowStatements =
       await this.statementsRepository.findCashFlowStatements(filter);
 
-    console.log(
-      `Fetching growth metrics for filter: ${JSON.stringify(filter)}`,
-    );
     const growthMetrics =
       await this.metricsRepository.findIncomeGrowthMetrics(filter);
 
-    console.log(`Fetching key metrics for filter: ${JSON.stringify(filter)}`);
     const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
 
     if (

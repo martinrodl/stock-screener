@@ -52,6 +52,7 @@ import {
   FmpController,
   StocksController,
   FilterController,
+  TasksController,
 } from './controllers';
 import {
   StatementsRepository,
@@ -90,7 +91,12 @@ import { OtherModule } from '../other/other.module';
     HttpModule,
     OtherModule,
   ],
-  controllers: [StocksController, FmpController, FilterController],
+  controllers: [
+    StocksController,
+    FmpController,
+    FilterController,
+    TasksController,
+  ],
   providers: [
     CronService,
     StocksService,

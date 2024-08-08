@@ -83,7 +83,6 @@ export class StatementsService {
     stock.lastAnnualIncomeStatement = lastAnnualIncomeStatement || null;
 
     await stock.save();
-    console.log('Stock updated with last annual statements');
 
     const cashFlowStatements = [
       ...statements.quarterlyCashFlow,
@@ -108,8 +107,6 @@ export class StatementsService {
       ...statement,
       stock: (stock as StockDocument)._id,
     }));
-
-    console.log('***');
 
     await this.statementsRepository.insertManyIfNotExists(
       cashFlowStatements,

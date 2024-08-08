@@ -92,7 +92,6 @@ export class FilterController {
     @Req() req: CustomRequest,
     @Body() applyFilterDto: ApplyFilterDto,
   ): Promise<Stock[]> {
-    console.log(applyFilterDto);
     return this.filterService.applyFilterDirectly(
       applyFilterDto.numberCriteria,
       applyFilterDto.stringCriteria,
@@ -149,7 +148,6 @@ export class FilterController {
   })
   async findByUser(@Req() req: CustomRequest): Promise<Filter[]> {
     const userId = req.user._id.toString();
-    console.log('findByUser', userId);
     return this.filterService.getFiltersByUser(userId);
   }
 

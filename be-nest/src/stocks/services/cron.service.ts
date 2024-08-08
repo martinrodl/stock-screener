@@ -93,15 +93,25 @@ export class CronService {
     }
   }
 
-  @Cron('0 0 * * *') // This cron expression runs at midnight every day
-  async handleUpdateStockValuesCron() {
-    console.log('Running scheduled task to update stock values');
+  async updateAllStockValues() {
+    console.log('Running task to update all stock values');
     for await (const stock of this.stocksRepository.getStockStream()) {
       try {
-        await delay(1000); // Add a delay of 1 second before each API call
+        console.log('Updating stock values for ', stock.symbol);
+        await this.statementsService.saveStatements(stock.symbol);
+        console.log('Statements updated');
+        await delay(1000);
+        await this.metricsService.saveMetrics(stock.symbol);
+        console.log('Metrics updated');
+        await delay(1000);
+        await this.outlookService.saveOutlookData(stock.symbol);
+        console.log('Outlook updated');
+        await delay(1000);
+        await this.analystRatingsService.saveAnalystRatings(stock.symbol);
+        await delay(1000);
         await this.countedService.updateStockValues(stock.symbol, 'annual');
-        await delay(1000); // Add another delay for the next API call
-        await this.countedService.updateStockValues(stock.symbol, 'quarter');
+        await delay(1000);
+        // await this.countedService.updateStockValues(stock.symbol, 'quarter');
         console.log(`Successfully updated stock values for ${stock.symbol}`);
       } catch (error) {
         console.error(

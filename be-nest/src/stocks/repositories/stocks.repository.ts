@@ -18,7 +18,6 @@ export class StocksRepository {
   }
 
   async findAll(query: any = {}): Promise<Stock[]> {
-    console.log('query ', query);
     return this.stockModel.find(query).exec();
   }
 
@@ -28,7 +27,6 @@ export class StocksRepository {
   }
 
   async update(symbol: string, stock: Partial<Stock>): Promise<Stock> {
-    console.log('stock ', stock);
     return this.stockModel
       .findOneAndUpdate({ symbol }, stock, { new: true, upsert: true })
       .exec();

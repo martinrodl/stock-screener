@@ -77,7 +77,6 @@ export class MetricsService {
     const lastAnnualKeyMetrics = metrics.keyMetricsAnnual.find(
       (metric) => metric.period === 'FY',
     );
-    // console.log('lastAnnualKeyMetrics', lastAnnualKeyMetrics);
     const lastAnnualIncomeGrowthMetrics =
       metrics.incomeGrowthMetricsAnnual.find(
         (metric) => metric.period === 'FY',
