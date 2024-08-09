@@ -122,7 +122,7 @@ const SimpleStockFilterForm: React.FC = () => {
                     condition: formState.ratioIntristicValue5ygrowth.condition,
                     value: formState.ratioIntristicValue5ygrowth.value,
                 },
-            ].filter((criteria) => criteria.value !== ''),
+            ].filter((criteria) => criteria.value),
             multiCriteria: [
                 {
                     type: 'country',
