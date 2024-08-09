@@ -18,7 +18,6 @@ const NumericLineFilter: FC<NumericLineFilterProps> = ({
     const [condition, setCondition] = useState(initialCondition)
     const [property, setProperty] = useState(initialProperty)
     const [value, setValue] = useState(initialValue)
-    console.log('value ', value)
 
     const handleConditionChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const newCondition = e.target.value as FilterNumberCondition
@@ -40,6 +39,7 @@ const NumericLineFilter: FC<NumericLineFilterProps> = ({
             onChange({ property, condition, value: parsedValue })
         } else {
             setValue('')
+            onChange({ property, condition, value: null })
         }
     }
 

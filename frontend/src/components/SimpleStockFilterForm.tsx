@@ -46,18 +46,22 @@ const SimpleStockFilterForm: React.FC = () => {
             value: 0.6,
         },
     })
+    console.log('formState ', formState)
 
     const handleNumericFilterChange = (criteria: {
         property: FilterNumberProperty
         condition: FilterNumberCondition
         value: number | string
     }) => {
+        console.log('****')
+        const newValue =
+            !criteria.value || isNaN(Number(criteria.value)) ? NaN : Number(criteria.value)
+
         setFormState((prevState) => ({
             ...prevState,
-            [criteria.property]: criteria.value,
+            [criteria.property]: newValue,
         }))
     }
-
     const handleRatioFilterChange = (
         criteria: {
             numerator: FilterNumberProperty
@@ -141,7 +145,6 @@ const SimpleStockFilterForm: React.FC = () => {
 
         const filteredState = filteredCriteria(requestBody)
         dispatch(setSimpleCriteria(filteredState))
-        console.log('Filtered State:', filteredState) // For demonstration purposes
     }
 
     const toggleFormVisibility = () => {
