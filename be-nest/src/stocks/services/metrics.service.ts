@@ -138,16 +138,20 @@ export class MetricsService {
       throw new Error(`Stock with identifier ${identifier} not found`);
     }
 
-    const filter =
-      periodType === PeriodType.ANNUAL
-        ? { stock: stock._id, period: 'FY' }
-        : { stock: stock._id, period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] } };
-
-    const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
+    const keyMetrics = await this.metricsRepository.findKeyMetrics(
+      stock.id,
+      periodType,
+    );
     const incomeGrowthMetrics =
-      await this.metricsRepository.findIncomeGrowthMetrics(filter);
+      await this.metricsRepository.findIncomeGrowthMetrics(
+        stock.id,
+        periodType,
+      );
     const profitGrowthMetrics =
-      await this.metricsRepository.findProfitGrowthMetrics(filter);
+      await this.metricsRepository.findProfitGrowthMetrics(
+        stock.id,
+        periodType,
+      );
 
     return {
       keyMetrics: plainToClass(KeyMetricDto, keyMetrics, {
@@ -180,19 +184,20 @@ export class MetricsService {
       throw new Error(`Stock with symbol ${symbol} not found`);
     }
 
-    const filter =
-      periodType === PeriodType.ANNUAL
-        ? { stock: stock._id, period: 'FY' }
-        : {
-            stock: stock._id,
-            period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
-          };
-
-    const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
+    const keyMetrics = await this.metricsRepository.findKeyMetrics(
+      stock.id,
+      periodType,
+    );
     const incomeGrowthMetrics =
-      await this.metricsRepository.findIncomeGrowthMetrics(filter);
+      await this.metricsRepository.findIncomeGrowthMetrics(
+        stock.id,
+        periodType,
+      );
     const profitGrowthMetrics =
-      await this.metricsRepository.findProfitGrowthMetrics(filter);
+      await this.metricsRepository.findProfitGrowthMetrics(
+        stock.id,
+        periodType,
+      );
 
     const combinedData: { [key: string]: any } = {};
 
@@ -237,19 +242,20 @@ export class MetricsService {
       throw new Error(`Stock with symbol ${symbol} not found`);
     }
 
-    const filter =
-      periodType === PeriodType.ANNUAL
-        ? { stock: stock._id, period: 'FY' }
-        : {
-            stock: stock._id,
-            period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
-          };
-
-    const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
+    const keyMetrics = await this.metricsRepository.findKeyMetrics(
+      stock.id,
+      periodType,
+    );
     const incomeGrowthMetrics =
-      await this.metricsRepository.findIncomeGrowthMetrics(filter);
+      await this.metricsRepository.findIncomeGrowthMetrics(
+        stock.id,
+        periodType,
+      );
     const profitGrowthMetrics =
-      await this.metricsRepository.findProfitGrowthMetrics(filter);
+      await this.metricsRepository.findProfitGrowthMetrics(
+        stock.id,
+        periodType,
+      );
 
     const filteredKeyMetrics = plainToClass(KeyMetricDto, keyMetrics, {
       excludeExtraneousValues: true,

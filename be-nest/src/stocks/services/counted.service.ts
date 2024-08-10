@@ -16,6 +16,7 @@ import {
 } from '../repositories';
 import { StockDocument } from '../schemas';
 import { OtherRepository } from '../../other/repositories/other.repository';
+import { PeriodType } from '../enums';
 
 @Injectable()
 export class CountedService {
@@ -33,7 +34,7 @@ export class CountedService {
 
   async updateStockValues(
     symbol: string,
-    periodType: 'annual' | 'quarter' = 'annual',
+    periodType: PeriodType = PeriodType.ANNUAL,
   ): Promise<void> {
     const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
     if (!stock) {
@@ -54,25 +55,31 @@ export class CountedService {
 
   private async fetchAndCalculateStockValues(
     stock: StockDocument,
-    periodType: 'annual' | 'quarter',
+    periodType: PeriodType,
   ) {
     const stockId = stock._id;
-    const filter = {
-      stock: stockId,
-      period:
-        periodType === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
-    };
 
     const incomeStatements =
-      await this.statementsRepository.findIncomeStatements(filter);
+      await this.statementsRepository.findIncomeStatements(
+        stock.id,
+        periodType,
+      );
 
     const cashFlowStatements =
-      await this.statementsRepository.findCashFlowStatements(filter);
+      await this.statementsRepository.findCashFlowStatements(
+        stock.id,
+        periodType,
+      );
 
-    const growthMetrics =
-      await this.metricsRepository.findIncomeGrowthMetrics(filter);
+    const growthMetrics = await this.metricsRepository.findIncomeGrowthMetrics(
+      stock.id,
+      periodType,
+    );
 
-    const keyMetrics = await this.metricsRepository.findKeyMetrics(filter);
+    const keyMetrics = await this.metricsRepository.findKeyMetrics(
+      stock.id,
+      periodType,
+    );
 
     if (
       !incomeStatements.length ||
@@ -143,6 +150,8 @@ export class CountedService {
     const buybackYield =
       latestCashFlowStatement.commonStockRepurchased /
       latestKeyMetric.marketCap;
+
+    console.log(keyMetrics.slice(5));
 
     return {
       stock: stockId, // Include the stock field in the values

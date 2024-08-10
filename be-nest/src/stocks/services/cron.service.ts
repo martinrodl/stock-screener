@@ -7,7 +7,7 @@ import { CountedService } from './counted.service';
 import { OutlookService } from './outlook.service';
 import { AnalystRatingsService } from './analyst-ratings.service';
 import { MetricsService } from './metrics.service';
-import { StockExchange } from '../enums';
+import { StockExchange, PeriodType } from '../enums';
 import { delay } from '@utils/index';
 
 @Injectable()
@@ -109,7 +109,10 @@ export class CronService {
         await delay(1000);
         await this.analystRatingsService.saveAnalystRatings(stock.symbol);
         await delay(1000);
-        await this.countedService.updateStockValues(stock.symbol, 'annual');
+        await this.countedService.updateStockValues(
+          stock.symbol,
+          PeriodType.ANNUAL,
+        );
         await delay(1000);
         // await this.countedService.updateStockValues(stock.symbol, 'quarter');
         console.log(`Successfully updated stock values for ${stock.symbol}`);

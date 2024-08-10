@@ -66,8 +66,7 @@ export class StocksController {
   @HttpCode(204)
   async updateStockValues(
     @Param('symbol') symbol: string,
-    @Query('periodType', new DefaultValuePipe('annual'))
-    periodType: 'annual' | 'quarter',
+    @Query('periodType') periodType: PeriodType,
   ): Promise<void> {
     await this.statementsService.saveStatements(symbol);
     await this.metricsService.saveMetrics(symbol);
@@ -79,8 +78,7 @@ export class StocksController {
   @Post('update/counted/:symbol')
   async updateCountedStockValues(
     @Param('symbol') symbol: string,
-    @Query('periodType', new DefaultValuePipe('annual'))
-    periodType: 'annual' | 'quarter',
+    @Query('periodType') periodType: PeriodType,
   ): Promise<void> {
     await this.countedService.updateStockValues(symbol, periodType);
   }

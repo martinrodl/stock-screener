@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   CashFlowStatement,
   CashFlowStatementDocument,
@@ -13,6 +13,7 @@ import {
   IncomeStatement,
   IncomeStatementDocument,
 } from '../schemas/income-statement.schema';
+import { PeriodType } from '../enums';
 
 @Injectable()
 export class StatementsRepository {
@@ -63,17 +64,62 @@ export class StatementsRepository {
     );
   }
 
-  async findCashFlowStatements(filter: any): Promise<CashFlowStatement[]> {
-    return this.cashFlowStatementModel.find(filter).exec();
+  // async findCashFlowStatements(filter: any): Promise<CashFlowStatement[]> {
+  //   return this.cashFlowStatementModel.find(filter).exec();
+  // }
+
+  // async findBalanceSheetStatements(
+  //   filter: any,
+  // ): Promise<BalanceSheetStatement[]> {
+  //   return this.balanceSheetStatementModel.find(filter).exec();
+  // }
+
+  // async findIncomeStatements(filter: any): Promise<IncomeStatement[]> {
+  //   return this.incomeStatementModel.find(filter).exec();
+  // }
+
+  async findCashFlowStatements(
+    stockId: Types.ObjectId,
+    period: PeriodType = PeriodType.ANNUAL,
+    limit = 5,
+  ): Promise<CashFlowStatement[]> {
+    const periodFilter =
+      period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
+
+    return this.cashFlowStatementModel
+      .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
+      .sort({ date: -1 }) // Sort by date in descending order
+      .limit(limit) // Limit to the specified number of documents
+      .exec();
   }
 
   async findBalanceSheetStatements(
-    filter: any,
+    stockId: Types.ObjectId,
+    period: PeriodType = PeriodType.ANNUAL,
+    limit = 5,
   ): Promise<BalanceSheetStatement[]> {
-    return this.balanceSheetStatementModel.find(filter).exec();
+    const periodFilter =
+      period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
+
+    return this.balanceSheetStatementModel
+      .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
+      .sort({ date: -1 }) // Sort by date in descending order
+      .limit(limit) // Limit to the specified number of documents
+      .exec();
   }
 
-  async findIncomeStatements(filter: any): Promise<IncomeStatement[]> {
-    return this.incomeStatementModel.find(filter).exec();
+  async findIncomeStatements(
+    stockId: Types.ObjectId,
+    period: PeriodType = PeriodType.ANNUAL,
+    limit = 5,
+  ): Promise<IncomeStatement[]> {
+    const periodFilter =
+      period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
+
+    return this.incomeStatementModel
+      .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
+      .sort({ date: -1 }) // Sort by date in descending order
+      .limit(limit) // Limit to the specified number of documents
+      .exec();
   }
 }

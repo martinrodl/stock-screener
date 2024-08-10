@@ -117,7 +117,7 @@ export class StatementsService {
 
   async getCombinedData(
     symbol: string,
-    periodType: string,
+    periodType: PeriodType = PeriodType.ANNUAL,
     properties: string[],
   ) {
     const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
@@ -125,20 +125,21 @@ export class StatementsService {
       throw new Error(`Stock with symbol ${symbol} not found`);
     }
 
-    const filter =
-      periodType === PeriodType.ANNUAL
-        ? { stock: stock._id, period: 'FY' }
-        : {
-            stock: stock._id,
-            period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
-          };
-
     const cashFlowStatements =
-      await this.statementsRepository.findCashFlowStatements(filter);
+      await this.statementsRepository.findCashFlowStatements(
+        stock.id,
+        periodType,
+      );
     const balanceSheetStatements =
-      await this.statementsRepository.findBalanceSheetStatements(filter);
+      await this.statementsRepository.findBalanceSheetStatements(
+        stock.id,
+        periodType,
+      );
     const incomeStatements =
-      await this.statementsRepository.findIncomeStatements(filter);
+      await this.statementsRepository.findIncomeStatements(
+        stock.id,
+        periodType,
+      );
 
     const combinedData: { [key: string]: CombinedData } = {};
 
@@ -198,20 +199,21 @@ export class StatementsService {
       throw new Error(`Stock with symbol ${symbol} not found`);
     }
 
-    const filter =
-      periodType === PeriodType.ANNUAL
-        ? { stock: stock._id, period: 'FY' }
-        : {
-            stock: stock._id,
-            period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
-          };
-
     const cashFlowStatements =
-      await this.statementsRepository.findCashFlowStatements(filter);
+      await this.statementsRepository.findCashFlowStatements(
+        stock.id,
+        periodType,
+      );
     const balanceSheetStatements =
-      await this.statementsRepository.findBalanceSheetStatements(filter);
+      await this.statementsRepository.findBalanceSheetStatements(
+        stock.id,
+        periodType,
+      );
     const incomeStatements =
-      await this.statementsRepository.findIncomeStatements(filter);
+      await this.statementsRepository.findIncomeStatements(
+        stock.id,
+        periodType,
+      );
 
     return {
       cashFlowStatements: plainToClass(
@@ -239,21 +241,22 @@ export class StatementsService {
       throw new Error(`Stock with symbol ${symbol} not found`);
     }
 
-    const filter =
-      periodType === PeriodType.ANNUAL
-        ? { stock: stock._id, period: 'FY' }
-        : {
-            stock: stock._id,
-            period: { $in: ['Q1', 'Q2', 'Q3', 'Q4'] },
-          };
-
     const cashFlowStatements =
-      await this.statementsRepository.findCashFlowStatements(filter);
+      await this.statementsRepository.findCashFlowStatements(
+        stock.id,
+        periodType,
+      );
 
     const balanceSheetStatements =
-      await this.statementsRepository.findBalanceSheetStatements(filter);
+      await this.statementsRepository.findBalanceSheetStatements(
+        stock.id,
+        periodType,
+      );
     const incomeStatements =
-      await this.statementsRepository.findIncomeStatements(filter);
+      await this.statementsRepository.findIncomeStatements(
+        stock.id,
+        periodType,
+      );
 
     const filteredCashFlowStatements = plainToClass(
       CashFlowStatementDto,

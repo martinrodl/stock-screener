@@ -17,7 +17,7 @@ BACKEND_PATH="./be"
 BACKEND_PATH_NEST="./be-nest"
 
 # Update versions
-update_version "$BACKEND_PATH"
+# update_version "$BACKEND_PATH"
 update_version "$BACKEND_PATH_NEST"
 update_version "$FRONTEND_PATH"
 
