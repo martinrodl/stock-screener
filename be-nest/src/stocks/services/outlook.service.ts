@@ -60,10 +60,12 @@ export class OutlookService {
       );
     }
     if (data.profile) {
-      await this.outlookRepository.insertProfile({
-        ...data.profile,
-        stock: stockId,
-      });
+      await this.outlookRepository.insertProfile(
+        {
+          ...data.profile,
+        },
+        stockId,
+      );
     }
   }
 }

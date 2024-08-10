@@ -18,7 +18,25 @@ export class StocksRepository {
   }
 
   async findAll(query: any = {}): Promise<Stock[]> {
-    return this.stockModel.find(query).exec();
+    return this.stockModel
+      .find({
+        ...query,
+        'profile.isEtf': { $ne: true },
+        'profile.isFund': { $ne: true },
+      })
+      .select({
+        symbol: 1,
+        __v: 1,
+        exchange: 1,
+        marketCap: 1,
+        name: 1,
+        pe: 1,
+        price: 1,
+        country: 1,
+        industry: 1,
+        sector: 1,
+      })
+      .exec();
   }
 
   async create(stock: Stock): Promise<Stock> {

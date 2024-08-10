@@ -5,11 +5,11 @@ export type ProfileDocument = Profile & Document;
 
 @Schema({ timestamps: true })
 export class Profile {
-  @Prop({ type: Types.ObjectId, ref: 'Stock' })
-  stock: Types.ObjectId; // Reference to Stock
+  // @Prop({ type: Types.ObjectId, ref: 'Stock' })
+  // stock: Types.ObjectId; // Reference to Stock
 
-  @Prop()
-  price: number;
+  // @Prop()
+  // price: number;
 
   @Prop()
   beta: number;

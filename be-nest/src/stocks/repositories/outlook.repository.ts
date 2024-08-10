@@ -85,39 +85,23 @@ export class OutlookRepository {
     await this.insertManyIfNotExistsHelper(this.stockNewsModel, docs);
   }
 
-  async insertProfile(profile: ProfileDocument): Promise<void> {
-    const existingProfile = await this.profileModel
-      .findOne({ stock: profile.stock })
+  async insertProfile(profile: ProfileDocument, stockId): Promise<void> {
+    // const existingProfile = await this.profileModel
+    //   .findOne({ stock: profile.stock })
+    //   .exec();
+
+    const createdProfil = await this.profileModel.create(profile);
+    await this.stockModel
+      .updateOne(
+        { _id: stockId },
+        {
+          profile: createdProfil,
+          country: profile.country,
+          sector: profile.sector,
+          industry: profile.industry,
+        },
+      )
       .exec();
-    if (!existingProfile) {
-      await this.profileModel.create(profile);
-      await this.stockModel
-        .updateOne(
-          { _id: profile.stock },
-          {
-            profile: profile._id,
-            country: profile.country,
-            sector: profile.sector,
-            industry: profile.industry,
-          },
-        )
-        .exec();
-    } else {
-      await this.profileModel
-        .updateOne({ stock: profile.stock }, profile)
-        .exec();
-      await this.stockModel
-        .updateOne(
-          { _id: profile.stock },
-          {
-            profile: existingProfile._id,
-            country: profile.country,
-            sector: profile.sector,
-            industry: profile.industry,
-          },
-        )
-        .exec();
-    }
   }
 
   async findProfile(filter: any): Promise<ProfileDocument | null> {
