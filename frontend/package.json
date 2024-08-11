@@ -1,7 +1,7 @@
 {
     "name": "stock-filter-app",
     "private": true,
-    "version": "0.0.14",
+    "version": "0.0.19",
     "type": "module",
     "scripts": {
         "start": "vite",

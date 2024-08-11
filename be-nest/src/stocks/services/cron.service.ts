@@ -114,23 +114,27 @@ export class CronService implements OnModuleInit {
       if (started) {
         try {
           console.log('Updating stock values for ', stock.symbol);
-
-          await this.outlookService.saveOutlookData(stock.symbol);
-          console.log('Outlook updated');
-          await delay(1000);
-          await this.statementsService.saveStatements(stock.symbol);
-          console.log('Statements updated');
-          await delay(1000);
-          await this.metricsService.saveMetrics(stock.symbol);
-          console.log('Metrics updated');
-          await delay(1000);
-          await this.analystRatingsService.saveAnalystRatings(stock.symbol);
-          await delay(1000);
-          await this.countedService.updateStockValues(
+          const { profile } = await this.outlookService.saveOutlookData(
             stock.symbol,
-            PeriodType.ANNUAL,
           );
-          await delay(1000);
+          console.log('Outlook updated');
+          const { isEtf, isFund } = profile;
+          if (!(isEtf || isFund)) {
+            await delay(250);
+            await this.statementsService.saveStatements(stock.symbol);
+            console.log('Statements updated');
+            await delay(250);
+            await this.metricsService.saveMetrics(stock.symbol);
+            console.log('Metrics updated');
+            await delay(250);
+            await this.analystRatingsService.saveAnalystRatings(stock.symbol);
+            await delay(250);
+            await this.countedService.updateStockValues(
+              stock.symbol,
+              PeriodType.ANNUAL,
+            );
+          }
+          await delay(250);
 
           console.log(`Successfully updated stock values for ${stock.symbol}`);
 
