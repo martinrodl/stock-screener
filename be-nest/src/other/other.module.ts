@@ -3,18 +3,26 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BondYieldService, CronService } from './services';
-import { Other, OtherSchema } from './schemas/other.schema';
-import { OtherRepository } from './repositories';
+import { Other, OtherSchema, Progress, ProgressSchema } from './schemas';
+import { OtherRepository, ProgressRepository } from './repositories';
 import { BondYieldController } from './controllers';
 
 @Module({
   imports: [
     HttpModule,
     ConfigModule,
-    MongooseModule.forFeature([{ name: Other.name, schema: OtherSchema }]),
+    MongooseModule.forFeature([
+      { name: Other.name, schema: OtherSchema },
+      { name: Progress.name, schema: ProgressSchema },
+    ]),
   ],
-  providers: [BondYieldService, CronService, OtherRepository],
+  providers: [
+    BondYieldService,
+    CronService,
+    OtherRepository,
+    ProgressRepository,
+  ],
   controllers: [BondYieldController],
-  exports: [OtherRepository],
+  exports: [OtherRepository, ProgressRepository],
 })
 export class OtherModule {}

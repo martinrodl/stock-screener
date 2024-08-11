@@ -69,8 +69,8 @@ export class StocksController {
     @Query('periodType') periodType: PeriodType,
   ): Promise<void> {
     await this.statementsService.saveStatements(symbol);
-    await this.metricsService.saveMetrics(symbol);
     await this.outlookService.saveOutlookData(symbol);
+    await this.metricsService.saveMetrics(symbol);
     await this.analystRatingsService.saveAnalystRatings(symbol);
     await this.countedService.updateStockValues(symbol, periodType);
   }

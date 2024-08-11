@@ -209,7 +209,9 @@ export class CountedService {
           .reduce((sum, metric) => sum + (metric.payoutRatio || 0), 0) / 5,
       buybackYield: buybackYield,
       similarCompanies,
-      averagePESimilarCompanies,
+      ...(isNaN(averagePESimilarCompanies)
+        ? {}
+        : { averagePESimilarCompanies }),
       freeCashFlow,
     };
   }

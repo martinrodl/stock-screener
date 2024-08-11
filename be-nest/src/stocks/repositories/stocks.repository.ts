@@ -76,8 +76,14 @@ export class StocksRepository {
     return this.stockModel.distinct('industry').exec();
   }
 
-  async *getStockStream(): AsyncIterable<Stock> {
-    const cursor = this.stockModel.find().cursor();
+  async *getStockStream(startFromSymbol?: string): AsyncIterable<Stock> {
+    const query = startFromSymbol ? { symbol: { $gt: startFromSymbol } } : {};
+
+    const cursor = this.stockModel
+      .find(query)
+      .sort({ symbol: 1 }) // Ensure symbols are sorted alphabetically
+      .cursor();
+
     for await (const stock of cursor) {
       yield stock;
     }

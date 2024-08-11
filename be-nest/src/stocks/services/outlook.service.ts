@@ -67,5 +67,6 @@ export class OutlookService {
         stockId,
       );
     }
+    return data;
   }
 }
