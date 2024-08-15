@@ -37,6 +37,8 @@ import {
   ActualValues,
   Filter,
   FilterSchema,
+  ETF,
+  ETFSchema,
 } from './schemas';
 import {
   AnalystRatingsService,
@@ -47,12 +49,14 @@ import {
   StatementsService,
   StocksService,
   FilterService,
+  ETFService,
 } from './services';
 import {
   FmpController,
   StocksController,
   FilterController,
   TasksController,
+  ETFController,
 } from './controllers';
 import {
   StatementsRepository,
@@ -61,6 +65,7 @@ import {
   OutlookRepository,
   StocksRepository,
   FilterRepository,
+  ETFRepository,
 } from './repositories';
 import { OtherModule } from '../other/other.module';
 
@@ -87,6 +92,7 @@ import { OtherModule } from '../other/other.module';
       { name: StockNews.name, schema: StockNewsSchema },
       { name: Profile.name, schema: ProfileSchema },
       { name: Filter.name, schema: FilterSchema },
+      { name: ETF.name, schema: ETFSchema },
     ]),
     HttpModule,
     OtherModule,
@@ -96,6 +102,7 @@ import { OtherModule } from '../other/other.module';
     FmpController,
     FilterController,
     TasksController,
+    ETFController,
   ],
   providers: [
     CronService,
@@ -112,6 +119,8 @@ import { OtherModule } from '../other/other.module';
     StocksRepository,
     FilterRepository,
     FilterService,
+    ETFRepository,
+    ETFService,
   ],
 })
 export class StocksModule {}

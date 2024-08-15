@@ -16,3 +16,4 @@ export * from './actual-values.schema';
 export * from './stock.schema';
 export * from './filter.schema';
 export * from './key-metric.schema';
+export * from './etf.schema';

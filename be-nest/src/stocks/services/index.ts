@@ -6,3 +6,4 @@ export * from './analyst-ratings.service';
 export * from './stocks.service';
 export * from './cron.service';
 export * from './filter.service';
+export * from './etf.service';

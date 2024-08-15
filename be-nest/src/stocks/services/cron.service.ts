@@ -7,6 +7,7 @@ import { CountedService } from './counted.service';
 import { OutlookService } from './outlook.service';
 import { AnalystRatingsService } from './analyst-ratings.service';
 import { MetricsService } from './metrics.service';
+import { ETFService } from './etf.service';
 import { StockExchange, PeriodType } from '../enums';
 import { delay } from '@utils/index';
 import { ProgressRepository } from '../../other/repositories';
@@ -22,6 +23,7 @@ export class CronService implements OnModuleInit {
     private readonly analystRatingsService: AnalystRatingsService,
     private readonly metricsService: MetricsService,
     private readonly progressRepository: ProgressRepository,
+    private readonly etfService: ETFService,
   ) {}
 
   @Cron('0 0 1 1 *') // every month on the 1st
@@ -119,20 +121,29 @@ export class CronService implements OnModuleInit {
           );
           console.log('Outlook updated');
           const { isEtf, isFund } = profile;
+          if (isEtf) {
+            console.log(`Updating ETF information for ${stock.symbol}`);
+            await this.etfService.updateETFInformation(stock.symbol);
+            console.log(
+              `Successfully updated ETF information for ${stock.symbol}`,
+            );
+          }
           if (!(isEtf || isFund)) {
-            await delay(250);
+            await delay(100);
             await this.statementsService.saveStatements(stock.symbol);
             console.log('Statements updated');
-            await delay(250);
+            await delay(100);
             await this.metricsService.saveMetrics(stock.symbol);
             console.log('Metrics updated');
-            await delay(250);
+            await delay(100);
             await this.analystRatingsService.saveAnalystRatings(stock.symbol);
-            await delay(250);
+            console.log('Ratings updated');
+            await delay(1000);
             await this.countedService.updateStockValues(
               stock.symbol,
               PeriodType.ANNUAL,
             );
+            console.log('Counted values updated');
           }
           await delay(250);
 
