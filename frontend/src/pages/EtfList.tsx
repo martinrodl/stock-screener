@@ -63,7 +63,7 @@ const EtfList = () => {
 
     const renderEtfs = (etfs: Etf[]) => {
         return etfs.map((etf, index) => (
-            <div
+            <button
                 key={index}
                 className="flex gap-x-2 items-center p-4 border-b border-gray-200"
                 onClick={() => navigate(`/etf/${etf.symbol}`)}
@@ -90,7 +90,7 @@ const EtfList = () => {
                     <span className="text-gray-500">5Y: {etf.performance5y?.toFixed(2)}%</span>
                     <span className="text-gray-500">10Y: {etf.performance10y?.toFixed(2)}%</span>
                 </div>
-            </div>
+            </button>
         ))
     }
 
