@@ -9,6 +9,7 @@ import SimpleStockList from '../pages/SimpleStockList'
 import UserFilters from '../pages/UserFilters'
 import Login from '../pages/Login'
 import Signup from '../pages/Signup'
+import EtfList from '../pages/EtfList'
 
 const AppRoutes = () => {
     return (
@@ -23,6 +24,7 @@ const AppRoutes = () => {
                 <Route path="portfolio-list" element={<PortfolioStocks />} />
                 <Route path="consider-list" element={<ConsiderStocks />} />
                 <Route path="stocks/page/:pageNumber" element={<SimpleStockList />} />
+                <Route path="etfs/page/:pageNumber" element={<EtfList />} />
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<Signup />} />
             </Route>

@@ -10,34 +10,34 @@ export class ETFRepository {
   ) {}
 
   // Fetch all ETFs with pagination and sorting
-  async getAllETFs(
-    skip: number = 0,
-    limit: number = 10,
-    sortBy: string = '',
-    sortOrder: 'asc' | 'desc' = 'asc',
+  async getFilteredETFs(
+    query: any,
+    sortField: string,
+    sortOrder: 1 | -1, // Specify that sortOrder is either 1 or -1
+    skip: number,
+    limit: number,
   ) {
-    const sortField = this.getSortField(sortBy);
-    const sortOrderValue = sortOrder === 'asc' ? 1 : -1;
-
-    const count = await this.etfModel.countDocuments({}).exec();
-    const pageTotal = Math.ceil(count / limit);
-
-    const data = await this.etfModel
-      .find()
-      .sort({ [sortField]: sortOrderValue })
+    return this.etfModel
+      .find(query)
+      .sort({ [sortField]: sortOrder }) // Use an object for sorting
       .skip(skip)
       .limit(limit)
+      .select({
+        _id: 1,
+        symbol: 1,
+        __v: 1,
+        name: 1,
+        expenseRatio: 1,
+        performance1y: 1,
+        performance3y: 1,
+        performance5y: 1,
+        performance10y: 1,
+      })
       .exec();
-
-    return {
-      data,
-      pageTotal,
-      status: 200,
-    };
   }
 
   // Fetch a single ETF by its ID
-  async getETFById(id: string): Promise<ETF> {
+  async getETFById(id: string): Promise<ETF & Document> {
     const etf = await this.etfModel.findById(id).exec();
     if (!etf) {
       throw new NotFoundException(`ETF with ID ${id} not found`);
@@ -46,7 +46,7 @@ export class ETFRepository {
   }
 
   // Fetch a single ETF by its symbol
-  async getETFBySymbol(symbol: string): Promise<ETF> {
+  async getETFBySymbol(symbol: string): Promise<ETF & Document> {
     const etf = await this.etfModel.findOne({ symbol }).exec();
     if (!etf) {
       throw new NotFoundException(`ETF with symbol ${symbol} not found`);
@@ -92,5 +92,15 @@ export class ETFRepository {
     };
 
     return sortFieldsMap[sortBy] || 'name';
+  }
+
+  async countDocuments(query: any): Promise<number> {
+    return this.etfModel.countDocuments(query).exec();
+  }
+
+  async getDistinctIndustries(): Promise<string[]> {
+    return this.etfModel.distinct('sectorsList.industry').exec() as Promise<
+      string[]
+    >;
   }
 }

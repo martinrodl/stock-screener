@@ -1,25 +1,118 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, firstValueFrom } from 'rxjs';
 import { ETFRepository } from '../repositories/etf.repository';
 import { ETF, Holder } from '../schemas/etf.schema';
 
 @Injectable()
 export class ETFService {
   private readonly apiKey = process.env.API_KEY;
+
   constructor(
     private readonly etfRepository: ETFRepository, // Inject the repository
     private readonly httpService: HttpService, // Inject HttpService for API calls
   ) {}
 
-  // Get all ETFs with pagination and sorting
+  private getSortField(sortBy: string): string {
+    const sortFieldsMap = {
+      expenseRatio: 'expenseRatio',
+      '1y': 'performance1y',
+      '3y': 'performance3y',
+      '5y': 'performance5y',
+      '10y': 'performance10y',
+    };
+    return sortFieldsMap[sortBy] || 'name';
+  }
+
+  async updatePerformanceMetrics(symbol: string): Promise<ETF> {
+    const performanceApiUrl = `https://financialmodelingprep.com/api/v3/stock-price-change/${symbol}?apikey=${this.apiKey}`;
+    const response = await lastValueFrom(
+      this.httpService.get(performanceApiUrl),
+    );
+    const performanceDataArray = response.data;
+
+    if (
+      !Array.isArray(performanceDataArray) ||
+      performanceDataArray.length === 0
+    ) {
+      throw new NotFoundException(
+        `Performance data for symbol ${symbol} not found`,
+      );
+    }
+
+    const performanceData = performanceDataArray[0];
+
+    if (!performanceData) {
+      throw new NotFoundException(
+        `Performance data for symbol ${symbol} not found`,
+      );
+    }
+
+    const performanceMetrics = {
+      performance1y: performanceData['1Y'],
+      performance3y: performanceData['3Y'],
+      performance5y: performanceData['5Y'],
+      performance10y: performanceData['10Y'],
+    };
+
+    const etf = await this.etfRepository.getETFBySymbol(symbol);
+    if (!etf) {
+      throw new NotFoundException(`ETF with symbol ${symbol} not found`);
+    }
+
+    return this.etfRepository.updateETFById(etf.id, performanceMetrics);
+  }
+
   async getAllETFs(
     skip: number = 0,
     limit: number = 10,
     sortBy: string = '',
     sortOrder: 'asc' | 'desc' = 'asc',
+    sector?: string,
+    minWeight?: number,
+    shareSymbol?: string, // New parameter for filtering by specific share
   ) {
-    return this.etfRepository.getAllETFs(skip, limit, sortBy, sortOrder);
+    const sortField = this.getSortField(sortBy);
+    const sortOrderValue = sortOrder === 'asc' ? 1 : -1;
+
+    // Build the query object
+    const query: any = {};
+
+    // Add sector filtering if specified
+    if (sector && minWeight !== undefined) {
+      query['sectorsList'] = {
+        $elemMatch: {
+          industry: sector,
+          exposure: { $gte: minWeight },
+        },
+      };
+    }
+
+    // Add share symbol filtering if specified
+    if (shareSymbol) {
+      query['holders'] = {
+        $elemMatch: {
+          asset: shareSymbol,
+        },
+      };
+    }
+
+    const count = await this.etfRepository.countDocuments(query); // No need for .exec()
+    const pageTotal = Math.ceil(count / limit);
+
+    const data = await this.etfRepository.getFilteredETFs(
+      query,
+      sortField,
+      sortOrderValue,
+      skip,
+      limit,
+    );
+
+    return {
+      data,
+      pageTotal,
+      status: 200,
+    };
   }
 
   // Get a single ETF by its ID
@@ -52,8 +145,10 @@ export class ETFService {
     const etfInfoApiUrl = `https://financialmodelingprep.com/api/v4/etf-info?symbol=${symbol}&apikey=${this.apiKey}`;
     const holderApiUrl = `https://financialmodelingprep.com/api/v3/etf-holder/${symbol}?apikey=${this.apiKey}`;
 
-    const response = await lastValueFrom(this.httpService.get(etfInfoApiUrl));
-    const etfData = response.data[0];
+    const etfInfoResponse = await lastValueFrom(
+      this.httpService.get(etfInfoApiUrl),
+    );
+    const etfData = etfInfoResponse.data[0];
 
     const holdersResponse = await lastValueFrom(
       this.httpService.get(holderApiUrl),
@@ -61,10 +156,10 @@ export class ETFService {
     const holdersData = holdersResponse.data;
 
     const holders: Holder[] = holdersData
-      .filter((holder: any) => holder.asset !== undefined || holder.name) // Skip if both asset and name are missing
+      .filter((holder: any) => holder.asset !== undefined || holder.name)
       .map((holder: any) => ({
-        asset: holder.asset || '', // Save empty string if asset is missing
-        name: holder.name || '', // Ensure name is at least an empty string
+        asset: holder.asset || '',
+        name: holder.name || '',
         isin: holder.isin || null,
         cusip: holder.cusip || null,
         sharesNumber: holder.sharesNumber,
@@ -94,22 +189,23 @@ export class ETFService {
         sectorsList: etfData.sectorsList,
         website: etfData.website,
         holdingsCount: etfData.holdingsCount,
-        performance1y: etfData.performance1y,
-        performance3y: etfData.performance3y,
-        performance5y: etfData.performance5y,
-        performance10y: etfData.performance10y,
         holders,
+        performance1y: null,
+        performance3y: null,
+        performance5y: null,
+        performance10y: null,
       });
     } else {
       etf = await this.etfRepository.updateETFById(etf._id, {
-        performance1y: etfData.performance1y,
-        performance3y: etfData.performance3y,
-        performance5y: etfData.performance5y,
-        performance10y: etfData.performance10y,
         holders,
       });
     }
 
-    return etf;
+    // Update the performance metrics
+    return this.updatePerformanceMetrics(symbol);
+  }
+
+  async getDistinctIndustries(): Promise<string[]> {
+    return this.etfRepository.getDistinctIndustries();
   }
 }

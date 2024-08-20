@@ -10,6 +10,11 @@ const pages = [
         path: '/',
     },
     {
+        key: 'etf-list',
+        title: 'ETF List',
+        path: '/etfs/page/1',
+    },
+    {
         key: 'stock-screener',
         title: 'Create Filter',
         path: '/stock-screener',

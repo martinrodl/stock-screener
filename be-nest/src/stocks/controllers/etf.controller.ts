@@ -7,6 +7,8 @@ import {
   Body,
   Put,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ETFService } from '../services/etf.service';
 import { ETF } from '../schemas/etf.schema';
@@ -24,40 +26,86 @@ import {
 export class ETFController {
   constructor(private readonly etfService: ETFService) {}
 
-  @ApiOperation({ summary: 'Get all ETFs with pagination and sorting' })
+  @Get('distinct-industries')
+  @ApiOperation({ summary: 'Get a list of all distinct industries in ETFs' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all distinct industries',
+    type: [String],
+  })
+  async getIndustries(): Promise<string[]> {
+    return this.etfService.getDistinctIndustries();
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Retrieve a list of ETFs with optional filtering and sorting',
+  })
   @ApiQuery({
     name: 'skip',
     required: false,
-    description: 'Number of items to skip',
+    description: 'Number of items to skip for pagination',
     example: 0,
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of items per page',
+    description: 'Number of items to return for pagination',
     example: 10,
   })
   @ApiQuery({
     name: 'sortBy',
     required: false,
-    description: 'Field to sort by (expenseRatio, 1y, 3y, 5y, 10y)',
+    description: 'Field to sort by (e.g., expenseRatio, 1y, 3y, 5y, 10y)',
     example: 'expenseRatio',
   })
   @ApiQuery({
     name: 'sortOrder',
     required: false,
-    description: 'Sort order (asc or desc)',
+    description: 'Sort order: asc for ascending, desc for descending',
     example: 'asc',
   })
-  @ApiResponse({ status: 200, description: 'List of ETFs' })
-  @Get()
+  @ApiQuery({
+    name: 'sector',
+    required: false,
+    description: 'Sector to filter by (e.g., Information Technology)',
+    example: 'Information Technology',
+  })
+  @ApiQuery({
+    name: 'minWeight',
+    required: false,
+    description: 'Minimum weight percentage for the specified sector',
+    example: 20,
+  })
+  @ApiQuery({
+    name: 'shareSymbol',
+    required: false,
+    description: 'Filter ETFs that hold a specific share symbol (e.g., AAPL)',
+    example: 'AAPL',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of ETFs retrieved successfully',
+    type: [ETF],
+  })
   async getAllETFs(
     @Query('skip') skip: number = 0,
     @Query('limit') limit: number = 10,
     @Query('sortBy') sortBy: string = '',
     @Query('sortOrder') sortOrder: 'asc' | 'desc' = 'asc',
+    @Query('sector') sector: string,
+    @Query('minWeight') minWeight: number,
+    @Query('shareSymbol') shareSymbol: string, // New parameter
   ) {
-    return this.etfService.getAllETFs(skip, limit, sortBy, sortOrder);
+    return this.etfService.getAllETFs(
+      skip,
+      limit,
+      sortBy,
+      sortOrder,
+      sector,
+      minWeight,
+      shareSymbol, // Pass the new parameter to the service
+    );
   }
 
   @ApiOperation({ summary: 'Get a specific ETF by ID' })
@@ -106,6 +154,26 @@ export class ETFController {
     @Body() etfData: Partial<ETF>,
   ): Promise<ETF> {
     return this.etfService.updateETFById(id, etfData);
+  }
+
+  @Put(':symbol/performance')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Update performance metrics of a specific ETF by symbol',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Performance metrics updated successfully',
+    type: ETF,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'ETF or performance data not found',
+  })
+  async updatePerformanceMetrics(
+    @Param('symbol') symbol: string,
+  ): Promise<ETF> {
+    return this.etfService.updatePerformanceMetrics(symbol);
   }
 
   @ApiOperation({ summary: 'Delete an ETF by ID' })
