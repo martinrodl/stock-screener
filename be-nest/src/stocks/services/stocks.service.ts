@@ -66,14 +66,11 @@ export class StocksService {
       throw new NotFoundException(`Stock with symbol ${symbol} not found`);
     }
 
-    const profile = await this.outlookRepository.findProfile({
-      stock: stock._id,
-    });
-    if (!profile) {
+    if (!stock.profile) {
       throw new NotFoundException(
         `Profile for stock with symbol ${symbol} not found`,
       );
     }
-    return profile;
+    return stock.profile;
   }
 }

@@ -14,7 +14,7 @@ const SymbolInputForm: React.FC<SymbolInputFormProps> = ({ onSymbolChange, initi
     }
 
     return (
-        <div className="flex flex-col">
+        <div className="flex gap-x-2 items-center">
             <label htmlFor="symbol" className="mb-2">
                 Symbol
             </label>

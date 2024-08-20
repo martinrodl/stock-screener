@@ -46,7 +46,6 @@ const SimpleStockFilterForm: React.FC = () => {
             value: 0.6,
         },
     })
-    console.log('formState ', formState)
 
     const handleNumericFilterChange = (criteria: {
         property: FilterNumberProperty

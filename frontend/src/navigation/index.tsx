@@ -10,21 +10,23 @@ import UserFilters from '../pages/UserFilters'
 import Login from '../pages/Login'
 import Signup from '../pages/Signup'
 import EtfList from '../pages/EtfList'
+import ETFDetail from '../pages/ETFDetail'
 
 const AppRoutes = () => {
     return (
         <Routes>
             <Route path="/" element={<Layout />}>
                 <Route index element={<SimpleStockList />} />
+                <Route path="stock/:symbol" element={<StockDetails />} />
                 <Route path="stock-screener" element={<CreateFilter />} />
                 <Route path="filter-stock-list/:filterId" element={<CreateFilter />} />
                 <Route path="user-filters" element={<UserFilters />} />
-                <Route path="stock/:symbol" element={<StockDetails />} />
                 <Route path="criteria-list" element={<CriteriaList />} />
                 <Route path="portfolio-list" element={<PortfolioStocks />} />
                 <Route path="consider-list" element={<ConsiderStocks />} />
                 <Route path="stocks/page/:pageNumber" element={<SimpleStockList />} />
                 <Route path="etfs/page/:pageNumber" element={<EtfList />} />
+                <Route path="etf/:symbol" element={<ETFDetail />} />
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<Signup />} />
             </Route>

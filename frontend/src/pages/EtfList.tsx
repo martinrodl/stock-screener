@@ -15,21 +15,16 @@ const EtfList = () => {
     const [symbol, setSymbol] = useState<string>('')
     const [sortBy, setSortBy] = useState<string>('')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-    const [searchClicked, setSearchClicked] = useState<boolean>(false) // Track when search is clicked
+    const [firstLoad, setFirstLoad] = useState<boolean>(true)
 
-    const { data, isLoading, error, refetch } = useEtfControllerGetAllEtFsQuery(
-        {
-            skip: (page - 1) * pageSize,
-            limit: pageSize,
-            sortBy,
-            sortOrder,
-            sector: sectors.join(','),
-            symbol, // Include the symbol for filtering
-        },
-        {
-            skip: !searchClicked, // Disable automatic query until search is clicked
-        }
-    )
+    const { data, isLoading, error, refetch } = useEtfControllerGetAllEtFsQuery({
+        skip: (page - 1) * pageSize,
+        limit: pageSize,
+        sortBy,
+        sortOrder,
+        sector: sectors.join(','),
+        symbol, // Include the symbol for filtering
+    })
 
     const handlePreviousPage = () => {
         setPage((currentPage) => Math.max(currentPage - 1, 1))
@@ -41,9 +36,15 @@ const EtfList = () => {
 
     const handleSearch = () => {
         setPage(1) // Reset to the first page when searching
-        setSearchClicked(true) // Set search as clicked
+        setFirstLoad(false) // Disable firstLoad to allow refetch
         refetch() // Trigger refetch manually
     }
+
+    useEffect(() => {
+        if (!firstLoad) {
+            refetch() // Only refetch when the firstLoad is false
+        }
+    }, [page, refetch, firstLoad])
 
     useEffect(() => {
         navigate(`/etfs/page/${page}`)
@@ -62,7 +63,11 @@ const EtfList = () => {
 
     const renderEtfs = (etfs: Etf[]) => {
         return etfs.map((etf, index) => (
-            <div key={index} className="flex gap-x-2 items-center p-4 border-b border-gray-200">
+            <div
+                key={index}
+                className="flex gap-x-2 items-center p-4 border-b border-gray-200"
+                onClick={() => navigate(`/etf/${etf.symbol}`)}
+            >
                 <div className="w-40 mx-3">
                     <h2 className="text-base font-semibold truncate">{etf.name}</h2>
                     <p className="text-sm text-gray-600">{etf.symbol}</p>
@@ -99,7 +104,7 @@ const EtfList = () => {
                     handleSearch()
                 }}
             >
-                <div className="flex gap-2 mb-4">
+                <div className="flex flex-col gap-2 mb-4">
                     <SymbolInputForm onSymbolChange={setSymbol} initialSymbol={symbol} />
                     <SectorFilter onChange={setSectors} initialValues={sectors} />
                     <select
