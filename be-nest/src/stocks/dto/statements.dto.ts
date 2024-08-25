@@ -27,6 +27,9 @@ export class CashFlowStatementDto {
 
   @Expose()
   freeCashFlow: number;
+
+  @Expose()
+  FY: string;
 }
 
 export class BalanceSheetStatementDto {
@@ -59,6 +62,9 @@ export class BalanceSheetStatementDto {
 
   @Expose()
   netDebt: number;
+
+  @Expose()
+  FY: string;
 }
 
 export class IncomeStatementDto {
@@ -97,6 +103,9 @@ export class IncomeStatementDto {
 
   @Expose()
   eps: number;
+
+  @Expose()
+  FY: string;
 }
 
 export class CombinedStatementDto {

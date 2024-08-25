@@ -193,7 +193,11 @@ export class StatementsService {
     });
   }
 
-  public async getStatements(symbol: string, periodType: PeriodType) {
+  public async getStatements(
+    symbol: string,
+    periodType: PeriodType,
+    limit: number,
+  ) {
     const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
     if (!stock) {
       throw new Error(`Stock with symbol ${symbol} not found`);
@@ -203,16 +207,19 @@ export class StatementsService {
       await this.statementsRepository.findCashFlowStatements(
         stock.id,
         periodType,
+        limit,
       );
     const balanceSheetStatements =
       await this.statementsRepository.findBalanceSheetStatements(
         stock.id,
         periodType,
+        limit,
       );
     const incomeStatements =
       await this.statementsRepository.findIncomeStatements(
         stock.id,
         periodType,
+        limit,
       );
 
     return {
@@ -235,6 +242,7 @@ export class StatementsService {
   async getGroupStatements(
     symbol: string,
     periodType: PeriodType,
+    limit: number,
   ): Promise<CombinedStatement[]> {
     const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
     if (!stock) {
@@ -245,17 +253,20 @@ export class StatementsService {
       await this.statementsRepository.findCashFlowStatements(
         stock.id,
         periodType,
+        limit,
       );
 
     const balanceSheetStatements =
       await this.statementsRepository.findBalanceSheetStatements(
         stock.id,
         periodType,
+        limit,
       );
     const incomeStatements =
       await this.statementsRepository.findIncomeStatements(
         stock.id,
         periodType,
+        limit,
       );
 
     const filteredCashFlowStatements = plainToClass(

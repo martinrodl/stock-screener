@@ -58,7 +58,7 @@ const injectedRtkApi = api.injectEndpoints({
         >({
             query: (queryArg) => ({
                 url: `/be-nest-stocks/api/stocks/statements/${queryArg.identifier}`,
-                params: { periodType: queryArg.periodType },
+                params: { periodType: queryArg.periodType, limit: queryArg.limit },
             }),
         }),
         stocksControllerGetGroupStatements: build.query<
@@ -67,7 +67,7 @@ const injectedRtkApi = api.injectEndpoints({
         >({
             query: (queryArg) => ({
                 url: `/be-nest-stocks/api/stocks/groupstatements/${queryArg['symbol']}`,
-                params: { periodType: queryArg.periodType },
+                params: { periodType: queryArg.periodType, limit: queryArg.limit },
             }),
         }),
         stocksControllerGetProfile: build.query<
@@ -448,11 +448,15 @@ export type StocksControllerGetStatementsApiResponse = unknown
 export type StocksControllerGetStatementsApiArg = {
     identifier: string
     periodType: 'annual' | 'quarterly'
+    /** Number of statements to return */
+    limit?: number
 }
 export type StocksControllerGetGroupStatementsApiResponse = unknown
 export type StocksControllerGetGroupStatementsApiArg = {
     symbol: string
     periodType: 'annual' | 'quarterly'
+    /** Number of statements to return */
+    limit?: number
 }
 export type StocksControllerGetProfileApiResponse = unknown
 export type StocksControllerGetProfileApiArg = {

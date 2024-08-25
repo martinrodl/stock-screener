@@ -105,6 +105,12 @@ export class StocksController {
     required: true,
     enum: PeriodType,
   })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of statements to return',
+    example: 3,
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns statements for the specified stock',
@@ -113,8 +119,9 @@ export class StocksController {
   public async getStatements(
     @Param('identifier') identifier: string,
     @Query('periodType') periodType: PeriodType,
+    @Query('limit') limit: number = 5,
   ) {
-    return this.statementsService.getStatements(identifier, periodType);
+    return this.statementsService.getStatements(identifier, periodType, limit);
   }
 
   @ApiQuery({
@@ -126,12 +133,23 @@ export class StocksController {
     status: 200,
     description: 'Returns statements for the specified stock',
   })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of statements to return',
+    example: 3,
+  })
   @Get('groupstatements/:symbol')
   public async getGroupStatements(
     @Param('symbol') identifier: string,
     @Query('periodType') periodType: PeriodType,
+    @Query('limit') limit: number = 5,
   ) {
-    return this.statementsService.getGroupStatements(identifier, periodType);
+    return this.statementsService.getGroupStatements(
+      identifier,
+      periodType,
+      limit,
+    );
   }
 
   @Get(':symbol/profile')
