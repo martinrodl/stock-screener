@@ -166,11 +166,18 @@ export class StocksController {
     status: 200,
     description: 'Returns metrics for the specified stock',
   })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of statements to return',
+    example: 3,
+  })
   @Get('groupmetrics/:symbol')
   public async getGroupMetrics(
     @Param('symbol') identifier: string,
     @Query('periodType') periodType: PeriodType,
+    @Query('limit') limit: number = 5,
   ) {
-    return this.metricsService.getGroupMetrics(identifier, periodType);
+    return this.metricsService.getGroupMetrics(identifier, periodType, limit);
   }
 }

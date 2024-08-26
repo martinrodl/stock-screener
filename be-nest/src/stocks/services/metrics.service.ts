@@ -236,6 +236,7 @@ export class MetricsService {
   public async getGroupMetrics(
     symbol: string,
     periodType: PeriodType,
+    limit: number = 5,
   ): Promise<CombinedMetricsDto[]> {
     const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
     if (!stock) {
@@ -245,16 +246,19 @@ export class MetricsService {
     const keyMetrics = await this.metricsRepository.findKeyMetrics(
       stock.id,
       periodType,
+      limit,
     );
     const incomeGrowthMetrics =
       await this.metricsRepository.findIncomeGrowthMetrics(
         stock.id,
         periodType,
+        limit,
       );
     const profitGrowthMetrics =
       await this.metricsRepository.findProfitGrowthMetrics(
         stock.id,
         periodType,
+        limit,
       );
 
     const filteredKeyMetrics = plainToClass(KeyMetricDto, keyMetrics, {

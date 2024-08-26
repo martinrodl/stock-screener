@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { formatBigNumber } from '../helpers/formatNumber'
+import { useStocksControllerGetGroupStatementsQuery } from '../services/beGeneratedApi'
 
 interface FinancialData {
     calendarYear: string
@@ -11,7 +12,7 @@ interface FinancialData {
     operatingExpenses: number
     depreciationAndAmortization: number
     operatingIncome: number
-    eps?: number // Made optional to handle missing data
+    eps: number
     netIncome: number
     operatingCashFlow: number
     inventory: number
@@ -158,4 +159,57 @@ const StatementTable: React.FC<StatementTableProps> = ({ data, periodType }) => 
     )
 }
 
-export default StatementTable
+interface FinancialStatementViewerProps {
+    symbol: string
+}
+
+const FinancialStatementViewer: React.FC<FinancialStatementViewerProps> = ({ symbol }) => {
+    const [periodType, setPeriodType] = useState<'annual' | 'quarterly'>('annual')
+
+    const {
+        data: groupStatements,
+        error: groupStatementsError,
+        isLoading: groupStatementsLoading,
+        refetch: refetchGroupStatements,
+    } = useStocksControllerGetGroupStatementsQuery({
+        symbol: symbol,
+        periodType: periodType,
+        limit: 10, // Pass the limit here to ensure it’s included in the query
+    })
+
+    const handlePeriodTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setPeriodType(event.target.value as 'annual' | 'quarterly')
+        refetchGroupStatements()
+    }
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-4">
+                <label htmlFor="period-type-selector" className="mr-2 font-medium">
+                    Select Period:
+                </label>
+                <select
+                    id="period-type-selector"
+                    value={periodType}
+                    onChange={handlePeriodTypeChange}
+                    className="p-2 border rounded-md"
+                >
+                    <option value="annual">Annual</option>
+                    <option value="quarterly">Quarterly</option>
+                </select>
+            </div>
+            {groupStatementsError && (
+                <p className="text-red-500">Error: {groupStatementsError.message}</p>
+            )}
+            {groupStatementsLoading ? (
+                <p>Loading...</p>
+            ) : groupStatements && groupStatements.length > 0 ? (
+                <StatementTable data={groupStatements} periodType={periodType} />
+            ) : (
+                <p>No data available.</p>
+            )}
+        </div>
+    )
+}
+
+export default FinancialStatementViewer

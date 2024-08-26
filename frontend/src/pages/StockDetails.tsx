@@ -5,6 +5,7 @@ import { getProperties } from '../helpers/getPropertyData'
 import BarChart from '../components/BarChart'
 import BasicInfoTable from '../components/BasicInfoTable'
 import StatementTable from '../components/StatementTable'
+import MetricsTable from '../components/MetricsTable'
 import DetailMetricsTable from '../components/DetailMetricsTable'
 import StockTable from '../components/SureTable'
 import {
@@ -284,6 +285,7 @@ const StockDetails = () => {
             </div>
 
             <StatementTable symbol={stock.symbol} />
+            <MetricsTable symbol={stock.symbol} />
 
             {groupStatements?.incomeStatements &&
                 groupStatements?.balanceSheetStatements &&

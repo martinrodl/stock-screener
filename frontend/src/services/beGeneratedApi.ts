@@ -84,7 +84,7 @@ const injectedRtkApi = api.injectEndpoints({
         >({
             query: (queryArg) => ({
                 url: `/be-nest-stocks/api/stocks/groupmetrics/${queryArg['symbol']}`,
-                params: { periodType: queryArg.periodType },
+                params: { periodType: queryArg.periodType, limit: queryArg.limit },
             }),
         }),
         fmpControllerFetchAndSaveStatements: build.mutation<
@@ -466,6 +466,8 @@ export type StocksControllerGetGroupMetricsApiResponse = unknown
 export type StocksControllerGetGroupMetricsApiArg = {
     symbol: string
     periodType: 'annual' | 'quarterly'
+    /** Number of statements to return */
+    limit?: number
 }
 export type FmpControllerFetchAndSaveStatementsApiResponse = unknown
 export type FmpControllerFetchAndSaveStatementsApiArg = {
