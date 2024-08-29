@@ -7,6 +7,7 @@ import BasicInfoTable from '../components/BasicInfoTable'
 import StatementTable from '../components/StatementTable'
 import MetricsTable from '../components/MetricsTable'
 import DetailMetricsTable from '../components/DetailMetricsTable'
+import News from '../components/News'
 import StockTable from '../components/SureTable'
 import {
     useStocksControllerGetStockQuery,
@@ -335,6 +336,7 @@ const StockDetails = () => {
                     )}
                 </div>
             </div>
+            <News symbol={stock.symbol} />
         </div>
     )
 }

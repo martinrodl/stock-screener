@@ -180,4 +180,29 @@ export class StocksController {
   ) {
     return this.metricsService.getGroupMetrics(identifier, periodType, limit);
   }
+
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of news items to return per page',
+    example: 10,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns paginated news for the specified stock symbol',
+  })
+  @Get('news/:symbol')
+  public async getStockNews(
+    @Param('symbol') symbol: string,
+    @Query('page', new DefaultValuePipe(1)) page: number,
+    @Query('limit', new DefaultValuePipe(10)) limit: number,
+  ) {
+    return this.outlookService.getStockNews(symbol, page, limit);
+  }
 }

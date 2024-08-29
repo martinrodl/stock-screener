@@ -69,4 +69,16 @@ export class OutlookService {
     }
     return data;
   }
+
+  async getStockNews(symbol: string, page: number, limit: number) {
+    const stock = await this.stocksService.getStock(symbol);
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found.`);
+    }
+
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+
+    // Call repository to get paginated news
+    return this.outlookRepository.findPaginatedStockNews(stockId, page, limit);
+  }
 }

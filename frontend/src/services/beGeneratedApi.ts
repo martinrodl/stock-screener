@@ -87,6 +87,15 @@ const injectedRtkApi = api.injectEndpoints({
                 params: { periodType: queryArg.periodType, limit: queryArg.limit },
             }),
         }),
+        stocksControllerGetStockNews: build.query<
+            StocksControllerGetStockNewsApiResponse,
+            StocksControllerGetStockNewsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/news/${queryArg['symbol']}`,
+                params: { page: queryArg.page, limit: queryArg.limit },
+            }),
+        }),
         fmpControllerFetchAndSaveStatements: build.mutation<
             FmpControllerFetchAndSaveStatementsApiResponse,
             FmpControllerFetchAndSaveStatementsApiArg
@@ -467,6 +476,14 @@ export type StocksControllerGetGroupMetricsApiArg = {
     symbol: string
     periodType: 'annual' | 'quarterly'
     /** Number of statements to return */
+    limit?: number
+}
+export type StocksControllerGetStockNewsApiResponse = unknown
+export type StocksControllerGetStockNewsApiArg = {
+    symbol: string
+    /** Page number for pagination */
+    page?: number
+    /** Number of news items to return per page */
     limit?: number
 }
 export type FmpControllerFetchAndSaveStatementsApiResponse = unknown
@@ -1626,6 +1643,8 @@ export const {
     useLazyStocksControllerGetProfileQuery,
     useStocksControllerGetGroupMetricsQuery,
     useLazyStocksControllerGetGroupMetricsQuery,
+    useStocksControllerGetStockNewsQuery,
+    useLazyStocksControllerGetStockNewsQuery,
     useFmpControllerFetchAndSaveStatementsMutation,
     useFmpControllerFetchAndSaveMetricsMutation,
     useFmpControllerFetchAndSaveRaringsMutation,

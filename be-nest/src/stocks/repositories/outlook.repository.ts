@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   AnalystRatingsDetailed,
   AnalystRatingsDetailedDocument,
@@ -106,5 +106,19 @@ export class OutlookRepository {
 
   async findProfile(filter: any): Promise<ProfileDocument | null> {
     return this.profileModel.findOne(filter).exec();
+  }
+
+  async findPaginatedStockNews(
+    stockId: Types.ObjectId,
+    page: number,
+    limit: number,
+  ): Promise<StockNewsDocument[]> {
+    const skip = (page - 1) * limit;
+    return this.stockNewsModel
+      .find({ stock: new Types.ObjectId(stockId) })
+      .skip(skip)
+      .limit(limit)
+      .sort({ date: -1 }) // Assuming you want the latest news first
+      .exec();
   }
 }
