@@ -73,4 +73,12 @@ export class StocksService {
     }
     return stock.profile;
   }
+
+  async getStockActualValues(symbol: string) {
+    const stock = await this.stocksRepository.findByIdOrSymbol(symbol);
+    if (!stock) {
+      throw new NotFoundException(`Stock with symbol ${symbol} not found`);
+    }
+    return stock.actualValues;
+  }
 }

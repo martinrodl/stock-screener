@@ -9,6 +9,17 @@ import MetricsTable from '../components/MetricsTable'
 import DetailMetricsTable from '../components/DetailMetricsTable'
 import News from '../components/News'
 import StockTable from '../components/SureTable'
+import ActualValuesTable from '../components/ActualValuesTable'
+import AnalystRatingsSummary from '../components/AnalystRatingsSummary'
+import AnalystRatingsDetailed from '../components/AnalystRatingsDetailed'
+import InsideTrades from '../components/InsideTrades'
+import BalanceSheetStatements from '../components/BalanceSheetStatements'
+import CashFlowStatements from '../components/CashFlowStatements'
+import IncomeStatements from '../components/IncomeStatements'
+import IncomeGrowthMetrics from '../components/IncomeGrowthMetrics'
+import KeyMetrics from '../components/KeyMetrics'
+import ProfitGrowthMetrics from '../components/ProfitGrowthMetrics'
+
 import {
     useStocksControllerGetStockQuery,
     useStocksControllerGetProfileQuery,
@@ -287,6 +298,17 @@ const StockDetails = () => {
 
             <StatementTable symbol={stock.symbol} />
             <MetricsTable symbol={stock.symbol} />
+            <ActualValuesTable symbol={stock.symbol} />
+            <BalanceSheetStatements symbol={symbol} />
+            <CashFlowStatements symbol={symbol} />
+            <IncomeStatements symbol={symbol} />
+            <IncomeGrowthMetrics symbol={symbol} />
+            <KeyMetrics symbol={symbol} />
+            <ProfitGrowthMetrics symbol={symbol} />
+
+            <AnalystRatingsSummary symbol={stock.symbol} />
+            <AnalystRatingsDetailed symbol={stock.symbol} />
+            <InsideTrades symbol={symbol ?? ''} />
 
             {groupStatements?.incomeStatements &&
                 groupStatements?.balanceSheetStatements &&

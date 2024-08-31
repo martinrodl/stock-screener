@@ -96,6 +96,135 @@ const injectedRtkApi = api.injectEndpoints({
                 params: { page: queryArg.page, limit: queryArg.limit },
             }),
         }),
+        stocksControllerGetStockActualValues: build.query<
+            StocksControllerGetStockActualValuesApiResponse,
+            StocksControllerGetStockActualValuesApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/actual-values`,
+            }),
+        }),
+        stocksControllerGetAnalystRatingsSummary: build.query<
+            StocksControllerGetAnalystRatingsSummaryApiResponse,
+            StocksControllerGetAnalystRatingsSummaryApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/latest-analyst-ratings`,
+            }),
+        }),
+        stocksControllerGetAnalystRatings: build.query<
+            StocksControllerGetAnalystRatingsApiResponse,
+            StocksControllerGetAnalystRatingsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/analyst-ratings`,
+                params: { page: queryArg.page, limit: queryArg.limit },
+            }),
+        }),
+        stocksControllerGetAnalystRatingsDetailed: build.query<
+            StocksControllerGetAnalystRatingsDetailedApiResponse,
+            StocksControllerGetAnalystRatingsDetailedApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/analyst-ratings-detailed/${queryArg['symbol']}`,
+                params: { page: queryArg.page, limit: queryArg.limit },
+            }),
+        }),
+        stocksControllerGetLatestAnalystRatingsDetailed: build.query<
+            StocksControllerGetLatestAnalystRatingsDetailedApiResponse,
+            StocksControllerGetLatestAnalystRatingsDetailedApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/analyst-ratings-detailed/${queryArg['symbol']}/latest`,
+            }),
+        }),
+        stocksControllerGetPaginatedInsideTrades: build.query<
+            StocksControllerGetPaginatedInsideTradesApiResponse,
+            StocksControllerGetPaginatedInsideTradesApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/inside-trades`,
+                params: { page: queryArg.page, limit: queryArg.limit },
+            }),
+        }),
+        stocksControllerGetBalanceSheetStatements: build.query<
+            StocksControllerGetBalanceSheetStatementsApiResponse,
+            StocksControllerGetBalanceSheetStatementsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/balance-sheet-statements`,
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
+            }),
+        }),
+        stocksControllerGetCashFlowStatements: build.query<
+            StocksControllerGetCashFlowStatementsApiResponse,
+            StocksControllerGetCashFlowStatementsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/cash-flow-statements`,
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
+            }),
+        }),
+        stocksControllerGetIncomeStatements: build.query<
+            StocksControllerGetIncomeStatementsApiResponse,
+            StocksControllerGetIncomeStatementsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/income-statements`,
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
+            }),
+        }),
+        stocksControllerGetIncomeGrowthMetrics: build.query<
+            StocksControllerGetIncomeGrowthMetricsApiResponse,
+            StocksControllerGetIncomeGrowthMetricsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/income-growth-metrics`,
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
+            }),
+        }),
+        stocksControllerGetKeyMetrics: build.query<
+            StocksControllerGetKeyMetricsApiResponse,
+            StocksControllerGetKeyMetricsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/key-metrics`,
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
+            }),
+        }),
+        stocksControllerGetProfitGrowthMetrics: build.query<
+            StocksControllerGetProfitGrowthMetricsApiResponse,
+            StocksControllerGetProfitGrowthMetricsApiArg
+        >({
+            query: (queryArg) => ({
+                url: `/be-nest-stocks/api/stocks/${queryArg['symbol']}/profit-growth-metrics`,
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
+            }),
+        }),
         fmpControllerFetchAndSaveStatements: build.mutation<
             FmpControllerFetchAndSaveStatementsApiResponse,
             FmpControllerFetchAndSaveStatementsApiArg
@@ -484,6 +613,96 @@ export type StocksControllerGetStockNewsApiArg = {
     /** Page number for pagination */
     page?: number
     /** Number of news items to return per page */
+    limit?: number
+}
+export type StocksControllerGetStockActualValuesApiResponse = unknown
+export type StocksControllerGetStockActualValuesApiArg = {
+    symbol: string
+}
+export type StocksControllerGetAnalystRatingsSummaryApiResponse = unknown
+export type StocksControllerGetAnalystRatingsSummaryApiArg = {
+    symbol: string
+}
+export type StocksControllerGetAnalystRatingsApiResponse = unknown
+export type StocksControllerGetAnalystRatingsApiArg = {
+    symbol: string
+    /** Page number for pagination */
+    page?: number
+    /** Number of analyst ratings to return per page */
+    limit?: number
+}
+export type StocksControllerGetAnalystRatingsDetailedApiResponse = unknown
+export type StocksControllerGetAnalystRatingsDetailedApiArg = {
+    symbol: string
+    /** Page number for pagination */
+    page?: number
+    /** Number of analyst ratings to return per page */
+    limit?: number
+}
+export type StocksControllerGetLatestAnalystRatingsDetailedApiResponse = unknown
+export type StocksControllerGetLatestAnalystRatingsDetailedApiArg = {
+    symbol: string
+}
+export type StocksControllerGetPaginatedInsideTradesApiResponse = unknown
+export type StocksControllerGetPaginatedInsideTradesApiArg = {
+    symbol: string
+    /** Page number for pagination */
+    page?: number
+    /** Number of inside trades to return per page */
+    limit?: number
+}
+export type StocksControllerGetBalanceSheetStatementsApiResponse = unknown
+export type StocksControllerGetBalanceSheetStatementsApiArg = {
+    symbol: string
+    periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
+    /** Number of statements to return per page */
+    limit?: number
+}
+export type StocksControllerGetCashFlowStatementsApiResponse = unknown
+export type StocksControllerGetCashFlowStatementsApiArg = {
+    symbol: string
+    periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
+    /** Number of statements to return per page */
+    limit?: number
+}
+export type StocksControllerGetIncomeStatementsApiResponse = unknown
+export type StocksControllerGetIncomeStatementsApiArg = {
+    symbol: string
+    periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
+    /** Number of statements to return per page */
+    limit?: number
+}
+export type StocksControllerGetIncomeGrowthMetricsApiResponse = unknown
+export type StocksControllerGetIncomeGrowthMetricsApiArg = {
+    symbol: string
+    periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
+    /** Number of metrics to return per page */
+    limit?: number
+}
+export type StocksControllerGetKeyMetricsApiResponse = unknown
+export type StocksControllerGetKeyMetricsApiArg = {
+    symbol: string
+    periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
+    /** Number of metrics to return per page */
+    limit?: number
+}
+export type StocksControllerGetProfitGrowthMetricsApiResponse = unknown
+export type StocksControllerGetProfitGrowthMetricsApiArg = {
+    symbol: string
+    periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
+    /** Number of metrics to return per page */
     limit?: number
 }
 export type FmpControllerFetchAndSaveStatementsApiResponse = unknown
@@ -1645,6 +1864,30 @@ export const {
     useLazyStocksControllerGetGroupMetricsQuery,
     useStocksControllerGetStockNewsQuery,
     useLazyStocksControllerGetStockNewsQuery,
+    useStocksControllerGetStockActualValuesQuery,
+    useLazyStocksControllerGetStockActualValuesQuery,
+    useStocksControllerGetAnalystRatingsSummaryQuery,
+    useLazyStocksControllerGetAnalystRatingsSummaryQuery,
+    useStocksControllerGetAnalystRatingsQuery,
+    useLazyStocksControllerGetAnalystRatingsQuery,
+    useStocksControllerGetAnalystRatingsDetailedQuery,
+    useLazyStocksControllerGetAnalystRatingsDetailedQuery,
+    useStocksControllerGetLatestAnalystRatingsDetailedQuery,
+    useLazyStocksControllerGetLatestAnalystRatingsDetailedQuery,
+    useStocksControllerGetPaginatedInsideTradesQuery,
+    useLazyStocksControllerGetPaginatedInsideTradesQuery,
+    useStocksControllerGetBalanceSheetStatementsQuery,
+    useLazyStocksControllerGetBalanceSheetStatementsQuery,
+    useStocksControllerGetCashFlowStatementsQuery,
+    useLazyStocksControllerGetCashFlowStatementsQuery,
+    useStocksControllerGetIncomeStatementsQuery,
+    useLazyStocksControllerGetIncomeStatementsQuery,
+    useStocksControllerGetIncomeGrowthMetricsQuery,
+    useLazyStocksControllerGetIncomeGrowthMetricsQuery,
+    useStocksControllerGetKeyMetricsQuery,
+    useLazyStocksControllerGetKeyMetricsQuery,
+    useStocksControllerGetProfitGrowthMetricsQuery,
+    useLazyStocksControllerGetProfitGrowthMetricsQuery,
     useFmpControllerFetchAndSaveStatementsMutation,
     useFmpControllerFetchAndSaveMetricsMutation,
     useFmpControllerFetchAndSaveRaringsMutation,

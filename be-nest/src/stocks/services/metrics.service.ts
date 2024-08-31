@@ -2,6 +2,7 @@ import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { plainToClass } from 'class-transformer';
+import { Types } from 'mongoose';
 
 import { MetricsRepository, StocksRepository } from '../repositories';
 import { StocksService } from './stocks.service';
@@ -317,5 +318,75 @@ export class MetricsService {
     addToMerged(profitGrowthMetrics);
 
     return Object.values(merged);
+  }
+
+  public async getIncomeGrowthMetrics(
+    symbol: string,
+    periodType: PeriodType,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+    const metrics = await this.metricsRepository.findIncomeGrowthMetrics(
+      stockId,
+      periodType,
+      limit,
+    );
+
+    return {
+      metrics: metrics.slice((page - 1) * limit, page * limit),
+      total: metrics.length,
+    };
+  }
+
+  public async getKeyMetrics(
+    symbol: string,
+    periodType: PeriodType,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+    const metrics = await this.metricsRepository.findKeyMetrics(
+      stockId,
+      periodType,
+      limit,
+    );
+
+    return {
+      metrics: metrics.slice((page - 1) * limit, page * limit),
+      total: metrics.length,
+    };
+  }
+
+  public async getProfitGrowthMetrics(
+    symbol: string,
+    periodType: PeriodType,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+    const metrics = await this.metricsRepository.findProfitGrowthMetrics(
+      stockId,
+      periodType,
+      limit,
+    );
+
+    return {
+      metrics: metrics.slice((page - 1) * limit, page * limit),
+      total: metrics.length,
+    };
   }
 }

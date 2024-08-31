@@ -121,4 +121,24 @@ export class OutlookRepository {
       .sort({ date: -1 }) // Assuming you want the latest news first
       .exec();
   }
+
+  async findPaginatedInsideTrades(
+    stockId: Types.ObjectId,
+    page: number,
+    limit: number,
+  ): Promise<{ trades: InsideTradesDocument[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const trades = await this.insideTradesModel
+      .find({ stock: stockId })
+      .skip(skip)
+      .limit(limit)
+      .sort({ transactionDate: -1 }) // Sort by transaction date descending
+      .exec();
+
+    const total = await this.insideTradesModel
+      .countDocuments({ stock: stockId })
+      .exec();
+
+    return { trades, total };
+  }
 }

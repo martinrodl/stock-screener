@@ -1,10 +1,14 @@
-// src/services/analyst-ratings.service.ts
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AnalystRatingsRepository } from '../repositories';
 import { StocksService } from '../services';
-import { AnalystRatings, StockDocument } from '../schemas';
+import {
+  AnalystRatings,
+  AnalystRatingsDocument,
+  AnalystRatingsDetailedDocument,
+  StockDocument,
+} from '../schemas';
 import { Types } from 'mongoose';
 
 @Injectable()
@@ -42,5 +46,71 @@ export class AnalystRatingsService {
     const stockId = (stock as StockDocument)._id as Types.ObjectId;
 
     return this.analystRatingsRepository.findByStockId(stockId.toHexString());
+  }
+
+  async findLatestByStockId(
+    symbol: string,
+  ): Promise<AnalystRatingsDocument | null> {
+    const stock = await this.stocksService.getStock(symbol);
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+    return this.analystRatingsRepository.findLatestByStockId(
+      stockId.toHexString(),
+    );
+  }
+
+  async getAnalystRatingsWithPagination(
+    symbol: string,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+
+    const { ratings, total } =
+      await this.analystRatingsRepository.findPaginatedByStockId(
+        stockId.toHexString(),
+        page,
+        limit,
+      );
+
+    return {
+      ratings,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getAnalystRatingsDetailedWithPagination(
+    symbol: string,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+
+    const { ratings, total } =
+      await this.analystRatingsRepository.findDetailedPaginatedByStockId(
+        stockId.toHexString(),
+        page,
+        limit,
+      );
+
+    return {
+      ratings,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async findLatestDetailedByStockId(
+    symbol: string,
+  ): Promise<AnalystRatingsDetailedDocument | null> {
+    const stock = await this.stocksService.getStock(symbol);
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+    return this.analystRatingsRepository.findLatestDetailedByStockId(stockId);
   }
 }

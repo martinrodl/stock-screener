@@ -2,6 +2,7 @@ import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { plainToClass } from 'class-transformer';
+import { Types } from 'mongoose';
 
 import { StatementsRepository } from '../repositories/statements.repository';
 import { StocksService } from './stocks.service';
@@ -325,5 +326,78 @@ export class StatementsService {
     addToMerged(incomeStatements);
 
     return Object.values(merged).slice(0, 10);
+  }
+
+  public async getBalanceSheetStatements(
+    symbol: string,
+    periodType: PeriodType,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+    const statements =
+      await this.statementsRepository.findBalanceSheetStatements(
+        stockId,
+        periodType,
+        limit,
+      );
+
+    return {
+      statements: statements.slice((page - 1) * limit, page * limit),
+      total: statements.length,
+    };
+  }
+
+  public async getCashFlowStatements(
+    symbol: string,
+    periodType: PeriodType,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+    const statements = await this.statementsRepository.findCashFlowStatements(
+      stockId,
+      periodType,
+      limit,
+    );
+
+    return {
+      statements: statements.slice((page - 1) * limit, page * limit),
+      total: statements.length,
+    };
+  }
+
+  public async getIncomeStatements(
+    symbol: string,
+    periodType: PeriodType,
+    page: number,
+    limit: number,
+  ) {
+    const stock = await this.stocksService.getStock(symbol);
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+    const stockId = (stock as StockDocument)._id as Types.ObjectId;
+
+    const statements = await this.statementsRepository.findIncomeStatements(
+      stockId,
+      periodType,
+      limit,
+    );
+
+    return {
+      statements: statements.slice((page - 1) * limit, page * limit),
+      total: statements.length,
+    };
   }
 }
