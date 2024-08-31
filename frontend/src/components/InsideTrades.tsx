@@ -40,41 +40,45 @@ const InsideTrades: React.FC<InsideTradesProps> = ({ symbol }) => {
     }
 
     return (
-        <div className="p-4 bg-white shadow rounded-md">
+        <div className="p-4 bg-white shadow rounded-md overflow-x-auto">
             <h2 className="text-lg font-semibold mb-4">Latest Inside Trades</h2>
-            <ul className="space-y-2">
-                {data.trades.map((trade) => (
-                    <li key={trade._id} className="border-b border-gray-200 pb-2">
-                        <p>
-                            <strong>Transaction Date:</strong>{' '}
-                            {new Date(trade.transactionDate).toLocaleDateString()}
-                        </p>
-                        <p>
-                            <strong>Reporting Name:</strong> {trade.reportingName}
-                        </p>
-                        <p>
-                            <strong>Type of Owner:</strong> {trade.typeOfOwner}
-                        </p>
-                        <p>
-                            <strong>Transaction Type:</strong> {trade.transactionType}
-                        </p>
-                        <p>
-                            <strong>Securities Transacted:</strong> {trade.securitiesTransacted}
-                        </p>
-                        <p>
-                            <strong>Price:</strong> ${trade.price.toFixed(2)}
-                        </p>
-                        <a
-                            href={trade.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500"
-                        >
-                            View Filing
-                        </a>
-                    </li>
-                ))}
-            </ul>
+            <table className="min-w-full bg-white border">
+                <thead>
+                    <tr>
+                        <th className="py-2 px-4 border-b text-left">Transaction Date</th>
+                        <th className="py-2 px-4 border-b text-left">Reporting Name</th>
+                        <th className="py-2 px-4 border-b text-left">Type of Owner</th>
+                        <th className="py-2 px-4 border-b text-left">Transaction Type</th>
+                        <th className="py-2 px-4 border-b text-left">Securities Transacted</th>
+                        <th className="py-2 px-4 border-b text-left">Price</th>
+                        <th className="py-2 px-4 border-b text-left">Filing Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.trades.map((trade) => (
+                        <tr key={trade._id}>
+                            <td className="py-2 px-4 border-b">
+                                {new Date(trade.transactionDate).toLocaleDateString()}
+                            </td>
+                            <td className="py-2 px-4 border-b">{trade.reportingName}</td>
+                            <td className="py-2 px-4 border-b">{trade.typeOfOwner}</td>
+                            <td className="py-2 px-4 border-b">{trade.transactionType}</td>
+                            <td className="py-2 px-4 border-b">{trade.securitiesTransacted}</td>
+                            <td className="py-2 px-4 border-b">${trade.price.toFixed(2)}</td>
+                            <td className="py-2 px-4 border-b">
+                                <a
+                                    href={trade.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500"
+                                >
+                                    View Filing
+                                </a>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
             <div className="flex justify-between mt-4">
                 <button
                     onClick={handlePreviousPage}

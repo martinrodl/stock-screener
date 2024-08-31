@@ -7,13 +7,10 @@ export function getProperties(
         return []
     }
 
-    console.log('properties ', properties)
-
     const result = groupStatements.map((statement) => {
         const data: { [key: string]: any; date: string } = { date: statement.date } // Initialize with date
         properties.forEach((property) => {
             if (Object.prototype.hasOwnProperty.call(statement, property)) {
-                console.log('Property exists:', property, statement[property])
                 data[property] = statement[property]
             } else {
                 console.warn(

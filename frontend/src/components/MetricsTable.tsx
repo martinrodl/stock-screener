@@ -1,213 +1,137 @@
 import React, { useState } from 'react'
-import { formatPercentage } from '../helpers/formatNumber'
 import { useStocksControllerGetGroupMetricsQuery } from '../services/beGeneratedApi'
 
-interface MetricsData {
-    calendarYear: string
-    quarter?: string
-    growthRevenue: number
-    growthOperatingIncome: number
-    growthNetIncome: number
-    growthEPS: number
-    growthInventory: number
-    growthDividendsPaid: number
-    growthFreeCashFlow: number
-    revenuePerShare: number
-    netIncomePerShare: number
-    operatingCashFlowPerShare: number
-    freeCashFlowPerShare: number
-    cashPerShare: number
-    bookValuePerShare: number
-    peRatio: number
-    debtToAssets: number
-    dividendYield: number
-    grahamNumber: number
-    roic: number
-    roe: number
-}
-
-const FinancialMetricsViewer: React.FC<{ symbol: string }> = ({ symbol }) => {
-    const [periodType, setPeriodType] = useState<'annual' | 'quarterly'>('annual')
-
-    const {
-        data: groupMetrics,
-        error: groupMetricsError,
-        isLoading: groupMetricsLoading,
-        refetch: refetchGroupMetrics,
-    } = useStocksControllerGetGroupMetricsQuery({
-        symbol: symbol,
-        periodType: periodType,
-        limit: 10,
+const GroupMetricsTable = ({ symbol }) => {
+    const [periodType, setPeriodType] = useState('annual')
+    const { data, error, isLoading } = useStocksControllerGetGroupMetricsQuery({
+        symbol,
+        periodType,
+        limit: 5,
     })
 
-    const handlePeriodTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setPeriodType(event.target.value as 'annual' | 'quarterly')
-        refetchGroupMetrics()
+    if (isLoading) {
+        return <p>Loading group metrics...</p>
     }
 
+    if (error) {
+        return <p>Error loading group metrics: {error.message}</p>
+    }
+
+    const metrics = data || []
+
     return (
-        <div>
+        <div className="p-4 bg-white shadow rounded-md">
             <div className="flex justify-between items-center mb-4">
-                <label htmlFor="period-type-selector" className="mr-2 font-medium">
-                    Select Period:
-                </label>
+                <h2 className="text-lg font-semibold">Group Financial Metrics</h2>
                 <select
-                    id="period-type-selector"
                     value={periodType}
-                    onChange={handlePeriodTypeChange}
-                    className="p-2 border rounded-md"
+                    onChange={(e) => setPeriodType(e.target.value)}
+                    className="border border-gray-300 rounded p-2"
                 >
                     <option value="annual">Annual</option>
-                    <option value="quarterly">Quarterly</option>
+                    <option value="quarter">Quarterly</option>
                 </select>
             </div>
-            {groupMetricsError && (
-                <p className="text-red-500">Error: {groupMetricsError.message}</p>
-            )}
-            {groupMetricsLoading ? (
-                <p>Loading...</p>
-            ) : groupMetrics && groupMetrics.length > 0 ? (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-x-2 divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th>Metric</th>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <th key={index}>
-                                        {periodType === 'quarterly' && item.quarter
-                                            ? `${item.calendarYear} ${item.quarter}`
-                                            : item.calendarYear}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td>Growth Revenue</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.growthRevenue)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Growth Operating Income</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>
-                                        {formatPercentage(item.growthOperatingIncome)}
-                                    </td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Growth Net Income</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.growthNetIncome)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Growth EPS</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.growthEPS)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Growth Inventory</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.growthInventory)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Growth Dividends Paid</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>
-                                        {formatPercentage(item.growthDividendsPaid)}
-                                    </td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Growth Free Cash Flow</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.growthFreeCashFlow)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Revenue Per Share</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.revenuePerShare.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Net Income Per Share</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.netIncomePerShare.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Operating Cash Flow Per Share</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.operatingCashFlowPerShare.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Free Cash Flow Per Share</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.freeCashFlowPerShare.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Cash Per Share</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.cashPerShare.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Book Value Per Share</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.bookValuePerShare.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>PE Ratio</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.peRatio.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Debt to Assets</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.debtToAssets)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Dividend Yield</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.dividendYield)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>Graham Number</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{item.grahamNumber.toFixed(2)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>ROIC</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.roic)}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <td>ROE</td>
-                                {groupMetrics.map((item: MetricsData, index: number) => (
-                                    <td key={index}>{formatPercentage(item.roe)}</td>
-                                ))}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            {metrics.length > 0 ? (
+                <table className="min-w-full bg-white border">
+                    <thead>
+                        <tr>
+                            <th className="py-2 px-4 border-b">Metric</th>
+                            {metrics.map((metric) => (
+                                <th key={metric.date} className="py-2 px-4 border-b">
+                                    {new Date(metric.date).toLocaleDateString()}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Revenue Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.growthRevenue * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Operating Income Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.growthOperatingIncome * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Net Income Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.growthNetIncome * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">EPS Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.growthEPS * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Free Cash Flow Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.growthFreeCashFlow * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">PE Ratio</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {metric.peRatio.toFixed(2)}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">ROIC</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.roic * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">ROE</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.roe * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Graham Number</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {metric.grahamNumber.toFixed(2)}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Dividend Yield</td>
+                            {metrics.map((metric) => (
+                                <td key={metric.date} className="py-2 px-4 border-b">
+                                    {(metric.dividendYield * 100).toFixed(2)}%
+                                </td>
+                            ))}
+                        </tr>
+                    </tbody>
+                </table>
             ) : (
-                <p>No data available.</p>
+                <p>No group metrics available.</p>
             )}
         </div>
     )
 }
 
-export default FinancialMetricsViewer
+export default GroupMetricsTable
