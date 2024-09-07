@@ -255,47 +255,7 @@ const StockDetails = () => {
                     </div>
                 </div>
             )}
-            <div className="mb-14">
-                <BasicInfoTable
-                    marketCap={stock.marketCap}
-                    peRatio={stock.pe}
-                    roic={groupMetrics?.lastAnnualKeyMetrics?.roic}
-                    roe={groupMetrics?.lastAnnualKeyMetrics?.roe}
-                    debtToEquity={groupMetrics?.lastAnnualKeyMetrics?.debtToEquity}
-                    dateMetrics={groupMetrics?.lastAnnualKeyMetrics?.date}
-                    price={stock.price}
-                    dcf={stock.dcf} // Fix this
-                    date={stock.actualValues.date}
-                    capeRatio={stock.actualValues.capeRatio}
-                    intrinsicValueZeroGrowth={stock.actualValues.intrinsicValueZeroGrowth}
-                    intrinsicValueAverageGrowth={stock.actualValues.intrinsicValueAverageGrowth5y}
-                    intrinsicValueLastYearGrowth={stock.actualValues.intrinsicValueLastYearGrowth}
-                    peterlynchValue={stock.actualValues.peterlynchValue}
-                    sharesOutstanding={stock.actualValues.sharesOutstanding}
-                    sharesOutstanding5y={stock.actualValues.sharesOutstanding5y}
-                    roe10y={stock.roe5y}
-                    roic10y={stock.roic5y}
-                    averageProfitGrowth={stock.actualValues.averageProfitGrowth5y}
-                    averageDividendGrowth={stock.actualValues.averageDividendGrowth5y}
-                    averageNetIncomeGrowth={stock.actualValues.averageNetIncomeGrowth5y}
-                    averageProfitMargin={stock.averageProfitMargin}
-                    profitMargin={stock.actualValues.averageProfitMargin5y}
-                    eps={stock.lastAnnualIncomeStatement.eps}
-                    debtPerShare={stock.actualValues.debtPerShare}
-                    dividendYield={stock.lastAnnualKeyMetrics.dividendYield}
-                    dividendYield10y={stock.actualValues.dividendYield5y}
-                    dividendPayoutRatio={stock.actualValues.dividendPayoutRatio5y}
-                    freeCashFlowPerShare={stock.lastAnnualKeyMetrics.freeCashFlowPerShare}
-                    buybackYield={stock.actualValues.buybackYield}
-                    buybackPayoutRatio={stock.buybackPayoutRatio}
-                    debtToAssets={stock.lastAnnualKeyMetrics.debtToAssets}
-                    netDebtToEBITDA={stock.lastAnnualKeyMetrics.netDebtToEBITDA}
-                    similarCompanies={stock.actualValues.similarCompanies}
-                    averagePESimilarCompanies={stock.actualValues.averagePESimilarCompanies}
-                    yearReturn={stock.yearReturn} // Implement in BE
-                />
-            </div>
-
+            <BasicInfoTable symbol={symbol} />
             <StatementTable symbol={stock.symbol} />
             <MetricsTable symbol={stock.symbol} />
             <ActualValuesTable symbol={stock.symbol} />
