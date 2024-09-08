@@ -247,9 +247,8 @@ const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol }) => {
 
     // Split the data into three columns
     const columns = [
-        dataMapping.slice(0, Math.ceil(dataMapping.length / 3)),
-        dataMapping.slice(Math.ceil(dataMapping.length / 3), 2 * Math.ceil(dataMapping.length / 3)),
-        dataMapping.slice(2 * Math.ceil(dataMapping.length / 3)),
+        dataMapping.slice(0, Math.ceil(dataMapping.length / 2)),
+        dataMapping.slice(Math.ceil(dataMapping.length / 2)),
     ]
 
     // Function to render a single data row

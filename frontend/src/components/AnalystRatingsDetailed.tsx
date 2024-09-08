@@ -29,59 +29,142 @@ const AnalystRatingsDetailed: React.FC<AnalystRatingsDetailedProps> = ({ symbol 
             <table className="min-w-full bg-white border">
                 <thead>
                     <tr>
-                        <th className="py-2 px-4 border-b text-left">Date</th>
-                        <th className="py-2 px-4 border-b text-left">Rating</th>
-                        <th className="py-2 px-4 border-b text-left">Score</th>
                         <th className="py-2 px-4 border-b text-left">Recommendation</th>
-                        <th className="py-2 px-4 border-b text-left">DCF Score</th>
-                        <th className="py-2 px-4 border-b text-left">DCF Recommendation</th>
-                        <th className="py-2 px-4 border-b text-left">ROE Score</th>
-                        <th className="py-2 px-4 border-b text-left">ROE Recommendation</th>
-                        <th className="py-2 px-4 border-b text-left">ROA Score</th>
-                        <th className="py-2 px-4 border-b text-left">ROA Recommendation</th>
-                        <th className="py-2 px-4 border-b text-left">DE Score</th>
-                        <th className="py-2 px-4 border-b text-left">DE Recommendation</th>
-                        <th className="py-2 px-4 border-b text-left">PE Score</th>
-                        <th className="py-2 px-4 border-b text-left">PE Recommendation</th>
-                        <th className="py-2 px-4 border-b text-left">PB Score</th>
-                        <th className="py-2 px-4 border-b text-left">PB Recommendation</th>
+                        {data.ratings.map((rating, index) => (
+                            <th key={index} className="py-2 px-4 border-b">
+                                {new Date(rating.date).toLocaleDateString()}
+                            </th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {data.ratings.map((rating, index) => (
-                        <tr key={index}>
-                            <td className="py-2 px-4 border-b">
-                                {new Date(rating.date).toLocaleDateString()}
+                    {/* Rating */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">Overall Rating</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.rating}
                             </td>
-                            <td className="py-2 px-4 border-b">{rating.rating}</td>
-                            <td className="py-2 px-4 border-b">{rating.ratingScore}</td>
-                            <td className="py-2 px-4 border-b">{rating.ratingRecommendation}</td>
-                            <td className="py-2 px-4 border-b">{rating.ratingDetailsDCFScore}</td>
-                            <td className="py-2 px-4 border-b">
+                        ))}
+                    </tr>
+
+                    {/* Rating Score */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">Overall Score</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.ratingScore}
+                            </td>
+                        ))}
+                    </tr>
+
+                    {/* DCF Score and Recommendation */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">DCF Score</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.ratingDetailsDCFScore}
+                            </td>
+                        ))}
+                    </tr>
+                    <tr>
+                        <td className="py-2 px-4 border-b">DCF Recommendation</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
                                 {rating.ratingDetailsDCFRecommendation}
                             </td>
-                            <td className="py-2 px-4 border-b">{rating.ratingDetailsROEScore}</td>
-                            <td className="py-2 px-4 border-b">
+                        ))}
+                    </tr>
+
+                    {/* ROE Score and Recommendation */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">ROE Score</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.ratingDetailsROEScore}
+                            </td>
+                        ))}
+                    </tr>
+                    <tr>
+                        <td className="py-2 px-4 border-b">ROE Recommendation</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
                                 {rating.ratingDetailsROERecommendation}
                             </td>
-                            <td className="py-2 px-4 border-b">{rating.ratingDetailsROAScore}</td>
-                            <td className="py-2 px-4 border-b">
+                        ))}
+                    </tr>
+
+                    {/* ROA Score and Recommendation */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">ROA Score</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.ratingDetailsROAScore}
+                            </td>
+                        ))}
+                    </tr>
+                    <tr>
+                        <td className="py-2 px-4 border-b">ROA Recommendation</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
                                 {rating.ratingDetailsROARecommendation}
                             </td>
-                            <td className="py-2 px-4 border-b">{rating.ratingDetailsDEScore}</td>
-                            <td className="py-2 px-4 border-b">
+                        ))}
+                    </tr>
+
+                    {/* DE Score and Recommendation */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">DE Score</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.ratingDetailsDEScore}
+                            </td>
+                        ))}
+                    </tr>
+                    <tr>
+                        <td className="py-2 px-4 border-b">DE Recommendation</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
                                 {rating.ratingDetailsDERecommendation}
                             </td>
-                            <td className="py-2 px-4 border-b">{rating.ratingDetailsPEScore}</td>
-                            <td className="py-2 px-4 border-b">
+                        ))}
+                    </tr>
+
+                    {/* PE Score and Recommendation */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">PE Score</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.ratingDetailsPEScore}
+                            </td>
+                        ))}
+                    </tr>
+                    <tr>
+                        <td className="py-2 px-4 border-b">PE Recommendation</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
                                 {rating.ratingDetailsPERecommendation}
                             </td>
-                            <td className="py-2 px-4 border-b">{rating.ratingDetailsPBScore}</td>
-                            <td className="py-2 px-4 border-b">
+                        ))}
+                    </tr>
+
+                    {/* PB Score and Recommendation */}
+                    <tr>
+                        <td className="py-2 px-4 border-b">PB Score</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
+                                {rating.ratingDetailsPBScore}
+                            </td>
+                        ))}
+                    </tr>
+                    <tr>
+                        <td className="py-2 px-4 border-b">PB Recommendation</td>
+                        {data.ratings.map((rating, index) => (
+                            <td key={index} className="py-2 px-4 border-b">
                                 {rating.ratingDetailsPBRecommendation}
                             </td>
-                        </tr>
-                    ))}
+                        ))}
+                    </tr>
                 </tbody>
             </table>
         </div>

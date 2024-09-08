@@ -1,12 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import Select from 'react-select'
-import { getProperties } from '../helpers/getPropertyData'
-import BarChart from '../components/BarChart'
+import { useEffect } from 'react'
 import BasicInfoTable from '../components/BasicInfoTable'
+import MetricsBarChartWrapper from '../components/MetricsBarChartWrapper'
+import StatementBarChartWrapper from '../components/StatementBarChartWrapper'
 import StatementTable from '../components/StatementTable'
 import MetricsTable from '../components/MetricsTable'
-import DetailMetricsTable from '../components/DetailMetricsTable'
 import News from '../components/News'
 import StockTable from '../components/SureTable'
 import ActualValuesTable from '../components/ActualValuesTable'
@@ -24,29 +22,12 @@ import {
     useStocksControllerGetStockQuery,
     useStocksControllerGetProfileQuery,
     useStocksControllerUpdateStockValuesMutation,
-    useStocksControllerGetGroupMetricsQuery,
-    useStocksControllerGetGroupStatementsQuery,
 } from '../services/beGeneratedApi'
 import { delay } from '../helpers/delay'
 
 const StockDetails = () => {
     const { symbol } = useParams()
     const navigate = useNavigate()
-
-    const [metricDatasets, setMetricDatasets] = useState<any[]>([])
-    const [statementDatasets, setStatementDatasets] = useState<any[]>([])
-    const [selectedMetricProperties, setSelectedMetricProperties] = useState<any[]>([
-        { value: 'freeCashFlowPerShare', label: 'freeCashFlowPerShare' },
-        { value: 'bookValuePerShare', label: 'bookValuePerShare' },
-        { value: 'revenuePerShare', label: 'revenuePerShare' },
-        { value: 'netIncomePerShare', label: 'netIncomePerShare' },
-    ])
-    const [selectedStatementProperties, setSelectedStatementProperties] = useState<any[]>([
-        { value: 'netIncome', label: 'netIncome' },
-        { value: 'revenue', label: 'revenue' },
-    ])
-    const [metricPropertyOptions, setMetricPropertyOptions] = useState<any[]>([])
-    const [statementPropertyOptions, setStatementPropertyOptions] = useState<any[]>([])
 
     const {
         data: stock,
@@ -61,20 +42,6 @@ const StockDetails = () => {
         isLoading: profileLoading,
         refetch: refetchProfile,
     } = useStocksControllerGetProfileQuery({ symbol: symbol ?? '' })
-
-    const {
-        data: groupMetrics,
-        error: groupMetricsError,
-        isLoading: groupMetricsLoading,
-        refetch: refetchGroupMetrics,
-    } = useStocksControllerGetGroupMetricsQuery({ symbol: symbol ?? '', periodType: 'annual' })
-
-    const {
-        data: groupStatements,
-        error: groupStatementsError,
-        isLoading: groupStatementsLoading,
-        refetch: refetchGroupStatements,
-    } = useStocksControllerGetGroupStatementsQuery({ symbol: symbol ?? '', periodType: 'annual' })
 
     const [updateStockValues] = useStocksControllerUpdateStockValuesMutation()
 
@@ -100,77 +67,14 @@ const StockDetails = () => {
     }
 
     useEffect(() => {
-        const extractKeys = (data) => {
-            const keys = new Set()
-            if (Array.isArray(data)) {
-                data.forEach((item) => {
-                    Object.keys(item).forEach((key) => keys.add(key))
-                })
-            }
-            return Array.from(keys).filter(
-                (key) => !['date', 'period', 'calendarYear'].includes(key)
-            )
-        }
-
-        if (groupMetrics && groupStatements) {
-            const metricsKeys = extractKeys(groupMetrics)
-            const statementsKeys = extractKeys(groupStatements)
-
-            const metricOptions = metricsKeys.map((key) => ({ value: key, label: key }))
-            const statementOptions = statementsKeys.map((key) => ({ value: key, label: key }))
-
-            setMetricPropertyOptions(metricOptions)
-            setStatementPropertyOptions(statementOptions)
-
-            // Set default selected values
-            setSelectedMetricProperties([
-                { value: 'freeCashFlowPerShare', label: 'freeCashFlowPerShare' },
-                { value: 'bookValuePerShare', label: 'bookValuePerShare' },
-                { value: 'revenuePerShare', label: 'revenuePerShare' },
-                { value: 'netIncomePerShare', label: 'netIncomePerShare' },
-            ])
-
-            setSelectedStatementProperties([
-                { value: 'netIncome', label: 'netIncome' },
-                { value: 'revenue', label: 'revenue' },
-            ])
-        }
-    }, [groupMetrics, groupStatements])
-
-    useEffect(() => {
-        if (groupMetrics && selectedMetricProperties.length > 0) {
-            const selectedMetricPropertiesNames = selectedMetricProperties.map((prop) => prop.value)
-
-            const selectedMetrics = getProperties(groupMetrics, selectedMetricPropertiesNames)
-
-            setMetricDatasets(selectedMetrics)
-        }
-    }, [groupMetrics, selectedMetricProperties])
-
-    useEffect(() => {
-        if (groupStatements && selectedStatementProperties.length > 0) {
-            const selectedStatementPropertiesNames = selectedStatementProperties.map(
-                (prop) => prop.value
-            )
-
-            const selectedStatements = getProperties(
-                groupStatements,
-                selectedStatementPropertiesNames
-            )
-
-            setStatementDatasets(selectedStatements)
-        }
-    }, [groupStatements, selectedStatementProperties])
-
-    useEffect(() => {
         const timeout = setTimeout(() => {
-            if (stockLoading || profileLoading || groupMetricsLoading || groupStatementsLoading) {
+            if (stockLoading || profileLoading) {
                 handleRetryClick()
             }
         }, 10000) // 10 seconds timeout
 
         return () => clearTimeout(timeout)
-    }, [stockLoading, profileLoading, groupMetricsLoading, groupStatementsLoading])
+    }, [stockLoading, profileLoading])
 
     const getTopButtons = () => (
         <div className="flex w-full p-4 justify-around">
@@ -195,11 +99,7 @@ const StockDetails = () => {
         </div>
     )
 
-    if (stockLoading || profileLoading || groupMetricsLoading || groupStatementsLoading) {
-        console.log('stockLoading ', stockLoading)
-        console.log('profileLoading ', profileLoading)
-        console.log('groupMetricsLoading ', groupMetricsLoading)
-        console.log('groupStatementsLoading ', groupStatementsLoading)
+    if (stockLoading || profileLoading) {
         return (
             <div>
                 {getTopButtons()}
@@ -208,20 +108,11 @@ const StockDetails = () => {
         )
     }
 
-    if (stockError || groupMetricsError || groupStatementsError || profileError) {
-        console.log(stockError)
-        console.log(profileError)
-        console.error('Metrics Error: ', groupMetricsError)
-        console.error('Statements Error: ', groupStatementsError)
+    if (stockError || profileError) {
         return (
             <div>
                 {getTopButtons()}
-                <div className="mt-5 ml-5">
-                    Error:{' '}
-                    {String(
-                        stockError || groupMetricsError || groupStatementsError || profileError
-                    )}
-                </div>
+                <div className="mt-5 ml-5">Error: {String(stockError || profileError)}</div>
             </div>
         )
     }
@@ -236,7 +127,7 @@ const StockDetails = () => {
     }
 
     return (
-        <div className="p-4 flex flex-col items-center">
+        <div className="p-4 flex flex-col gap-y-5 items-center max-w-4xl">
             {getTopButtons()}
             <div className="flex gap-x-3 items-center mb-4">
                 <h1 className="text-xl font-bold">
@@ -256,6 +147,22 @@ const StockDetails = () => {
                 </div>
             )}
             <BasicInfoTable symbol={symbol} />
+            <MetricsBarChartWrapper
+                symbol={symbol || ''}
+                initialSelectedProperties={[
+                    { value: 'freeCashFlowPerShare', label: 'freeCashFlowPerShare' },
+                    { value: 'bookValuePerShare', label: 'bookValuePerShare' },
+                    { value: 'revenuePerShare', label: 'revenuePerShare' },
+                    { value: 'netIncomePerShare', label: 'netIncomePerShare' },
+                ]}
+            />
+            <StatementBarChartWrapper
+                symbol={symbol || ''}
+                initialSelectedProperties={[
+                    { value: 'netIncome', label: 'Net Income' },
+                    { value: 'revenue', label: 'Revenue' },
+                ]}
+            />
             <StatementTable symbol={stock.symbol} />
             <MetricsTable symbol={stock.symbol} />
             <ActualValuesTable symbol={stock.symbol} />
@@ -270,54 +177,7 @@ const StockDetails = () => {
             <AnalystRatingsDetailed symbol={stock.symbol} />
             <InsideTrades symbol={symbol ?? ''} />
 
-            {groupStatements?.incomeStatements &&
-                groupStatements?.balanceSheetStatements &&
-                groupMetrics?.keyMetrics && (
-                    <DetailMetricsTable
-                        stockDetail={{
-                            incomeStatements: groupStatements.incomeStatements,
-                            keyMetrics: groupMetrics.keyMetrics,
-                            balanceSheetStatements: groupStatements.balanceSheetStatements,
-                        }}
-                    />
-                )}
             <StockTable symbol={stock.symbol} />
-            <div className="my-4 flex flex-col gap-y-10 mt-20">
-                <h1 className="text-lg font-semibold text-center">Metrics Graph</h1>
-                <Select
-                    isMulti
-                    options={metricPropertyOptions}
-                    onChange={(selectedOptions) =>
-                        setSelectedMetricProperties(selectedOptions || [])
-                    }
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                    placeholder="Select metric properties to display"
-                    value={selectedMetricProperties}
-                />
-                <div className="h-[300px] w-[800px]">
-                    {metricDatasets.length > 0 && <BarChart mergedDatasets={metricDatasets} />}
-                </div>
-            </div>
-            <div className="my-4 flex flex-col gap-y-10 mt-20">
-                <h1 className="text-lg font-semibold text-center">Statements Graph</h1>
-                <Select
-                    isMulti
-                    options={statementPropertyOptions}
-                    onChange={(selectedOptions) =>
-                        setSelectedStatementProperties(selectedOptions || [])
-                    }
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                    placeholder="Select statement properties to display"
-                    value={selectedStatementProperties}
-                />
-                <div className="h-[300px] w-[800px]">
-                    {statementDatasets.length > 0 && (
-                        <BarChart mergedDatasets={statementDatasets} />
-                    )}
-                </div>
-            </div>
             <News symbol={stock.symbol} />
         </div>
     )
