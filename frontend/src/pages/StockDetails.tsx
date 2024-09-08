@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import BasicInfoTable from '../components/BasicInfoTable'
 import MetricsBarChartWrapper from '../components/MetricsBarChartWrapper'
 import StatementBarChartWrapper from '../components/StatementBarChartWrapper'
@@ -28,6 +28,25 @@ import { delay } from '../helpers/delay'
 const StockDetails = () => {
     const { symbol } = useParams()
     const navigate = useNavigate()
+
+    const [isBasicInfoLoaded, setBasicInfoLoaded] = useState(false)
+    const [isMetricsChartLoaded, setMetricsChartLoaded] = useState(false)
+    const [isStatementsChartLoaded, setStatementsChartLoaded] = useState(false)
+    const [isStatementTableLoaded, setStatementTableLoaded] = useState(false)
+    const [isMetricsTableLoaded, setMetricsTableLoaded] = useState(false)
+    const [isActualValuesTableLoaded, setActualValuesTableLoaded] = useState(false)
+    const [isBalanceSheetLoaded, setBalanceSheetLoaded] = useState(false)
+    const [isCashFlowLoaded, setCashFlowLoaded] = useState(false)
+    const [isIncomeStatementsLoaded, setIncomeStatementsLoaded] = useState(false)
+    const [isIncomeGrowthLoaded, setIncomeGrowthLoaded] = useState(false)
+    const [isKeyMetricsLoaded, setKeyMetricsLoaded] = useState(false)
+    const [isProfitGrowthLoaded, setProfitGrowthLoaded] = useState(false)
+
+    const [isAnalystRatingsSummaryLoaded, setAnalystRatingsSummaryLoaded] = useState(false)
+    const [isAnalystRatingsDetailedLoaded, setAnalystRatingsDetailedLoaded] = useState(false)
+    const [isInsideTradesLoaded, setInsideTradesLoaded] = useState(false)
+    const [isStockTableLoaded, setStockTableLoaded] = useState(false)
+    const [isNewsLoaded, setNewsLoaded] = useState(false)
 
     const {
         data: stock,
@@ -59,12 +78,10 @@ const StockDetails = () => {
         }
     }
 
-    const handleRetryClick = () => {
+    const handleRetryClick = useCallback(() => {
         refetchStock()
         refetchProfile()
-        refetchGroupMetrics()
-        refetchGroupStatements()
-    }
+    }, [refetchStock, refetchProfile])
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -74,7 +91,7 @@ const StockDetails = () => {
         }, 10000) // 10 seconds timeout
 
         return () => clearTimeout(timeout)
-    }, [stockLoading, profileLoading])
+    }, [stockLoading, profileLoading, handleRetryClick])
 
     const getTopButtons = () => (
         <div className="flex w-full p-4 justify-around">
@@ -146,39 +163,103 @@ const StockDetails = () => {
                     </div>
                 </div>
             )}
-            <BasicInfoTable symbol={symbol} />
-            <MetricsBarChartWrapper
-                symbol={symbol || ''}
-                initialSelectedProperties={[
-                    { value: 'freeCashFlowPerShare', label: 'freeCashFlowPerShare' },
-                    { value: 'bookValuePerShare', label: 'bookValuePerShare' },
-                    { value: 'revenuePerShare', label: 'revenuePerShare' },
-                    { value: 'netIncomePerShare', label: 'netIncomePerShare' },
-                ]}
-            />
-            <StatementBarChartWrapper
-                symbol={symbol || ''}
-                initialSelectedProperties={[
-                    { value: 'netIncome', label: 'Net Income' },
-                    { value: 'revenue', label: 'Revenue' },
-                ]}
-            />
-            <StatementTable symbol={stock.symbol} />
-            <MetricsTable symbol={stock.symbol} />
-            <ActualValuesTable symbol={stock.symbol} />
-            <BalanceSheetStatements symbol={symbol} />
-            <CashFlowStatements symbol={symbol} />
-            <IncomeStatements symbol={symbol} />
-            <IncomeGrowthMetrics symbol={symbol} />
-            <KeyMetrics symbol={symbol} />
-            <ProfitGrowthMetrics symbol={symbol} />
-
-            <AnalystRatingsSummary symbol={stock.symbol} />
-            <AnalystRatingsDetailed symbol={stock.symbol} />
-            <InsideTrades symbol={symbol ?? ''} />
-
-            <StockTable symbol={stock.symbol} />
-            <News symbol={stock.symbol} />
+            <BasicInfoTable symbol={symbol} onLoadComplete={() => setBasicInfoLoaded(true)} />
+            {isBasicInfoLoaded && (
+                <MetricsBarChartWrapper
+                    symbol={symbol || ''}
+                    initialSelectedProperties={[
+                        { value: 'freeCashFlowPerShare', label: 'freeCashFlowPerShare' },
+                        { value: 'bookValuePerShare', label: 'bookValuePerShare' },
+                        { value: 'revenuePerShare', label: 'revenuePerShare' },
+                        { value: 'netIncomePerShare', label: 'netIncomePerShare' },
+                    ]}
+                    onLoadComplete={() => setMetricsChartLoaded(true)}
+                />
+            )}
+            {isMetricsChartLoaded && (
+                <StatementBarChartWrapper
+                    symbol={symbol || ''}
+                    initialSelectedProperties={[
+                        { value: 'netIncome', label: 'Net Income' },
+                        { value: 'revenue', label: 'Revenue' },
+                    ]}
+                    onLoadComplete={() => setStatementsChartLoaded(true)}
+                />
+            )}
+            {isStatementsChartLoaded && (
+                <StatementTable
+                    symbol={stock.symbol}
+                    onLoadComplete={() => setStatementTableLoaded(true)}
+                />
+            )}
+            {isStatementTableLoaded && (
+                <MetricsTable
+                    symbol={stock.symbol}
+                    onLoadComplete={() => setMetricsTableLoaded(true)}
+                />
+            )}
+            {isMetricsTableLoaded && (
+                <ActualValuesTable
+                    symbol={stock.symbol}
+                    onLoadComplete={() => setActualValuesTableLoaded(true)}
+                />
+            )}
+            {isActualValuesTableLoaded && (
+                <BalanceSheetStatements
+                    symbol={symbol}
+                    onLoadComplete={() => setBalanceSheetLoaded(true)}
+                />
+            )}
+            {isBalanceSheetLoaded && (
+                <CashFlowStatements
+                    symbol={symbol}
+                    onLoadComplete={() => setCashFlowLoaded(true)}
+                />
+            )}
+            {isCashFlowLoaded && (
+                <IncomeStatements
+                    symbol={symbol}
+                    onLoadComplete={() => setIncomeStatementsLoaded(true)}
+                />
+            )}
+            {isIncomeStatementsLoaded && (
+                <IncomeGrowthMetrics
+                    symbol={symbol}
+                    onLoadComplete={() => setIncomeGrowthLoaded(true)}
+                />
+            )}
+            {isIncomeGrowthLoaded && (
+                <KeyMetrics symbol={symbol} onLoadComplete={() => setKeyMetricsLoaded(true)} />
+            )}
+            {isKeyMetricsLoaded && (
+                <ProfitGrowthMetrics
+                    symbol={symbol}
+                    onLoadComplete={() => setProfitGrowthLoaded(true)}
+                />
+            )}
+            {isProfitGrowthLoaded && (
+                <AnalystRatingsSummary
+                    symbol={stock.symbol}
+                    onLoadComplete={() => setAnalystRatingsSummaryLoaded(true)}
+                />
+            )}
+            {isAnalystRatingsSummaryLoaded && (
+                <AnalystRatingsDetailed
+                    symbol={stock.symbol}
+                    onLoadComplete={() => setAnalystRatingsDetailedLoaded(true)}
+                />
+            )}
+            {isAnalystRatingsDetailedLoaded && (
+                <InsideTrades
+                    symbol={symbol ?? ''}
+                    onLoadComplete={() => setInsideTradesLoaded(true)}
+                />
+            )}
+            {isAnalystRatingsDetailedLoaded && (
+                <News symbol={stock.symbol} onLoadComplete={() => setNewsLoaded(true)} />
+            )}
+            )
+            <StockTable symbol={stock.symbol} onLoadComplete={() => setStockTableLoaded(true)} />
         </div>
     )
 }

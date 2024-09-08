@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useStocksControllerGetIncomeStatementsQuery } from '../services/beGeneratedApi'
 
-const IncomeStatements = ({ symbol }) => {
+const IncomeStatements = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
     const { data, error, isLoading } = useStocksControllerGetIncomeStatementsQuery({
         symbol,
@@ -9,6 +9,12 @@ const IncomeStatements = ({ symbol }) => {
         page: 1,
         limit: 5,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading income statements...</p>

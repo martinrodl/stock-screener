@@ -1,15 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useStocksControllerGetAnalystRatingsQuery } from '../services/beGeneratedApi'
 
 interface AnalystRatingProps {
     symbol: string
 }
 
-const AnalystRatingsSummary: React.FC<AnalystRatingProps> = ({ symbol }) => {
+const AnalystRatingsSummary: React.FC<AnalystRatingProps> = ({ symbol, onLoadComplete }) => {
     const { data, error, isLoading } = useStocksControllerGetAnalystRatingsQuery({
         symbol,
         limit: 5,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading analyst ratings...</p>

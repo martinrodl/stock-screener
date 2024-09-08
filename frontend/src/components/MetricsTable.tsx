@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useStocksControllerGetGroupMetricsQuery } from '../services/beGeneratedApi'
 
-const GroupMetricsTable = ({ symbol }) => {
+const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
     const { data, error, isLoading } = useStocksControllerGetGroupMetricsQuery({
         symbol,
         periodType,
         limit: 5,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading group metrics...</p>

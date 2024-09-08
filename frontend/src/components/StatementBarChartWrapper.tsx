@@ -6,12 +6,14 @@ import { getProperties } from '../helpers/getPropertyData'
 
 interface StatementBarChartWrapperProps {
     symbol: string
-    initialSelectedProperties?: { value: string; label: string }[] // Optional initial selected properties
+    initialSelectedProperties?: { value: string; label: string }[]
+    onLoadComplete: () => void
 }
 
 const StatementBarChartWrapper: React.FC<StatementBarChartWrapperProps> = ({
     symbol,
     initialSelectedProperties,
+    onLoadComplete,
 }) => {
     const [statementDatasets, setStatementDatasets] = useState<any[]>([])
     const [selectedStatementProperties, setSelectedStatementProperties] = useState(
@@ -25,6 +27,12 @@ const StatementBarChartWrapper: React.FC<StatementBarChartWrapperProps> = ({
         isLoading: groupStatementsLoading,
         refetch: refetchGroupStatements,
     } = useStocksControllerGetGroupStatementsQuery({ symbol, periodType: 'annual' })
+
+    useEffect(() => {
+        if (!groupStatementsLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, groupStatementsLoading])
 
     useEffect(() => {
         const extractKeys = (data: any[]) => {

@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useStocksControllerGetPaginatedInsideTradesQuery } from '../services/beGeneratedApi'
 
 interface InsideTradesProps {
     symbol: string
 }
 
-const InsideTrades: React.FC<InsideTradesProps> = ({ symbol }) => {
+const InsideTrades: React.FC<InsideTradesProps> = ({ symbol, onLoadComplete }) => {
     const [page, setPage] = useState(1)
     const limit = 10
 
@@ -14,6 +14,12 @@ const InsideTrades: React.FC<InsideTradesProps> = ({ symbol }) => {
         page,
         limit,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading inside trades...</p>

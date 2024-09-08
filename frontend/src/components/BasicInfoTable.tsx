@@ -1,22 +1,26 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import moment from 'moment'
 import { formatBigNumber } from '../helpers/formatNumber'
 import { useStocksControllerGetStockQuery } from '../services/beGeneratedApi'
 
 interface BasicInfoProps {
     symbol: string
+    onLoadComplete: () => void
 }
 
-const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol }) => {
+const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol, onLoadComplete }) => {
     const {
         data: stock,
         error: stockError,
         isLoading: stockLoading,
     } = useStocksControllerGetStockQuery({ symbol })
 
-    console.log('stock', stock)
+    useEffect(() => {
+        if (!stockLoading) {
+            onLoadComplete()
+        }
+    }, [stockLoading, onLoadComplete])
 
-    // Handle loading and error states
     if (stockLoading) {
         return <p>Loading basic info...</p>
     }
@@ -25,7 +29,6 @@ const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol }) => {
         return <p>Error loading basic info: {String(stockError)}</p>
     }
 
-    // If stock data is not available
     if (!stock || !stock.lastAnnualKeyMetrics) {
         return <p>No basic info available.</p>
     }

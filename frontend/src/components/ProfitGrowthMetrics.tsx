@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useStocksControllerGetProfitGrowthMetricsQuery } from '../services/beGeneratedApi'
 
-const ProfitGrowthMetrics = ({ symbol }) => {
+const ProfitGrowthMetrics = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
     const { data, error, isLoading } = useStocksControllerGetProfitGrowthMetricsQuery({
         symbol,
@@ -9,6 +9,12 @@ const ProfitGrowthMetrics = ({ symbol }) => {
         page: 1,
         limit: 5,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading profit growth metrics...</p>

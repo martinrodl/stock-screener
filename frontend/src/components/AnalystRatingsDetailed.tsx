@@ -1,15 +1,24 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useStocksControllerGetAnalystRatingsDetailedQuery } from '../services/beGeneratedApi'
 
 interface AnalystRatingsDetailedProps {
     symbol: string
 }
 
-const AnalystRatingsDetailed: React.FC<AnalystRatingsDetailedProps> = ({ symbol }) => {
+const AnalystRatingsDetailed: React.FC<AnalystRatingsDetailedProps> = ({
+    symbol,
+    onLoadComplete,
+}) => {
     const { data, error, isLoading } = useStocksControllerGetAnalystRatingsDetailedQuery({
         symbol,
         limit: 5, // Fetch the latest 5 detailed ratings
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading detailed analyst ratings...</p>

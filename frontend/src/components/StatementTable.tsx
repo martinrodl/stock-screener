@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useStocksControllerGetGroupStatementsQuery } from '../services/beGeneratedApi'
 
-const GroupStatementTable = ({ symbol }) => {
+const GroupStatementTable = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
     const { data, error, isLoading } = useStocksControllerGetGroupStatementsQuery({
         symbol,
         periodType,
         limit: 5,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading group statements...</p>

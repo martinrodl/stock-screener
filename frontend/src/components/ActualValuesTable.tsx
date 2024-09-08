@@ -1,8 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useStocksControllerGetStockActualValuesQuery } from '../services/beGeneratedApi'
 
-const ActualValuesTable = ({ symbol }) => {
+const ActualValuesTable = ({ symbol, onLoadComplete }) => {
     const { data, error, isLoading } = useStocksControllerGetStockActualValuesQuery({ symbol })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading actual values...</p>

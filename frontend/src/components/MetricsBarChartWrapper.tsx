@@ -7,11 +7,13 @@ import { getProperties } from '../helpers/getPropertyData'
 interface MetricsBarChartWrapperProps {
     symbol: string
     initialSelectedProperties?: { value: string; label: string }[]
+    onLoadComplete: () => void
 }
 
 const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
     symbol,
     initialSelectedProperties,
+    onLoadComplete,
 }) => {
     const [metricDatasets, setMetricDatasets] = useState<any[]>([])
     const [selectedMetricProperties, setSelectedMetricProperties] = useState(
@@ -25,6 +27,12 @@ const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
         isLoading: groupMetricsLoading,
         refetch: refetchGroupMetrics,
     } = useStocksControllerGetGroupMetricsQuery({ symbol, periodType: 'annual' })
+
+    useEffect(() => {
+        if (!groupMetricsLoading) {
+            onLoadComplete()
+        }
+    }, [groupMetricsLoading, onLoadComplete])
 
     useEffect(() => {
         const extractKeys = (data: any[]) => {

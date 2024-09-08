@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useStocksControllerGetIncomeGrowthMetricsQuery } from '../services/beGeneratedApi'
 
-const IncomeGrowthMetrics = ({ symbol }) => {
+const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
     const { data, error, isLoading } = useStocksControllerGetIncomeGrowthMetricsQuery({
         symbol,
@@ -9,6 +9,12 @@ const IncomeGrowthMetrics = ({ symbol }) => {
         page: 1,
         limit: 5,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading income growth metrics...</p>

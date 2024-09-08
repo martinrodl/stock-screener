@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useStocksControllerGetKeyMetricsQuery } from '../services/beGeneratedApi'
 
-const KeyMetrics = ({ symbol }) => {
+const KeyMetrics = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
     const { data, error, isLoading } = useStocksControllerGetKeyMetricsQuery({
         symbol,
@@ -9,6 +9,12 @@ const KeyMetrics = ({ symbol }) => {
         page: 1,
         limit: 5,
     })
+
+    useEffect(() => {
+        if (!isLoading) {
+            onLoadComplete()
+        }
+    }, [onLoadComplete, isLoading])
 
     if (isLoading) {
         return <p>Loading key metrics...</p>
