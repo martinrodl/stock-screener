@@ -20,13 +20,14 @@ const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
         initialSelectedProperties || []
     )
     const [metricPropertyOptions, setMetricPropertyOptions] = useState<any[]>([])
+    const [periodType, setPeriodType] = useState('annual') // State for period type (annual/quarter)
 
     const {
         data: groupMetrics,
         error: groupMetricsError,
         isLoading: groupMetricsLoading,
-        refetch: refetchGroupMetrics,
-    } = useStocksControllerGetGroupMetricsQuery({ symbol, periodType: 'annual' })
+        refetch: refetchGroupMetrics, // Function to retry fetching data
+    } = useStocksControllerGetGroupMetricsQuery({ symbol, periodType, limit: 10 })
 
     useEffect(() => {
         if (!groupMetricsLoading) {
@@ -70,27 +71,23 @@ const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
     }, [groupMetrics, selectedMetricProperties])
 
     const handleRetry = () => {
-        refetchGroupMetrics()
-    }
-
-    if (groupMetricsLoading) {
-        return <p>Loading metric data...</p>
-    }
-
-    if (groupMetricsError) {
-        return (
-            <div>
-                <p>Error loading metrics data: {String(groupMetricsError)}</p>
-                <button onClick={handleRetry} className="bg-gray-200 p-2 rounded">
-                    Retry
-                </button>
-            </div>
-        )
+        refetchGroupMetrics() // Retry fetching the data when the button is clicked
     }
 
     return (
         <div className="my-4 flex flex-col gap-y-10 mt-20">
-            <h1 className="text-lg font-semibold text-center">Metrics Graph</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-lg font-semibold text-center">Metrics Graph</h1>
+                <select
+                    value={periodType}
+                    onChange={(e) => setPeriodType(e.target.value)} // Switch between annual and quarterly
+                    className="border border-gray-300 rounded p-2"
+                >
+                    <option value="annual">Annual</option>
+                    <option value="quarter">Quarterly</option>
+                </select>
+            </div>
+
             <Select
                 isMulti
                 options={metricPropertyOptions}
@@ -100,8 +97,21 @@ const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
                 placeholder="Select metric properties to display"
                 value={selectedMetricProperties}
             />
+
             <div className="h-[300px] w-[800px]">
-                {metricDatasets.length > 0 ? (
+                {groupMetricsLoading ? (
+                    <p>Loading metric data...</p>
+                ) : groupMetricsError ? (
+                    <div>
+                        <p>Error loading metrics data: {String(groupMetricsError)}</p>
+                        <button
+                            onClick={handleRetry}
+                            className="mt-4 bg-gray-300 p-2 rounded-md text-gray-700"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                ) : metricDatasets.length > 0 ? (
                     <BarChart mergedDatasets={metricDatasets} />
                 ) : (
                     <p>No data available for the selected metrics</p>
