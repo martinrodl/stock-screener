@@ -48,6 +48,10 @@ const StockDetails = () => {
     const [isStockTableLoaded, setStockTableLoaded] = useState(false)
     const [isNewsLoaded, setNewsLoaded] = useState(false)
 
+    // New state for loading spinner
+    const [isUpdating, setIsUpdating] = useState(false)
+    const [isRetrying, setIsRetrying] = useState(false)
+
     const {
         data: stock,
         error: stockError,
@@ -68,19 +72,29 @@ const StockDetails = () => {
         navigate(-1) // Navigates back to the last page in history
     }
 
+    // Handle stock value update
     const handleUpdateButtonClick = async () => {
+        setIsUpdating(true) // Show loader while updating
         try {
             await updateStockValues({ symbol: symbol ?? '', periodType: 'annual' }).unwrap()
             await delay(2000)
             window.location.reload() // Reload the page to fetch updated data
         } catch (error) {
             console.error('Failed to update stock values:', error)
+        } finally {
+            setIsUpdating(false) // Hide loader after updating
         }
     }
 
-    const handleRetryClick = useCallback(() => {
-        refetchStock()
-        refetchProfile()
+    // Retry fetching data
+    const handleRetryClick = useCallback(async () => {
+        setIsRetrying(true) // Show loader while retrying
+        try {
+            await refetchStock()
+            await refetchProfile()
+        } finally {
+            setIsRetrying(false) // Hide loader after retrying
+        }
     }, [refetchStock, refetchProfile])
 
     useEffect(() => {
@@ -104,19 +118,22 @@ const StockDetails = () => {
             <button
                 onClick={handleUpdateButtonClick}
                 className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled={isUpdating}
             >
-                Update Stock Values
+                {isUpdating ? 'Updating...' : 'Update Stock Values'}
             </button>
             <button
                 onClick={handleRetryClick}
                 className="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled={isRetrying}
             >
-                Retry Loading
+                {isRetrying ? 'Retrying...' : 'Retry Loading'}
             </button>
         </div>
     )
 
-    if (stockLoading || profileLoading) {
+    // Show loading spinner during the retry or update process
+    if (stockLoading || profileLoading || isUpdating || isRetrying) {
         return (
             <div>
                 {getTopButtons()}
