@@ -108,6 +108,8 @@ export class FilterService {
   ): any {
     const query: any = {};
 
+    // Handle number criteria
+    const numberConditions: any[] = [];
     numberCriteria?.forEach((criterion) => {
       const { property, condition, value } = criterion;
 
@@ -123,36 +125,51 @@ export class FilterService {
           break;
       }
 
-      if (property.includes('.')) {
-        const [root, nested] = property.split('.');
-        query[`${root}.${nested}`] = matchCondition;
-      } else {
-        query[property] = matchCondition;
-      }
-    });
-
-    stringCriteria?.forEach((criterion) => {
-      const { property, condition, value } = criterion;
-
-      if (value !== null && value !== undefined && value !== '') {
-        switch (condition) {
-          case FilterStringCondition.EQUAL:
-            query[property] = value;
-            break;
-          case FilterStringCondition.NOT_EQUAL:
-            query[property] = { $ne: value };
-            break;
-          default:
-            break;
+      if (matchCondition) {
+        if (property.includes('.')) {
+          const [root, nested] = property.split('.');
+          numberConditions.push({ [`${root}.${nested}`]: matchCondition });
+        } else {
+          numberConditions.push({ [property]: matchCondition });
         }
       }
     });
 
+    // Apply number conditions using $and if there are multiple conditions
+    if (numberConditions.length > 0) {
+      query.$and = query.$and || [];
+      query.$and.push(...numberConditions);
+    }
+
+    // Handle string criteria
+    stringCriteria?.forEach((criterion) => {
+      const { property, condition, value } = criterion;
+
+      if (value !== null && value !== undefined && value !== '') {
+        let stringCondition;
+        switch (condition) {
+          case FilterStringCondition.EQUAL:
+            stringCondition = value;
+            break;
+          case FilterStringCondition.NOT_EQUAL:
+            stringCondition = { $ne: value };
+            break;
+          default:
+            break;
+        }
+
+        if (stringCondition) {
+          query[property] = stringCondition;
+        }
+      }
+    });
+
+    // Handle ratio criteria
     if (ratioCriteria) {
       ratioCriteria.forEach((criterion) => {
         const { numerator, denominator, condition, value } = criterion;
 
-        query['$expr'] = query['$expr'] || { $and: [] };
+        query.$expr = query.$expr || { $and: [] };
         let exprCondition;
 
         switch (condition) {
@@ -188,10 +205,13 @@ export class FilterService {
             break;
         }
 
-        query['$expr']['$and'].push(exprCondition);
+        if (exprCondition) {
+          query.$expr.$and.push(exprCondition);
+        }
       });
     }
 
+    // Handle multi-criteria
     if (multiCriteria) {
       multiCriteria.forEach(({ type, values }) => {
         if (values && values.length > 0) {
