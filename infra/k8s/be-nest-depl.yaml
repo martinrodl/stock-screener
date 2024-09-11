@@ -14,15 +14,15 @@ spec:
         spec:
             containers:
                 - name: be-nest
-                  image: mrodl/stocks-be-nest:0.0.26
+                  image: mrodl/stocks-be-nest:0.0.27
                   imagePullPolicy: Always
                   resources:
                       limits:
                           memory: 8192Mi
-                          cpu: '1'
+                          cpu: '2'
                       requests:
-                          memory: 512Mi
-                          cpu: '0.2'
+                          memory: 2048Mi
+                          cpu: '1'
                   env:
                       - name: MONGO_URI
                         value: 'mongodb://stocks-mongo-srv:27017/nest-stocks'
