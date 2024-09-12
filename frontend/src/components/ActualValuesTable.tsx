@@ -33,7 +33,9 @@ const ActualValuesTable = ({ symbol, onLoadComplete }) => {
                     </tr>
                     <tr>
                         <td className="py-2 px-4 border-b font-semibold">CAPE Ratio</td>
-                        <td className="py-2 px-4 border-b">{actualValues?.capeRatio.toFixed(2)}</td>
+                        <td className="py-2 px-4 border-b">
+                            {actualValues?.capeRatio?.toFixed(2)}
+                        </td>
                     </tr>
                     <tr>
                         <td className="py-2 px-4 border-b font-semibold">
