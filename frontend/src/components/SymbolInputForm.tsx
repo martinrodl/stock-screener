@@ -8,7 +8,7 @@ const SymbolInputForm: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         if (symbol) {
-            navigate(`/stock/${symbol}`)
+            navigate(`/stock/${symbol.toUpperCase()}`)
         }
     }
 
