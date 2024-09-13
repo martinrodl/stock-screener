@@ -28,7 +28,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['stock'], // Ensure the 'stock' reducer is persisted
+    whitelist: ['stock', 'auth'], // Ensure the 'stock' reducer is persisted
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
