@@ -23,7 +23,8 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
         return <p>Error loading group statements: {error.message}</p>
     }
 
-    const statements = data || []
+    // Reverse the order of the statements array
+    const statements = ([...data] || []).reverse()
 
     return (
         <div className="p-4 bg-white shadow rounded-md">
@@ -51,6 +52,15 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Add rows for each property from the API */}
+                        <tr>
+                            <td className="py-2 px-4 border-b">EPS</td>
+                            {statements.map((statement) => (
+                                <td key={statement.date} className="py-2 px-4 border-b">
+                                    {statement.eps?.toFixed(2) || '-'}
+                                </td>
+                            ))}
+                        </tr>
                         <tr>
                             <td className="py-2 px-4 border-b">Revenue</td>
                             {statements.map((statement) => (
@@ -68,14 +78,6 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">Operating Income</td>
-                            {statements.map((statement) => (
-                                <td key={statement.date} className="py-2 px-4 border-b">
-                                    {statement.operatingIncome?.toLocaleString() || '-'}
-                                </td>
-                            ))}
-                        </tr>
-                        <tr>
                             <td className="py-2 px-4 border-b">Net Income</td>
                             {statements.map((statement) => (
                                 <td key={statement.date} className="py-2 px-4 border-b">
@@ -84,18 +86,16 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">EPS</td>
+                            <td className="py-2 px-4 border-b">Operating Margin</td>
                             {statements.map((statement) => (
                                 <td key={statement.date} className="py-2 px-4 border-b">
-                                    {statement.eps?.toFixed(2) || '-'}
-                                </td>
-                            ))}
-                        </tr>
-                        <tr>
-                            <td className="py-2 px-4 border-b">Operating Cash Flow</td>
-                            {statements.map((statement) => (
-                                <td key={statement.date} className="py-2 px-4 border-b">
-                                    {statement.operatingCashFlow?.toLocaleString() || '-'}
+                                    {/* Calculate Operating Margin: (Operating Income / Revenue) * 100 */}
+                                    {statement.operatingIncome && statement.revenue
+                                        ? `${(
+                                              (statement.operatingIncome / statement.revenue) *
+                                              100
+                                          ).toFixed(2)}%`
+                                        : '-'}
                                 </td>
                             ))}
                         </tr>
@@ -124,10 +124,10 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">Total Debt</td>
+                            <td className="py-2 px-4 border-b">Long Term Debt</td>
                             {statements.map((statement) => (
                                 <td key={statement.date} className="py-2 px-4 border-b">
-                                    {statement.totalDebt?.toLocaleString() || '-'}
+                                    {statement.longTermDebt?.toLocaleString() || '-'}
                                 </td>
                             ))}
                         </tr>
@@ -136,6 +136,22 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
                             {statements.map((statement) => (
                                 <td key={statement.date} className="py-2 px-4 border-b">
                                     {statement.netDebt?.toLocaleString() || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        {/* Shareholder Returns */}
+                        <tr>
+                            <td className="py-2 px-4 border-b">Shareholder Returns</td>
+                            {statements.map((statement) => (
+                                <td key={statement.date} className="py-2 px-4 border-b">
+                                    {/* Sum Dividends Paid and Common Stock Repurchased */}
+                                    {statement.dividendsPaid !== undefined &&
+                                    statement.commonStockRepurchased !== undefined
+                                        ? (
+                                              statement.dividendsPaid +
+                                              statement.commonStockRepurchased
+                                          ).toLocaleString()
+                                        : '-'}
                                 </td>
                             ))}
                         </tr>

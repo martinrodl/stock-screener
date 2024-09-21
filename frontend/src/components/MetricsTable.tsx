@@ -6,7 +6,7 @@ const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
     const { data, error, isLoading } = useStocksControllerGetGroupMetricsQuery({
         symbol,
         periodType,
-        limit: 5,
+        limit: 7,
     })
 
     useEffect(() => {
@@ -44,90 +44,106 @@ const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
                         <tr>
                             <th className="py-2 px-4 border-b">Metric</th>
                             {metrics.map((metric) => (
-                                <th key={metric.date} className="py-2 px-4 border-b">
-                                    {new Date(metric.date).toLocaleDateString()}
+                                <th key={metric?.date} className="py-2 px-4 border-b">
+                                    {new Date(metric?.date).toLocaleDateString()}
                                 </th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td className="py-2 px-4 border-b">Revenue Growth</td>
+                            <td className="py-2 px-4 border-b">Revenue per Share</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.growthRevenue * 100).toFixed(2)}%
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.revenuePerShare?.toFixed(2) || 'N/A'}
                                 </td>
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">Operating Income Growth</td>
+                            <td className="py-2 px-4 border-b">Net Income per Share</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.growthOperatingIncome * 100).toFixed(2)}%
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.netIncomePerShare?.toFixed(2) || 'N/A'}
                                 </td>
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">Net Income Growth</td>
+                            <td className="py-2 px-4 border-b">Operating Cash Flow per Share</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.growthNetIncome * 100).toFixed(2)}%
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.operatingCashFlowPerShare?.toFixed(2) || 'N/A'}
                                 </td>
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">EPS Growth</td>
+                            <td className="py-2 px-4 border-b">Free Cash Flow per Share</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.growthEPS * 100).toFixed(2)}%
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.freeCashFlowPerShare?.toFixed(2) || 'N/A'}
                                 </td>
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">Free Cash Flow Growth</td>
+                            <td className="py-2 px-4 border-b">Cash per Share</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.growthFreeCashFlow * 100).toFixed(2)}%
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.cashPerShare?.toFixed(2) || 'N/A'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Book Value per Share</td>
+                            {metrics.map((metric) => (
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.bookValuePerShare?.toFixed(2) || 'N/A'}
                                 </td>
                             ))}
                         </tr>
                         <tr>
                             <td className="py-2 px-4 border-b">PE Ratio</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {metric.peRatio.toFixed(2)}
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.peRatio?.toFixed(2) || 'N/A'}
                                 </td>
                             ))}
                         </tr>
                         <tr>
-                            <td className="py-2 px-4 border-b">ROIC</td>
+                            <td className="py-2 px-4 border-b">Debt to Assets</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.roic * 100).toFixed(2)}%
-                                </td>
-                            ))}
-                        </tr>
-                        <tr>
-                            <td className="py-2 px-4 border-b">ROE</td>
-                            {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.roe * 100).toFixed(2)}%
-                                </td>
-                            ))}
-                        </tr>
-                        <tr>
-                            <td className="py-2 px-4 border-b">Graham Number</td>
-                            {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {metric.grahamNumber.toFixed(2)}
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {(metric?.debtToAssets * 100)?.toFixed(2) || 'N/A'}%
                                 </td>
                             ))}
                         </tr>
                         <tr>
                             <td className="py-2 px-4 border-b">Dividend Yield</td>
                             {metrics.map((metric) => (
-                                <td key={metric.date} className="py-2 px-4 border-b">
-                                    {(metric.dividendYield * 100).toFixed(2)}%
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {(metric?.dividendYield * 100)?.toFixed(2) || 'N/A'}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Graham Number</td>
+                            {metrics.map((metric) => (
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {metric?.grahamNumber?.toFixed(2) || 'N/A'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">ROIC</td>
+                            {metrics.map((metric) => (
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {(metric?.roic * 100)?.toFixed(2) || 'N/A'}%
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">ROE</td>
+                            {metrics.map((metric) => (
+                                <td key={metric?.date} className="py-2 px-4 border-b">
+                                    {(metric?.roe * 100)?.toFixed(2) || 'N/A'}%
                                 </td>
                             ))}
                         </tr>
