@@ -43,28 +43,32 @@ const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">Group Financial Metrics</h2>
                 <div className="flex items-center">
-                    {/* Next Button */}
+                    {/* Pagination Info */}
                     <span className="mr-4">
                         Page {page} of {Math.ceil(total / limit)}
                     </span>
-                    {metrics.length === limit && (
-                        <button
-                            onClick={handleNextPage}
-                            className="mr-4 px-4 py-2 rounded bg-blue-500 text-white"
-                        >
-                            {'<'}
-                        </button>
-                    )}
 
                     {/* Previous Button */}
-                    {page > 1 && (
-                        <button
-                            onClick={handlePreviousPage}
-                            className="mr-4 px-4 py-2 rounded bg-blue-500 text-white"
-                        >
-                            {'>'}
-                        </button>
-                    )}
+                    <button
+                        onClick={handlePreviousPage}
+                        disabled={page === 1}
+                        className={`mr-4 px-4 py-2 rounded bg-blue-500 text-white ${
+                            page === 1 ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                    >
+                        {'<'}
+                    </button>
+
+                    {/* Next Button */}
+                    <button
+                        onClick={handleNextPage}
+                        disabled={page * limit >= total}
+                        className={`mr-4 px-4 py-2 rounded bg-blue-500 text-white ${
+                            page * limit >= total ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                    >
+                        {'>'}
+                    </button>
 
                     <select
                         value={periodType}
@@ -97,6 +101,7 @@ const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
                             </tr>
                         </thead>
                         <tbody>
+                            {/* Rendering all the metrics from the API */}
                             <tr>
                                 <td className="py-2 px-4 border-b whitespace-nowrap">
                                     Revenue per Share
@@ -114,6 +119,46 @@ const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
                                 {metrics.map((metric) => (
                                     <td key={metric?.date} className="py-2 px-4 border-b">
                                         {metric?.netIncomePerShare?.toFixed(2) || 'N/A'}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Operating Cash Flow per Share
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {metric?.operatingCashFlowPerShare?.toFixed(2) || 'N/A'}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Free Cash Flow per Share
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {metric?.freeCashFlowPerShare?.toFixed(2) || 'N/A'}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Cash per Share
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {metric?.cashPerShare?.toFixed(2) || 'N/A'}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Book Value per Share
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {metric?.bookValuePerShare?.toFixed(2) || 'N/A'}
                                     </td>
                                 ))}
                             </tr>
@@ -142,6 +187,81 @@ const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
                                 {metrics.map((metric) => (
                                     <td key={metric?.date} className="py-2 px-4 border-b">
                                         {(metric?.dividendYield * 100)?.toFixed(2) || 'N/A'}%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Graham Number
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {metric?.grahamNumber?.toFixed(2) || 'N/A'}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">ROIC</td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {(metric?.roic * 100)?.toFixed(2) || 'N/A'}%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">ROE</td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {(metric?.roe * 100)?.toFixed(2) || 'N/A'}%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Growth Revenue
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {(metric?.growthRevenue * 100)?.toFixed(2) || 'N/A'}%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Growth Operating Income
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {(metric?.growthOperatingIncome * 100)?.toFixed(2) || 'N/A'}
+                                        %
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Growth Net Income
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {(metric?.growthNetIncome * 100)?.toFixed(2) || 'N/A'}%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">Growth EPS</td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {(metric?.growthEPS * 100)?.toFixed(2) || 'N/A'}%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="py-2 px-4 border-b whitespace-nowrap">
+                                    Growth Free Cash Flow
+                                </td>
+                                {metrics.map((metric) => (
+                                    <td key={metric?.date} className="py-2 px-4 border-b">
+                                        {(metric?.growthFreeCashFlow * 100)?.toFixed(2) || 'N/A'}%
                                     </td>
                                 ))}
                             </tr>

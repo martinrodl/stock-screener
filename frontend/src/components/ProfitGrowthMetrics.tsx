@@ -95,13 +95,12 @@ const ProfitGrowthMetrics = ({ symbol, onLoadComplete }) => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Implementing all properties from the API response */}
                         <tr>
                             <td className="py-2 px-4 border-b">Net Income Growth</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.growthNetIncome !== undefined
-                                        ? (metric.growthNetIncome * 100).toFixed(2) + '%'
-                                        : '-'}
+                                    {(metric.growthNetIncome * 100).toFixed(2) + '%'}
                                 </td>
                             ))}
                         </tr>
@@ -111,11 +110,16 @@ const ProfitGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             </td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.growthDepreciationAndAmortization !== undefined
-                                        ? (metric.growthDepreciationAndAmortization * 100).toFixed(
-                                              2
-                                          ) + '%'
-                                        : '-'}
+                                    {(metric.growthDepreciationAndAmortization * 100).toFixed(2) +
+                                        '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Deferred Income Tax Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthDeferredIncomeTax * 100).toFixed(2) + '%'}
                                 </td>
                             ))}
                         </tr>
@@ -123,10 +127,39 @@ const ProfitGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Stock-Based Compensation Growth</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.growthStockBasedCompensation !== undefined
-                                        ? (metric.growthStockBasedCompensation * 100).toFixed(2) +
-                                          '%'
-                                        : '-'}
+                                    {(metric.growthStockBasedCompensation * 100).toFixed(2) + '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Change in Working Capital Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthChangeInWorkingCapital * 100).toFixed(2) + '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Accounts Receivables Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthAccountsReceivables * 100).toFixed(2) + '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Inventory Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthInventory * 100).toFixed(2) + '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Accounts Payables Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthAccountsPayables * 100).toFixed(2) + '%'}
                                 </td>
                             ))}
                         </tr>
@@ -134,9 +167,7 @@ const ProfitGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Operating Cash Flow Growth</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.growthOperatingCashFlow !== undefined
-                                        ? (metric.growthOperatingCashFlow * 100).toFixed(2) + '%'
-                                        : '-'}
+                                    {(metric.growthOperatingCashFlow * 100).toFixed(2) + '%'}
                                 </td>
                             ))}
                         </tr>
@@ -144,9 +175,7 @@ const ProfitGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Capital Expenditure Growth</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.growthCapitalExpenditure !== undefined
-                                        ? (metric.growthCapitalExpenditure * 100).toFixed(2) + '%'
-                                        : '-'}
+                                    {(metric.growthCapitalExpenditure * 100).toFixed(2) + '%'}
                                 </td>
                             ))}
                         </tr>
@@ -154,9 +183,31 @@ const ProfitGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Free Cash Flow Growth</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.growthFreeCashFlow !== undefined
-                                        ? (metric.growthFreeCashFlow * 100).toFixed(2) + '%'
-                                        : '-'}
+                                    {(metric.growthFreeCashFlow * 100).toFixed(2) + '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Debt Repayment Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthDebtRepayment * 100).toFixed(2) + '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Common Stock Repurchased Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthCommonStockRepurchased * 100).toFixed(2) + '%'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Dividends Paid Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.growthDividendsPaid * 100).toFixed(2) + '%'}
                                 </td>
                             ))}
                         </tr>

@@ -94,13 +94,12 @@ const KeyMetrics = ({ symbol, onLoadComplete }) => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Displaying all the properties from the API response */}
                         <tr>
                             <td className="py-2 px-4 border-b">Revenue Per Share</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.revenuePerShare !== undefined
-                                        ? metric.revenuePerShare.toFixed(2)
-                                        : '-'}
+                                    {metric.revenuePerShare?.toFixed(2) || '-'}
                                 </td>
                             ))}
                         </tr>
@@ -108,9 +107,7 @@ const KeyMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Net Income Per Share</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.netIncomePerShare !== undefined
-                                        ? metric.netIncomePerShare.toFixed(2)
-                                        : '-'}
+                                    {metric.netIncomePerShare?.toFixed(2) || '-'}
                                 </td>
                             ))}
                         </tr>
@@ -118,9 +115,7 @@ const KeyMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Operating Cash Flow Per Share</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.operatingCashFlowPerShare !== undefined
-                                        ? metric.operatingCashFlowPerShare.toFixed(2)
-                                        : '-'}
+                                    {metric.operatingCashFlowPerShare?.toFixed(2) || '-'}
                                 </td>
                             ))}
                         </tr>
@@ -128,9 +123,15 @@ const KeyMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Free Cash Flow Per Share</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.freeCashFlowPerShare !== undefined
-                                        ? metric.freeCashFlowPerShare.toFixed(2)
-                                        : '-'}
+                                    {metric.freeCashFlowPerShare?.toFixed(2) || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Cash Per Share</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.cashPerShare?.toFixed(2) || '-'}
                                 </td>
                             ))}
                         </tr>
@@ -138,9 +139,15 @@ const KeyMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Book Value Per Share</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.bookValuePerShare !== undefined
-                                        ? metric.bookValuePerShare.toFixed(2)
-                                        : '-'}
+                                    {metric.bookValuePerShare?.toFixed(2) || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Tangible Book Value Per Share</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.tangibleBookValuePerShare?.toFixed(2) || '-'}
                                 </td>
                             ))}
                         </tr>
@@ -148,7 +155,7 @@ const KeyMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">PE Ratio</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.peRatio !== undefined ? metric.peRatio.toFixed(2) : '-'}
+                                    {metric.peRatio?.toFixed(2) || '-'}
                                 </td>
                             ))}
                         </tr>
@@ -156,9 +163,63 @@ const KeyMetrics = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Debt to Equity</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
-                                    {metric.debtToEquity !== undefined
-                                        ? metric.debtToEquity.toFixed(2)
-                                        : '-'}
+                                    {metric.debtToEquity?.toFixed(2) || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Price to Sales Ratio</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.priceToSalesRatio?.toFixed(2) || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Price to Free Cash Flow Ratio</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.pfcfRatio?.toFixed(2) || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Graham Number</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.grahamNumber?.toFixed(2) || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">ROE</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.roe * 100).toFixed(2) + '%' || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">ROIC</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.roic * 100).toFixed(2) + '%' || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Debt to Assets</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.debtToAssets * 100).toFixed(2) + '%' || '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Dividend Yield</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {(metric.dividendYield * 100).toFixed(2) + '%' || '-'}
                                 </td>
                             ))}
                         </tr>

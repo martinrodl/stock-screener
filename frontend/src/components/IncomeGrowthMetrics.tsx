@@ -19,7 +19,6 @@ const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
         }
     }, [onLoadComplete, isLoading])
 
-    // Calculate total number of pages
     const total = data?.metrics?.total || 0
     const metrics = data?.metrics?.metrics || []
 
@@ -95,12 +94,13 @@ const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Add rows for each metric from the API response */}
                         <tr>
                             <td className="py-2 px-4 border-b">Revenue Growth</td>
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
                                     {metric.growthRevenue !== undefined
-                                        ? metric.growthRevenue.toFixed(2)
+                                        ? (metric.growthRevenue * 100).toFixed(2) + '%'
                                         : '-'}
                                 </td>
                             ))}
@@ -110,7 +110,7 @@ const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
                                     {metric.growthCostOfRevenue !== undefined
-                                        ? metric.growthCostOfRevenue.toFixed(2)
+                                        ? (metric.growthCostOfRevenue * 100).toFixed(2) + '%'
                                         : '-'}
                                 </td>
                             ))}
@@ -120,7 +120,7 @@ const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
                                     {metric.growthGrossProfit !== undefined
-                                        ? metric.growthGrossProfit.toFixed(2)
+                                        ? (metric.growthGrossProfit * 100).toFixed(2) + '%'
                                         : '-'}
                                 </td>
                             ))}
@@ -130,7 +130,7 @@ const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
                                     {metric.growthOperatingIncome !== undefined
-                                        ? metric.growthOperatingIncome.toFixed(2)
+                                        ? (metric.growthOperatingIncome * 100).toFixed(2) + '%'
                                         : '-'}
                                 </td>
                             ))}
@@ -140,7 +140,7 @@ const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
                                     {metric.growthNetIncome !== undefined
-                                        ? metric.growthNetIncome.toFixed(2)
+                                        ? (metric.growthNetIncome * 100).toFixed(2) + '%'
                                         : '-'}
                                 </td>
                             ))}
@@ -150,7 +150,71 @@ const IncomeGrowthMetrics = ({ symbol, onLoadComplete }) => {
                             {metrics.map((metric) => (
                                 <td key={metric._id} className="py-2 px-4 border-b">
                                     {metric.growthEPS !== undefined
-                                        ? metric.growthEPS.toFixed(2)
+                                        ? (metric.growthEPS * 100).toFixed(2) + '%'
+                                        : '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">
+                                Depreciation & Amortization Growth
+                            </td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.growthDepreciationAndAmortization !== undefined
+                                        ? (metric.growthDepreciationAndAmortization * 100).toFixed(
+                                              2
+                                          ) + '%'
+                                        : '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Interest Expense Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.growthInterestExpense !== undefined
+                                        ? (metric.growthInterestExpense * 100).toFixed(2) + '%'
+                                        : '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Operating Expenses Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.growthOperatingExpenses !== undefined
+                                        ? (metric.growthOperatingExpenses * 100).toFixed(2) + '%'
+                                        : '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Free Cash Flow Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.growthFreeCashFlow !== undefined
+                                        ? (metric.growthFreeCashFlow * 100).toFixed(2) + '%'
+                                        : '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Inventory Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.growthInventory !== undefined
+                                        ? (metric.growthInventory * 100).toFixed(2) + '%'
+                                        : '-'}
+                                </td>
+                            ))}
+                        </tr>
+                        <tr>
+                            <td className="py-2 px-4 border-b">Dividends Paid Growth</td>
+                            {metrics.map((metric) => (
+                                <td key={metric._id} className="py-2 px-4 border-b">
+                                    {metric.growthDividendsPaid !== undefined
+                                        ? (metric.growthDividendsPaid * 100).toFixed(2) + '%'
                                         : '-'}
                                 </td>
                             ))}
