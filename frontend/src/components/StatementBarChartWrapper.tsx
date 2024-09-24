@@ -40,25 +40,26 @@ const StatementBarChartWrapper: React.FC<StatementBarChartWrapperProps> = ({
     }, [onLoadComplete, groupStatementsLoading])
 
     useEffect(() => {
-        const extractKeys = (data: any[]) => {
-            const keys = new Set<string>()
-            data.forEach((item) => {
-                Object.keys(item).forEach((key) => keys.add(key))
-            })
-            return Array.from(keys).filter(
-                (key) => !['date', 'period', 'calendarYear'].includes(key)
-            )
-        }
+        // Make sure to check if groupStatements and groupStatements.statements exist
+        if (groupStatements?.statements) {
+            const extractKeys = (data: any[]) => {
+                const keys = new Set<string>()
+                data.forEach((item) => {
+                    Object.keys(item).forEach((key) => keys.add(key))
+                })
+                return Array.from(keys).filter(
+                    (key) => !['date', 'period', 'calendarYear'].includes(key)
+                )
+            }
 
-        if (groupStatements) {
-            const statementKeys = extractKeys(groupStatements)
+            const statementKeys = extractKeys(groupStatements.statements) // Access statements array
             const statementOptions = statementKeys.map((key) => ({ value: key, label: key }))
             setStatementPropertyOptions(statementOptions)
 
             // If initial properties are set, use them
             if (initialSelectedProperties) {
                 const selectedProperties = getProperties(
-                    groupStatements,
+                    groupStatements.statements,
                     initialSelectedProperties.map((prop) => prop.value)
                 )
                 setStatementDatasets(selectedProperties)
@@ -67,12 +68,12 @@ const StatementBarChartWrapper: React.FC<StatementBarChartWrapperProps> = ({
     }, [groupStatements, initialSelectedProperties])
 
     useEffect(() => {
-        if (groupStatements && selectedStatementProperties.length > 0) {
+        if (groupStatements?.statements && selectedStatementProperties.length > 0) {
             const selectedStatementPropertyNames = selectedStatementProperties.map(
                 (prop) => prop.value
             )
             const selectedStatements = getProperties(
-                groupStatements,
+                groupStatements.statements, // Access statements array
                 selectedStatementPropertyNames
             )
             setStatementDatasets(selectedStatements)

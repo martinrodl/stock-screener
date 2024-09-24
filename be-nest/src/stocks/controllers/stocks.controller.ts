@@ -139,15 +139,23 @@ export class StocksController {
     description: 'Number of statements to return',
     example: 3,
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    example: 1,
+  })
   @Get('groupstatements/:symbol')
   public async getGroupStatements(
     @Param('symbol') identifier: string,
     @Query('periodType') periodType: PeriodType,
+    @Query('page', new DefaultValuePipe(1)) page: number,
     @Query('limit') limit: number = 5,
   ) {
     return this.statementsService.getGroupStatements(
       identifier,
       periodType,
+      page,
       limit,
     );
   }
@@ -172,13 +180,25 @@ export class StocksController {
     description: 'Number of statements to return',
     example: 3,
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    example: 1,
+  })
   @Get('groupmetrics/:symbol')
   public async getGroupMetrics(
     @Param('symbol') identifier: string,
     @Query('periodType') periodType: PeriodType,
+    @Query('page', new DefaultValuePipe(1)) page: number,
     @Query('limit') limit: number = 5,
   ) {
-    return this.metricsService.getGroupMetrics(identifier, periodType, limit);
+    return this.metricsService.getGroupMetrics(
+      identifier,
+      periodType,
+      page,
+      limit,
+    );
   }
 
   @ApiQuery({

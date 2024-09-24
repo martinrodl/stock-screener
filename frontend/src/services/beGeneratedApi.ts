@@ -67,7 +67,11 @@ const injectedRtkApi = api.injectEndpoints({
         >({
             query: (queryArg) => ({
                 url: `/be-nest-stocks/api/stocks/groupstatements/${queryArg['symbol']}`,
-                params: { periodType: queryArg.periodType, limit: queryArg.limit },
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
             }),
         }),
         stocksControllerGetProfile: build.query<
@@ -84,7 +88,11 @@ const injectedRtkApi = api.injectEndpoints({
         >({
             query: (queryArg) => ({
                 url: `/be-nest-stocks/api/stocks/groupmetrics/${queryArg['symbol']}`,
-                params: { periodType: queryArg.periodType, limit: queryArg.limit },
+                params: {
+                    periodType: queryArg.periodType,
+                    page: queryArg.page,
+                    limit: queryArg.limit,
+                },
             }),
         }),
         stocksControllerGetStockNews: build.query<
@@ -593,6 +601,8 @@ export type StocksControllerGetGroupStatementsApiResponse = unknown
 export type StocksControllerGetGroupStatementsApiArg = {
     symbol: string
     periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
     /** Number of statements to return */
     limit?: number
 }
@@ -604,6 +614,8 @@ export type StocksControllerGetGroupMetricsApiResponse = unknown
 export type StocksControllerGetGroupMetricsApiArg = {
     symbol: string
     periodType: 'annual' | 'quarterly'
+    /** Page number for pagination */
+    page?: number
     /** Number of statements to return */
     limit?: number
 }

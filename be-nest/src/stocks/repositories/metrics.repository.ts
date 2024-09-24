@@ -76,7 +76,6 @@ export class MetricsRepository {
   async findKeyMetrics(
     stockId: Types.ObjectId,
     period: PeriodType = PeriodType.ANNUAL,
-    limit = 5,
   ) {
     const periodFilter =
       period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
@@ -84,14 +83,12 @@ export class MetricsRepository {
     return this.keyMetricsModel
       .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
       .sort({ date: -1 }) // Sort by date in descending order
-      .limit(limit) // Limit to the specified number of documents
       .exec();
   }
 
   async findIncomeGrowthMetrics(
     stockId: Types.ObjectId,
     period: PeriodType = PeriodType.ANNUAL,
-    limit = 5,
   ) {
     const periodFilter =
       period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
@@ -99,14 +96,12 @@ export class MetricsRepository {
     return this.incomeGrowthMetricsModel
       .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
       .sort({ date: -1 }) // Sort by date in descending order
-      .limit(limit) // Limit to the specified number of documents
       .exec();
   }
 
   async findProfitGrowthMetrics(
     stockId: Types.ObjectId,
     period: PeriodType = PeriodType.ANNUAL,
-    limit = 5,
   ) {
     const periodFilter =
       period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
@@ -114,7 +109,6 @@ export class MetricsRepository {
     return this.profitGrowthMetricsModel
       .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
       .sort({ date: -1 }) // Sort by date in descending order
-      .limit(limit) // Limit to the specified number of documents
       .exec();
   }
 }

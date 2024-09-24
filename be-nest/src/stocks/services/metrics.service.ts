@@ -237,8 +237,9 @@ export class MetricsService {
   public async getGroupMetrics(
     symbol: string,
     periodType: PeriodType,
+    page: number,
     limit: number = 5,
-  ): Promise<CombinedMetricsDto[]> {
+  ): Promise<{ metrics: CombinedMetricsDto[]; total: number }> {
     const stock = (await this.stocksService.getStock(symbol)) as StockDocument;
     if (!stock) {
       throw new Error(`Stock with symbol ${symbol} not found`);
@@ -247,19 +248,16 @@ export class MetricsService {
     const keyMetrics = await this.metricsRepository.findKeyMetrics(
       stock.id,
       periodType,
-      limit,
     );
     const incomeGrowthMetrics =
       await this.metricsRepository.findIncomeGrowthMetrics(
         stock.id,
         periodType,
-        limit,
       );
     const profitGrowthMetrics =
       await this.metricsRepository.findProfitGrowthMetrics(
         stock.id,
         periodType,
-        limit,
       );
 
     const filteredKeyMetrics = plainToClass(KeyMetricDto, keyMetrics, {
@@ -288,9 +286,12 @@ export class MetricsService {
       filteredProfitGrowthMetrics,
     );
 
-    return plainToClass(CombinedMetricsDto, mergedMetrics, {
-      excludeExtraneousValues: true,
-    }).slice(0, 10);
+    return {
+      metrics: plainToClass(CombinedMetricsDto, mergedMetrics, {
+        excludeExtraneousValues: true,
+      }).slice((page - 1) * limit, page * limit),
+      total: mergedMetrics.length,
+    };
   }
 
   private mergeMetrics(
@@ -334,7 +335,6 @@ export class MetricsService {
     const metrics = await this.metricsRepository.findIncomeGrowthMetrics(
       stockId,
       periodType,
-      limit,
     );
 
     return {
@@ -357,7 +357,6 @@ export class MetricsService {
     const metrics = await this.metricsRepository.findKeyMetrics(
       stockId,
       periodType,
-      limit,
     );
 
     return {
@@ -381,7 +380,6 @@ export class MetricsService {
     const metrics = await this.metricsRepository.findProfitGrowthMetrics(
       stockId,
       periodType,
-      limit,
     );
 
     return {

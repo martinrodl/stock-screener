@@ -27,7 +27,9 @@ const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
         error: groupMetricsError,
         isLoading: groupMetricsLoading,
         refetch: refetchGroupMetrics, // Function to retry fetching data
-    } = useStocksControllerGetGroupMetricsQuery({ symbol, periodType, limit: 10 })
+    } = useStocksControllerGetGroupMetricsQuery({ symbol, periodType, limit: 10, page: 1 })
+
+    console.log('groupMetrics', groupMetrics)
 
     useEffect(() => {
         if (!groupMetricsLoading) {
@@ -36,36 +38,38 @@ const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
     }, [groupMetricsLoading, onLoadComplete])
 
     useEffect(() => {
-        const extractKeys = (data: any[]) => {
-            const keys = new Set<string>()
-            data.forEach((item) => {
-                Object.keys(item).forEach((key) => keys.add(key))
-            })
-            return Array.from(keys).filter(
-                (key) => !['date', 'period', 'calendarYear'].includes(key)
-            )
-        }
+        if (groupMetrics?.metrics) {
+            const extractKeys = (data: any[]) => {
+                const keys = new Set<string>()
+                data.forEach((item) => {
+                    Object.keys(item).forEach((key) => keys.add(key))
+                })
+                return Array.from(keys).filter(
+                    (key) => !['date', 'period', 'calendarYear'].includes(key)
+                )
+            }
 
-        if (groupMetrics) {
-            const metricKeys = extractKeys(groupMetrics)
+            const metricKeys = extractKeys(groupMetrics.metrics)
             const metricOptions = metricKeys.map((key) => ({ value: key, label: key }))
             setMetricPropertyOptions(metricOptions)
 
             // If initial properties are set, use them
             if (initialSelectedProperties) {
                 const selectedProperties = getProperties(
-                    groupMetrics,
+                    groupMetrics.metrics,
                     initialSelectedProperties.map((prop) => prop.value)
                 )
+                console.log('selectedProperties', selectedProperties)
+                console.log(' groupMetrics.metrics ', groupMetrics.metrics)
                 setMetricDatasets(selectedProperties)
             }
         }
     }, [groupMetrics, initialSelectedProperties])
 
     useEffect(() => {
-        if (groupMetrics && selectedMetricProperties.length > 0) {
+        if (groupMetrics?.metrics && selectedMetricProperties.length > 0) {
             const selectedMetricPropertyNames = selectedMetricProperties.map((prop) => prop.value)
-            const selectedMetrics = getProperties(groupMetrics, selectedMetricPropertyNames)
+            const selectedMetrics = getProperties(groupMetrics.metrics, selectedMetricPropertyNames)
             setMetricDatasets(selectedMetrics)
         }
     }, [groupMetrics, selectedMetricProperties])
@@ -73,6 +77,8 @@ const MetricsBarChartWrapper: React.FC<MetricsBarChartWrapperProps> = ({
     const handleRetry = () => {
         refetchGroupMetrics() // Retry fetching the data when the button is clicked
     }
+
+    console.log('metricDatasets', metricDatasets)
 
     return (
         <div className="my-4 flex flex-col gap-y-10 mt-20">

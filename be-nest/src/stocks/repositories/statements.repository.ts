@@ -81,7 +81,6 @@ export class StatementsRepository {
   async findCashFlowStatements(
     stockId: Types.ObjectId,
     period: PeriodType = PeriodType.ANNUAL,
-    limit = 5,
   ): Promise<CashFlowStatement[]> {
     const periodFilter =
       period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
@@ -89,14 +88,12 @@ export class StatementsRepository {
     return this.cashFlowStatementModel
       .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
       .sort({ date: -1 }) // Sort by date in descending order
-      .limit(limit) // Limit to the specified number of documents
       .exec();
   }
 
   async findBalanceSheetStatements(
     stockId: Types.ObjectId,
     period: PeriodType = PeriodType.ANNUAL,
-    limit = 5,
   ): Promise<BalanceSheetStatement[]> {
     const periodFilter =
       period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
@@ -104,14 +101,12 @@ export class StatementsRepository {
     return this.balanceSheetStatementModel
       .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
       .sort({ date: -1 }) // Sort by date in descending order
-      .limit(limit) // Limit to the specified number of documents
       .exec();
   }
 
   async findIncomeStatements(
     stockId: Types.ObjectId,
     period: PeriodType = PeriodType.ANNUAL,
-    limit = 5,
   ): Promise<IncomeStatement[]> {
     const periodFilter =
       period === 'annual' ? 'FY' : { $in: ['Q1', 'Q2', 'Q3', 'Q4'] };
@@ -119,7 +114,6 @@ export class StatementsRepository {
     return this.incomeStatementModel
       .find({ stock: new Types.ObjectId(stockId), period: periodFilter })
       .sort({ date: -1 }) // Sort by date in descending order
-      .limit(limit) // Limit to the specified number of documents
       .exec();
   }
 }

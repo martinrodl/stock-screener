@@ -3,17 +3,31 @@ import { useStocksControllerGetGroupStatementsQuery } from '../services/beGenera
 
 const GroupStatementTable = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
+    const [page, setPage] = useState(1) // State for tracking current page
     const { data, error, isLoading } = useStocksControllerGetGroupStatementsQuery({
         symbol,
         periodType,
-        limit: 5,
+        page,
+        limit: 5, // Limit per page
     })
 
     useEffect(() => {
-        if (!isLoading) {
+        if (!isLoading && data?.statements?.length) {
             onLoadComplete()
         }
-    }, [onLoadComplete, isLoading])
+    }, [data, isLoading, onLoadComplete])
+
+    const handlePrevious = () => {
+        if (page > 1) {
+            setPage((prevPage) => prevPage - 1)
+        }
+    }
+
+    const handleNext = () => {
+        if (data?.statements?.length === 5) {
+            setPage((prevPage) => prevPage + 1)
+        }
+    }
 
     if (isLoading) {
         return <p>Loading group statements...</p>
@@ -24,35 +38,63 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
     }
 
     // Reverse the order of the statements array
-    const statements = ([...data] || []).reverse()
+    const statements = ([...(data?.statements ?? [])] || []).reverse()
 
     return (
         <div className="p-4 bg-white shadow rounded-md">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">Group Financial Statements</h2>
-                <select
-                    value={periodType}
-                    onChange={(e) => setPeriodType(e.target.value)}
-                    className="border border-gray-300 rounded p-2"
-                >
-                    <option value="annual">Annual</option>
-                    <option value="quarter">Quarterly</option>
-                </select>
+                <div className="flex items-center">
+                    {/* Next Button */}
+                    {statements.length === 5 && (
+                        <button
+                            onClick={handleNext}
+                            className="mr-4 px-4 py-2 rounded bg-blue-500 text-white"
+                        >
+                            {'<'}
+                        </button>
+                    )}
+
+                    {/* Previous Button */}
+                    {page > 1 && (
+                        <button
+                            onClick={handlePrevious}
+                            className="mr-4 px-4 py-2 rounded bg-blue-500 text-white"
+                        >
+                            {'>'}
+                        </button>
+                    )}
+
+                    <select
+                        value={periodType}
+                        onChange={(e) => {
+                            setPeriodType(e.target.value)
+                            setPage(1) // Reset page when periodType changes
+                        }}
+                        className="border border-gray-300 rounded p-2"
+                    >
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarterly</option>
+                    </select>
+                </div>
             </div>
+
             {statements.length > 0 ? (
                 <table className="min-w-full bg-white border">
                     <thead>
                         <tr>
-                            <th className="py-2 px-4 border-b">Metric</th>
+                            <th className="py-2 px-4 border-b whitespace-nowrap">Metric</th>
                             {statements.map((statement) => (
-                                <th key={statement.date} className="py-2 px-4 border-b">
+                                <th
+                                    key={statement.date}
+                                    className="py-2 px-4 border-b whitespace-nowrap overflow-hidden text-ellipsis"
+                                >
                                     {new Date(statement.date).toLocaleDateString()}
                                 </th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
-                        {/* Add rows for each property from the API */}
                         <tr>
                             <td className="py-2 px-4 border-b">EPS</td>
                             {statements.map((statement) => (
@@ -89,7 +131,6 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
                             <td className="py-2 px-4 border-b">Operating Margin</td>
                             {statements.map((statement) => (
                                 <td key={statement.date} className="py-2 px-4 border-b">
-                                    {/* Calculate Operating Margin: (Operating Income / Revenue) * 100 */}
                                     {statement.operatingIncome && statement.revenue
                                         ? `${(
                                               (statement.operatingIncome / statement.revenue) *
@@ -139,12 +180,10 @@ const GroupStatementTable = ({ symbol, onLoadComplete }) => {
                                 </td>
                             ))}
                         </tr>
-                        {/* Shareholder Returns */}
                         <tr>
                             <td className="py-2 px-4 border-b">Shareholder Returns</td>
                             {statements.map((statement) => (
                                 <td key={statement.date} className="py-2 px-4 border-b">
-                                    {/* Sum Dividends Paid and Common Stock Repurchased */}
                                     {statement.dividendsPaid !== undefined &&
                                     statement.commonStockRepurchased !== undefined
                                         ? (
