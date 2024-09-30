@@ -4,6 +4,7 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './store'
 import AppRoutes from './navigation'
 import { AuthProvider } from './contexts/AuthContext'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
     return (
@@ -11,7 +12,9 @@ function App() {
             <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
                 <BrowserRouter>
                     <AuthProvider>
-                        <AppRoutes />
+                        <ErrorBoundary>
+                            <AppRoutes />
+                        </ErrorBoundary>
                     </AuthProvider>
                 </BrowserRouter>
             </PersistGate>

@@ -1,5 +1,5 @@
+import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEffect, useState, useCallback } from 'react'
 import BasicInfoTable from '../components/BasicInfoTable'
 import MetricsBarChartWrapper from '../components/MetricsBarChartWrapper'
 import StatementBarChartWrapper from '../components/StatementBarChartWrapper'
@@ -17,6 +17,7 @@ import IncomeStatements from '../components/IncomeStatements'
 import IncomeGrowthMetrics from '../components/IncomeGrowthMetrics'
 import KeyMetrics from '../components/KeyMetrics'
 import ProfitGrowthMetrics from '../components/ProfitGrowthMetrics'
+import ErrorBoundary from '../components/ErrorBoundary' // Import the ErrorBoundary
 
 import {
     useStocksControllerGetStockQuery,
@@ -48,7 +49,6 @@ const StockDetails = () => {
     const [isStockTableLoaded, setStockTableLoaded] = useState(false)
     const [isNewsLoaded, setNewsLoaded] = useState(false)
 
-    // New state for loading spinner
     const [isUpdating, setIsUpdating] = useState(false)
     const [isRetrying, setIsRetrying] = useState(false)
 
@@ -69,31 +69,29 @@ const StockDetails = () => {
     const [updateStockValues] = useStocksControllerUpdateStockValuesMutation()
 
     const handleBackButtonClick = () => {
-        navigate(-1) // Navigates back to the last page in history
+        navigate(-1)
     }
 
-    // Handle stock value update
     const handleUpdateButtonClick = async () => {
-        setIsUpdating(true) // Show loader while updating
+        setIsUpdating(true)
         try {
             await updateStockValues({ symbol: symbol ?? '', periodType: 'annual' }).unwrap()
             await delay(2000)
-            window.location.reload() // Reload the page to fetch updated data
+            window.location.reload()
         } catch (error) {
             console.error('Failed to update stock values:', error)
         } finally {
-            setIsUpdating(false) // Hide loader after updating
+            setIsUpdating(false)
         }
     }
 
-    // Retry fetching data
     const handleRetryClick = useCallback(async () => {
-        setIsRetrying(true) // Show loader while retrying
+        setIsRetrying(true)
         try {
             await refetchStock()
             await refetchProfile()
         } finally {
-            setIsRetrying(false) // Hide loader after retrying
+            setIsRetrying(false)
         }
     }, [refetchStock, refetchProfile])
 
@@ -102,7 +100,7 @@ const StockDetails = () => {
             if (stockLoading || profileLoading) {
                 handleRetryClick()
             }
-        }, 10000) // 10 seconds timeout
+        }, 10000)
 
         return () => clearTimeout(timeout)
     }, [stockLoading, profileLoading, handleRetryClick])
@@ -132,7 +130,6 @@ const StockDetails = () => {
         </div>
     )
 
-    // Show loading spinner during the retry or update process
     if (stockLoading || profileLoading || isUpdating || isRetrying) {
         return (
             <div>
@@ -180,103 +177,140 @@ const StockDetails = () => {
                     </div>
                 </div>
             )}
-            <BasicInfoTable symbol={symbol} onLoadComplete={() => setBasicInfoLoaded(true)} />
+            <ErrorBoundary>
+                <BasicInfoTable symbol={symbol} onLoadComplete={() => setBasicInfoLoaded(true)} />
+            </ErrorBoundary>
             {isBasicInfoLoaded && (
-                <MetricsBarChartWrapper
-                    symbol={symbol || ''}
-                    initialSelectedProperties={[
-                        { value: 'freeCashFlowPerShare', label: 'freeCashFlowPerShare' },
-                        { value: 'bookValuePerShare', label: 'bookValuePerShare' },
-                        { value: 'revenuePerShare', label: 'revenuePerShare' },
-                        { value: 'netIncomePerShare', label: 'netIncomePerShare' },
-                    ]}
-                    onLoadComplete={() => setMetricsChartLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <MetricsBarChartWrapper
+                        symbol={symbol || ''}
+                        initialSelectedProperties={[
+                            { value: 'freeCashFlowPerShare', label: 'freeCashFlowPerShare' },
+                            { value: 'bookValuePerShare', label: 'bookValuePerShare' },
+                            { value: 'revenuePerShare', label: 'revenuePerShare' },
+                            { value: 'netIncomePerShare', label: 'netIncomePerShare' },
+                        ]}
+                        onLoadComplete={() => setMetricsChartLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isMetricsChartLoaded && (
-                <StatementBarChartWrapper
-                    symbol={symbol || ''}
-                    initialSelectedProperties={[
-                        { value: 'netIncome', label: 'Net Income' },
-                        { value: 'revenue', label: 'Revenue' },
-                    ]}
-                    onLoadComplete={() => setStatementsChartLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <StatementBarChartWrapper
+                        symbol={symbol || ''}
+                        initialSelectedProperties={[
+                            { value: 'netIncome', label: 'Net Income' },
+                            { value: 'revenue', label: 'Revenue' },
+                        ]}
+                        onLoadComplete={() => setStatementsChartLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isStatementsChartLoaded && (
-                <StatementTable
-                    symbol={stock.symbol}
-                    onLoadComplete={() => setStatementTableLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <StatementTable
+                        symbol={stock.symbol}
+                        onLoadComplete={() => setStatementTableLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isStatementTableLoaded && (
-                <MetricsTable
-                    symbol={stock.symbol}
-                    onLoadComplete={() => setMetricsTableLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <MetricsTable
+                        symbol={stock.symbol}
+                        onLoadComplete={() => setMetricsTableLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isMetricsTableLoaded && (
-                <ActualValuesTable
-                    symbol={stock.symbol}
-                    onLoadComplete={() => setActualValuesTableLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <ActualValuesTable
+                        symbol={stock.symbol}
+                        onLoadComplete={() => setActualValuesTableLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isActualValuesTableLoaded && (
-                <BalanceSheetStatements
-                    symbol={symbol}
-                    onLoadComplete={() => setBalanceSheetLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <BalanceSheetStatements
+                        symbol={symbol}
+                        onLoadComplete={() => setBalanceSheetLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isBalanceSheetLoaded && (
-                <CashFlowStatements
-                    symbol={symbol}
-                    onLoadComplete={() => setCashFlowLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <CashFlowStatements
+                        symbol={symbol}
+                        onLoadComplete={() => setCashFlowLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isCashFlowLoaded && (
-                <IncomeStatements
-                    symbol={symbol}
-                    onLoadComplete={() => setIncomeStatementsLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <IncomeStatements
+                        symbol={symbol}
+                        onLoadComplete={() => setIncomeStatementsLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isIncomeStatementsLoaded && (
-                <IncomeGrowthMetrics
-                    symbol={symbol}
-                    onLoadComplete={() => setIncomeGrowthLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <IncomeGrowthMetrics
+                        symbol={symbol}
+                        onLoadComplete={() => setIncomeGrowthLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isIncomeGrowthLoaded && (
-                <KeyMetrics symbol={symbol} onLoadComplete={() => setKeyMetricsLoaded(true)} />
+                <ErrorBoundary>
+                    <KeyMetrics symbol={symbol} onLoadComplete={() => setKeyMetricsLoaded(true)} />
+                </ErrorBoundary>
             )}
             {isKeyMetricsLoaded && (
-                <ProfitGrowthMetrics
-                    symbol={symbol}
-                    onLoadComplete={() => setProfitGrowthLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <ProfitGrowthMetrics
+                        symbol={symbol}
+                        onLoadComplete={() => setProfitGrowthLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isProfitGrowthLoaded && (
-                <AnalystRatingsSummary
-                    symbol={stock.symbol}
-                    onLoadComplete={() => setAnalystRatingsSummaryLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <AnalystRatingsSummary
+                        symbol={stock.symbol}
+                        onLoadComplete={() => setAnalystRatingsSummaryLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isAnalystRatingsSummaryLoaded && (
-                <AnalystRatingsDetailed
-                    symbol={stock.symbol}
-                    onLoadComplete={() => setAnalystRatingsDetailedLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <AnalystRatingsDetailed
+                        symbol={stock.symbol}
+                        onLoadComplete={() => setAnalystRatingsDetailedLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isAnalystRatingsDetailedLoaded && (
-                <InsideTrades
-                    symbol={symbol ?? ''}
-                    onLoadComplete={() => setInsideTradesLoaded(true)}
-                />
+                <ErrorBoundary>
+                    <InsideTrades
+                        symbol={symbol ?? ''}
+                        onLoadComplete={() => setInsideTradesLoaded(true)}
+                    />
+                </ErrorBoundary>
             )}
             {isAnalystRatingsDetailedLoaded && (
-                <News symbol={stock.symbol} onLoadComplete={() => setNewsLoaded(true)} />
+                <ErrorBoundary>
+                    <News symbol={stock.symbol} onLoadComplete={() => setNewsLoaded(true)} />
+                </ErrorBoundary>
             )}
             )
-            <StockTable symbol={stock.symbol} onLoadComplete={() => setStockTableLoaded(true)} />
+            <ErrorBoundary>
+                <StockTable
+                    symbol={stock.symbol}
+                    onLoadComplete={() => setStockTableLoaded(true)}
+                />
+            </ErrorBoundary>
         </div>
     )
 }
