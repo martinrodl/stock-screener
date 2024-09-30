@@ -164,8 +164,9 @@ const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol, onLoadComplete }) =>
         {
             key: 'similarCompanies',
             label: 'Similar Companies',
-            format: (companies: string[]) =>
-                companies
+            format: (companies: string[]) => {
+                if (!companies || companies.length === 0) return 'N/A' // Handle empty array
+                return companies
                     .map((company, index) => (
                         <Link
                             to={`/stock/${company}`}
@@ -177,7 +178,8 @@ const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol, onLoadComplete }) =>
                             {company}
                         </Link>
                     ))
-                    .reduce((prev, curr) => [prev, ', ', curr]), // Add ", " between links
+                    .reduce((prev, curr) => [prev, ', ', curr], []) // Provide initial value []
+            },
             value: stock.actualValues?.similarCompanies,
             isWide: true, // Custom flag to indicate this row should span two columns
         },
@@ -219,10 +221,11 @@ const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol, onLoadComplete }) =>
             }
         }
 
-        // Check if this is the Similar Companies row and adjust styles
-        const isSimilarCompanies = key === 'similarCompanies'
-        const labelWidth = isSimilarCompanies ? '18%' : '70%'
-        const valueWidth = isSimilarCompanies ? '82%' : '30%'
+        // Ensure we handle `null` values gracefully
+        const formattedValue = rowValue !== null ? format(rowValue) : 'N/A'
+
+        const labelWidth = isWide ? '18%' : '70%'
+        const valueWidth = isWide ? '82%' : '30%'
 
         return (
             <div
@@ -238,7 +241,7 @@ const BasicInfoTable: React.FC<BasicInfoProps> = ({ symbol, onLoadComplete }) =>
                     className="inline-block text-sm font-normal truncate ml-2"
                     style={{ width: valueWidth }}
                 >
-                    {rowValue !== null ? format(rowValue) : 'N/A'}
+                    {formattedValue}
                 </span>
             </div>
         )
