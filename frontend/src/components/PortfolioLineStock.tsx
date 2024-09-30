@@ -24,9 +24,7 @@ export const PortfolioLineStock = ({
                         Market Cap: ${stock.marketCap?.toLocaleString()}
                     </span>
                     <div className="w-30 flex flex-start">
-                        <span className="text-gray-500">
-                            P/E Ratio: {stock.peRatio?.toFixed(2)}
-                        </span>
+                        <span className="text-gray-500">P/E Ratio: {stock.pe?.toFixed(2)}</span>
                     </div>
                 </div>
             </Link>

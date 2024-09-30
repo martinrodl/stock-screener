@@ -21,6 +21,8 @@ const CreateFilter = () => {
     const navigate = useNavigate()
     const { filterId, pageNumber } = useParams<{ filterId?: string; pageNumber?: string }>()
     const [page, setPage] = useState<number>(Number(pageNumber) || 1)
+
+    // Fetch filter details and stocks
     const { data: filter, refetch: refetchFilter } = useFilterControllerFindOneQuery({
         id: filterId || '',
     })
@@ -30,8 +32,12 @@ const CreateFilter = () => {
     const [updateFilter] = useFilterControllerUpdateMutation()
     const [createFilter] = useFilterControllerCreateMutation()
     const [deleteFilter] = useFilterControllerRemoveMutation()
-    const stocks = useSelector((state: RootState) => state.stock.simpleResults)
 
+    // Fetch stocks from the store
+    const stocks = useSelector((state: RootState) => state.stock.simpleResults.stocks || [])
+    const totalResults = useSelector((state: RootState) => state.stock.simpleResults.total || 0)
+
+    // Handle fetching stocks when filter or page changes
     useEffect(() => {
         if (filter) {
             fetchStocks({
@@ -43,33 +49,44 @@ const CreateFilter = () => {
                     name: filter.name,
                     user: '', // user will be taken from the token
                 },
-                skip: (page - 1) * pageSize,
-                limit: pageSize,
+                page, // Correctly pass the page argument
+                limit: pageSize, // Limit per page
             })
         }
     }, [filter, page, fetchStocks])
 
+    // Update store with fetched data
     useEffect(() => {
         if (data) {
             dispatch(setSimpleResults(data))
         }
     }, [data, dispatch])
 
+    // Pagination handlers
     const handlePreviousPage = () => {
         setPage((currentPage) => Math.max(currentPage - 1, 1))
     }
 
     const handleNextPage = () => {
-        setPage((currentPage) => currentPage + 1)
+        const maxPage = Math.ceil(totalResults / pageSize)
+        setPage((currentPage) => Math.min(currentPage + 1, maxPage))
     }
 
+    // Pagination Controls
     const renderPagesButtons = () => {
+        const maxPage = Math.ceil(totalResults / pageSize)
+
         return (
             <div className="flex-1 flex justify-between mb-3">
                 <button onClick={handlePreviousPage} disabled={page === 1}>
                     Previous page
                 </button>
-                <button onClick={handleNextPage}>Next page</button>
+                <span>
+                    Page {page} of {maxPage}
+                </span>
+                <button onClick={handleNextPage} disabled={page >= maxPage}>
+                    Next page
+                </button>
             </div>
         )
     }
@@ -107,8 +124,8 @@ const CreateFilter = () => {
                 multiCriteria: criteria.multiCriteria,
                 name: criteria.name,
             },
-            skip: 0,
-            limit: pageSize,
+            page, // Pass the current page
+            limit: pageSize, // Limit per page
         })
     }
 
@@ -129,16 +146,16 @@ const CreateFilter = () => {
             <DynamicFilterForm
                 onSubmit={handleApplyFilter}
                 onSave={handleSaveFilter}
-                onDelete={handleDeleteFilter} // Pass handleDeleteFilter as onDelete prop
+                onDelete={handleDeleteFilter}
                 filter={filter}
-                filterId={filterId} // Pass the filterId here
+                filterId={filterId}
             />
             <div className="mt-6">
                 {isLoading && <h2 className="my-2">Loading...</h2>}
                 {error && <h2>Error: {String(error)}</h2>}
                 {stocks && !stocks.length && <h2>No stocks found</h2>}
                 {renderPagesButtons()}
-                {stocks && stocks.length && renderStocks(stocks)}
+                {stocks && stocks.length > 0 && renderStocks(stocks)}
                 {renderPagesButtons()}
             </div>
         </div>

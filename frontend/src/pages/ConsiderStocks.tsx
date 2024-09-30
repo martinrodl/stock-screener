@@ -29,6 +29,8 @@ const ConsiderStocks = () => {
         await refetch()
     }
 
+    console.log('stocks ', stocks)
+
     const renderStocks = (stocks) => {
         return stocks.map((stock, index) => (
             <PortfolioLineStock

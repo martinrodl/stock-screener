@@ -301,6 +301,7 @@ const injectedRtkApi = api.injectEndpoints({
                 url: `/be-nest-stocks/api/filters/apply-direct`,
                 method: 'POST',
                 body: queryArg.createFilterDto,
+                params: { page: queryArg.page, limit: queryArg.limit },
             }),
         }),
         filterControllerCreate: build.mutation<
@@ -749,6 +750,10 @@ export type FilterControllerGetIndustriesApiArg = void
 export type FilterControllerApplyFilterDirectlyApiResponse =
     /** status 200 Return the stocks matching the filter criteria */ Stock[]
 export type FilterControllerApplyFilterDirectlyApiArg = {
+    /** Page number for pagination */
+    page?: number
+    /** Number of metrics to return per page */
+    limit?: number
     /** The filter data to apply directly */
     createFilterDto: CreateFilterDto
 }

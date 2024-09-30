@@ -90,14 +90,29 @@ export class FilterService {
     stringCriteria?: StringFilterCriteriaDto[],
     ratioCriteria?: RatioCriteriaDto[],
     multiCriteria?: MultiCriteriaDto[],
-  ): Promise<Stock[]> {
+    page = 1,
+    limit = 20,
+  ): Promise<{ stocks: Stock[]; total: number }> {
     const query = this.buildQueryFromCriteria(
       numberCriteria,
       stringCriteria,
       ratioCriteria,
       multiCriteria,
     );
-    return this.stocksRepository.findAll(query);
+    // Fetch all matching stocks
+    const allStocks = await this.stocksRepository.findAll(query);
+
+    // Calculate the total number of stocks
+    const total = allStocks.length;
+
+    // Apply pagination (slice the results based on the page and limit)
+    const paginatedStocks = allStocks.slice((page - 1) * limit, page * limit);
+
+    // Return the paginated stocks and the total count
+    return {
+      stocks: paginatedStocks,
+      total,
+    };
   }
 
   private buildQueryFromCriteria(

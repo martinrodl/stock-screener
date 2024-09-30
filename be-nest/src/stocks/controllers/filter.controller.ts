@@ -8,6 +8,7 @@ import {
   Put,
   UseGuards,
   Req,
+  Query,
   HttpCode,
   HttpStatus,
   ForbiddenException,
@@ -17,6 +18,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBody,
+  ApiQuery,
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
@@ -83,6 +85,18 @@ export class FilterController {
     type: CreateFilterDto,
     description: 'The filter data to apply directly',
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of metrics to return per page',
+    example: 10,
+  })
   @ApiResponse({
     status: 200,
     description: 'Return the stocks matching the filter criteria',
@@ -91,12 +105,16 @@ export class FilterController {
   async applyFilterDirectly(
     @Req() req: CustomRequest,
     @Body() applyFilterDto: ApplyFilterDto,
-  ): Promise<Stock[]> {
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 20,
+  ): Promise<{ stocks: Stock[]; total: number }> {
     return this.filterService.applyFilterDirectly(
       applyFilterDto.numberCriteria,
       applyFilterDto.stringCriteria,
       applyFilterDto.ratioCriteria,
       applyFilterDto.multiCriteria,
+      page,
+      limit,
     );
   }
 

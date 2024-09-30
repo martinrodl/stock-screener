@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useNavigate } from 'react-router-dom'
-
 import SimpleStockFilterForm from '../components/SimpleStockFilterForm'
 import { Stock } from '../types/Stock'
 import { SimpleStockCriteria } from '../types/StockCriteria'
@@ -19,14 +18,15 @@ const SimpleStockList = () => {
     const [page, setPage] = useState<number>(Number(pageNumber) || 1)
     const [fetchStocks, { data, isLoading, error }] =
         useFilterControllerApplyFilterDirectlyMutation()
-    const stocks = useSelector((state: RootState) => state.stock.simpleResults)
+    const stocks = useSelector((state: RootState) => state.stock.simpleResults.stocks || [])
+    const totalResults = useSelector((state: RootState) => state.stock.simpleResults.total || 0)
     const savedStockCriteria = useSelector((state: RootState) => state.stock.simpleCriteria)
 
     const handleSubmit = (criteria: SimpleStockCriteria) => {
         fetchStocks({
             createFilterDto: { ...criteria, user: '' },
-            skip: (page - 1) * pageSize,
-            limit: pageSize,
+            page, // Pass the page here
+            limit: pageSize, // Pass the limit here
         })
     }
 
@@ -40,8 +40,8 @@ const SimpleStockList = () => {
         navigate(`/stocks/page/${page}`)
         fetchStocks({
             createFilterDto: savedStockCriteria,
-            skip: (page - 1) * pageSize,
-            limit: pageSize,
+            page, // Pass the current page
+            limit: pageSize, // Set the limit per page
         })
     }, [fetchStocks, navigate, page, savedStockCriteria])
 
@@ -50,16 +50,24 @@ const SimpleStockList = () => {
     }
 
     const handleNextPage = () => {
-        setPage((currentPage) => currentPage + 1)
+        const maxPage = Math.ceil(totalResults / pageSize)
+        setPage((currentPage) => Math.min(currentPage + 1, maxPage))
     }
 
     const renderPagesButtons = () => {
+        const maxPage = Math.ceil(totalResults / pageSize)
+
         return (
             <div className="flex-1 flex justify-between mb-3">
                 <button onClick={handlePreviousPage} disabled={page === 1}>
                     Previous page
                 </button>
-                <button onClick={handleNextPage}>Next page</button>
+                <span>
+                    Page {page} of {maxPage}
+                </span>
+                <button onClick={handleNextPage} disabled={page >= maxPage}>
+                    Next page
+                </button>
             </div>
         )
     }
@@ -80,7 +88,7 @@ const SimpleStockList = () => {
                 {error && <h2>Error: {String(error)}</h2>}
                 {stocks && !stocks.length && <h2>No stocks found</h2>}
                 {renderPagesButtons()}
-                {stocks && stocks.length && renderStocks(stocks)}
+                {stocks && stocks.length > 0 && renderStocks(stocks)}
                 {renderPagesButtons()}
             </div>
         </div>
