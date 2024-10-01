@@ -3,8 +3,8 @@ import { useStocksControllerGetGroupMetricsQuery } from '../services/beGenerated
 
 const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
     const [periodType, setPeriodType] = useState('annual')
-    const [page, setPage] = useState(1) // State for pagination
-    const limit = 7 // Limit per page
+    const [page, setPage] = useState(1)
+    const limit = 5
 
     const { data, error, isLoading } = useStocksControllerGetGroupMetricsQuery({
         symbol,
@@ -35,7 +35,7 @@ const GroupMetricsTable = ({ symbol, onLoadComplete }) => {
         return <p>Error loading group metrics: {error.message}</p>
     }
 
-    const metrics = data?.metrics || []
+    const metrics = [...(data?.metrics || [])].reverse()
     const total = data?.total || 0
 
     return (
