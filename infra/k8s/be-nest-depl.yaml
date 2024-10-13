@@ -14,7 +14,7 @@ spec:
         spec:
             containers:
                 - name: be-nest
-                  image: mrodl/stocks-be-nest:0.0.29
+                  image: mrodl/stocks-be-nest:0.0.30
                   imagePullPolicy: Always
                   resources:
                       limits:

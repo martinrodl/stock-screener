@@ -81,4 +81,41 @@ export class StocksService {
     }
     return stock.actualValues;
   }
+
+  async updateFullQuote(symbol: string): Promise<StockDocument> {
+    const apiKey = process.env.API_KEY;
+    const url = `https://financialmodelingprep.com/api/v3/quote/${symbol}?apikey=${apiKey}`;
+    try {
+      const response = await firstValueFrom(new HttpService().get(url));
+      const stockData = response.data[0];
+
+      if (!stockData) {
+        throw new NotFoundException(
+          `Quote for stock symbol ${symbol} not found`,
+        );
+      }
+
+      const updatedProperties: Partial<Stock> = {};
+
+      if (stockData.price !== undefined) {
+        updatedProperties.price = stockData.price;
+      }
+
+      if (stockData.marketCap !== undefined) {
+        updatedProperties.marketCap = stockData.marketCap;
+      }
+
+      if (stockData.pe !== undefined) {
+        updatedProperties.pe = stockData.pe;
+      }
+
+      if (Object.keys(updatedProperties).length > 0) {
+        await this.stocksRepository.update(symbol, updatedProperties);
+      }
+      return stockData;
+    } catch (error) {
+      console.error('Error updating stock quote:', error);
+      throw new Error('Failed to update stock quote');
+    }
+  }
 }

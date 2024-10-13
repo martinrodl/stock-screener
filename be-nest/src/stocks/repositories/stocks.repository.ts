@@ -50,6 +50,15 @@ export class StocksRepository {
       .exec();
   }
 
+  async updateStockProperties(
+    stockId: string,
+    updatedProperties: Partial<Stock>,
+  ): Promise<StockDocument> {
+    return this.stockModel
+      .findByIdAndUpdate(stockId, { $set: updatedProperties }, { new: true })
+      .exec();
+  }
+
   async delete(symbol: string): Promise<Stock> {
     return this.stockModel.findOneAndDelete({ symbol }).exec();
   }

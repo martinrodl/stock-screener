@@ -73,6 +73,7 @@ export class StocksController {
     await this.metricsService.saveMetrics(symbol);
     await this.analystRatingsService.saveAnalystRatings(symbol);
     await this.countedService.updateStockValues(symbol, periodType);
+    await this.stocksService.updateFullQuote(symbol);
   }
 
   @Post('update/counted/:symbol')
