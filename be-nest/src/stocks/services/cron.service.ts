@@ -26,7 +26,7 @@ export class CronService implements OnModuleInit {
     private readonly etfService: ETFService,
   ) {}
 
-  @Cron('0 0 1 1 *') // every month on the 1st
+  @Cron('0 * * * *') // Cron run every hour
   async updateStocksList() {
     console.log('Running scheduled task to update stock lists');
     const stockExchanges = Object.values(StockExchange);

@@ -1,3 +1,5 @@
+// https://financialmodelingprep.com/api/v3/stock/list?apikey={API_KEY}
+
 export enum StockExchange {
   NYSE = 'NYSE',
   NASDAQ = 'NASDAQ',
@@ -11,4 +13,7 @@ export enum StockExchange {
   ASX = 'ASX',
   BSE = 'BSE',
   NSE = 'NSE',
+  WSE = 'WSE',
+  PRA = 'PRA',
+  JPX = 'JPX',
 }
