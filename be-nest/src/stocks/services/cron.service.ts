@@ -179,7 +179,11 @@ export class CronService implements OnModuleInit {
       console.log(
         'Found progress from the last run. Resuming updateAllStockValues...',
       );
-      this.updateAllStockValues(); // Resume the task
+
+      setTimeout(() => {
+        this.updateAllStockValues(); // Resume the task
+      }, 0);
     }
+    console.log('Finish onModuleInit. ');
   }
 }
